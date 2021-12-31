@@ -1,57 +1,71 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import React, {Key, ReactText} from 'react';
+import {DownOutlined, ReadOutlined, SearchOutlined} from "@ant-design/icons";
+import {Tree} from "antd";
+import 'antd/dist/antd.css';
 
-function App() {
+const App = () => {
+  const treeData = [
+    {
+      title: "Read",
+      key: '0-0',
+      icon: <ReadOutlined />,
+      children: [
+        {
+          title: (<span style={{fontWeight: "bold"}}>In this section, you can search read the full Bible, or you can just read selected passages from the Bible.</span>),
+          key: '0-0-0',
+          selectable: false
+        },
+        {
+          title: 'Read Chapter',
+          key: '0-0-1',
+        },
+        {
+          title: 'Browse',
+          key: '0-0-2',
+        },
+      ],
+    },
+    {
+      title: 'Search',
+      key: '0-1',
+      icon: <SearchOutlined />,
+      children: [
+        {
+          title: (<span style={{fontWeight: "bold"}}>In this section, you can search the full bible for any word or phrase, including wildcards. The search can be performed in the Old Testament, New Testament or the Full Bible, or you can limit the search to a particular book of the Bible. Additionally, you can search any of the supported translations of the Bible.</span>),
+          key: '0-1-0',
+          selectable: false
+        },
+        {
+          title: 'Search Full Bible',
+          key: '0-1-1',
+        },
+        {
+          title: 'Browse',
+          key: '0-1-2',
+        },
+      ],
+    },
+  ];
+  const handleExpand = (expandedKeys: ReactText[], info: {expanded: any, node: any}) => {
+    console.log('handleExpand - expandedKeys:');
+    console.log(expandedKeys);
+    console.log('expanded:');
+    console.log(info.expanded);
+    console.log('node:');
+    console.log(info.node);
+  };
+  const handleSelect = (selectedKeys: Key[]) => {
+    console.log("handleSelect - selectedKeys:");
+    console.log(selectedKeys);
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+      <Tree
+          showIcon
+          switcherIcon={<DownOutlined />}
+          treeData={treeData}
+          onExpand={handleExpand}
+          onSelect={handleSelect}
+      />
   );
 }
 
