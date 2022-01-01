@@ -1,11 +1,13 @@
 import {Redirect, Route, Switch, useHistory} from "react-router-dom";
 import 'antd/dist/antd.css';
 import MainMenu from "./pages/MainMenu";
-import {Breadcrumb, Layout, Menu} from "antd";
+import {Layout, Menu} from "antd";
 import About from "./pages/About";
+import PracticeSetup from "./pages/PracticeSetup";
+import Practice from "./pages/Practice";
 
 const App = () => {
-    let history = useHistory();
+    const history = useHistory();
     const { Header, Content, Footer } = Layout;
     const menuItems = [
         {
@@ -67,11 +69,7 @@ const App = () => {
                     {menuItems.map(item => (<Menu.Item key={item.key} onClick={() => handleMenuItem(item)}>{item.label}</Menu.Item>))}
                 </Menu>
             </Header>
-            <Content style={{ padding: '0 50px' }}>
-                <Breadcrumb style={{ margin: '16px 0' }}>
-                    <Breadcrumb.Item>Home</Breadcrumb.Item>
-                    <Breadcrumb.Item>Main Menu</Breadcrumb.Item>
-                </Breadcrumb>
+            <Content style={{ padding: '0 50px', marginTop: '20px' }}>
                 <div className="site-layout-content">
                     <Switch>
                         <Route path="/" exact>
@@ -82,6 +80,12 @@ const App = () => {
                         </Route>
                         <Route path="/about" exact>
                             <About/>
+                        </Route>
+                        <Route path="/practiceSetup" exact>
+                            <PracticeSetup/>
+                        </Route>
+                        <Route path="/practice" exact>
+                            <Practice/>
                         </Route>
                     </Switch>
                 </div>
