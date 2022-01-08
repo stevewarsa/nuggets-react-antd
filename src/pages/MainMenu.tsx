@@ -10,8 +10,13 @@ import {
 } from "@ant-design/icons";
 import {Collapse, List, Space} from "antd";
 import 'antd/dist/antd.css';
+import {useHistory} from "react-router-dom";
+import {useDispatch} from "react-redux";
+import {stateActions} from "../store";
 
 const MainMenu = () => {
+    const history = useHistory();
+    const dispatcher = useDispatch();
     const { Panel } = Collapse;
     const menuItems = [
         {
@@ -298,6 +303,8 @@ const MainMenu = () => {
     const handleSelect = (item: {key: string, label: string, action: string}) => {
         console.log("handleSelect - item:");
         console.log(item);
+        history.push(item.action);
+        dispatcher(stateActions.setSelectedMenuToPracticeSetup());
     };
     return (
         <Collapse accordion>

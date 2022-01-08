@@ -5,9 +5,15 @@ import {Layout, Menu} from "antd";
 import About from "./pages/About";
 import PracticeSetup from "./pages/PracticeSetup";
 import Practice from "./pages/Practice";
+import {useDispatch, useSelector} from "react-redux";
+import {AppState} from "./model/AppState";
+import {stateActions} from "./store";
 
 const App = () => {
     const history = useHistory();
+    const dispatcher = useDispatch();
+    const selectedMenu = useSelector((state: AppState) => state.selectedMenuKey);
+    console.log("App - selectedMenu from store is " + selectedMenu);
     const { Header, Content, Footer } = Layout;
     const menuItems = [
         {
@@ -60,12 +66,13 @@ const App = () => {
     const handleMenuItem = (item: {key: number, label: string, path: string}) => {
         console.log(item.label);
         history.push(item.path);
+        dispatcher(stateActions.setSelectedMenuItem(item.key));
     }
 
     return (
         <Layout className="layout">
             <Header>
-                <Menu theme="light" mode="horizontal" defaultSelectedKeys={['1']}>
+                <Menu theme="light" mode="horizontal" selectedKeys={[selectedMenu.toString()]} defaultSelectedKeys={['1']}>
                     {menuItems.map(item => (<Menu.Item key={item.key} onClick={() => handleMenuItem(item)}>{item.label}</Menu.Item>))}
                 </Menu>
             </Header>

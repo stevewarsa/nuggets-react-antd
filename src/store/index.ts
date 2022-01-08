@@ -3,7 +3,8 @@ import {AppState} from "../model/AppState";
 
 const initialState: AppState = {
     practiceConfig: {},
-    memPassageList: []
+    memPassageList: [],
+    selectedMenuKey: 1
 } as AppState;
 
 const state = createSlice({
@@ -19,6 +20,15 @@ const state = createSlice({
             console.log("setMemPassageList (reducer). Incoming action is:");
             console.log(action);
             state.memPassageList = action.payload;
+        },
+        setSelectedMenuToPracticeSetup(state) {
+            console.log("setSelectedMenuToPracticeSetup (reducer)");
+            state.selectedMenuKey = 2;
+        },
+        setSelectedMenuItem(state, action) {
+            console.log("setSelectedMenuItem (reducer) - action is:");
+            console.log(action);
+            state.selectedMenuKey = action.payload;
         }
     }
 });
