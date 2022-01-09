@@ -301,8 +301,8 @@ const MainMenu = () => {
         }
     ];
     const handleSelect = (item: {key: string, label: string, action: string}) => {
-        console.log("handleSelect - item:");
-        console.log(item);
+        // console.log("handleSelect - item:");
+        // console.log(item);
         history.push(item.action);
         dispatcher(stateActions.setSelectedMenuToPracticeSetup());
     };

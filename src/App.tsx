@@ -13,7 +13,7 @@ const App = () => {
     const history = useHistory();
     const dispatcher = useDispatch();
     const selectedMenu = useSelector((state: AppState) => state.selectedMenuKey);
-    console.log("App - selectedMenu from store is " + selectedMenu);
+    // console.log("App - selectedMenu from store is " + selectedMenu);
     const { Header, Content, Footer } = Layout;
     const menuItems = [
         {
@@ -64,7 +64,7 @@ const App = () => {
     ];
 
     const handleMenuItem = (item: {key: number, label: string, path: string}) => {
-        console.log(item.label);
+        // console.log(item.label);
         history.push(item.path);
         dispatcher(stateActions.setSelectedMenuItem(item.key));
     }

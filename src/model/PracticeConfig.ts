@@ -1,4 +1,4 @@
 export interface PracticeConfig {
-    practiceMode: number;
-    passageDisplayOrder: number;
+    practiceMode: string;
+    passageDisplayOrder: string;
 }

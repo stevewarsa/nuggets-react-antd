@@ -5,18 +5,19 @@ import {stateActions} from "../store";
 import {PracticeConfig} from "../model/PracticeConfig";
 import {useHistory} from "react-router-dom";
 import {useDispatch} from "react-redux";
+import {PassageUtils} from "../helpers/passage-utils";
 
 const PracticeSetup = () => {
     const history = useHistory();
     const dispatcher = useDispatch();
-    const [practiceMode, setPracticeMode] = useState(1);
-    const [passageDisplayOrder, setPassageDisplayOrder] = useState(1);
+    const [practiceMode, setPracticeMode] = useState(PassageUtils.BY_REF);
+    const [passageDisplayOrder, setPassageDisplayOrder] = useState(PassageUtils.BY_FREQ);
 
     const handlePracticeModeChange = (e: any) => {
-        setPracticeMode(parseInt(e.target.value));
+        setPracticeMode(e.target.value);
     };
     const handlePassageDisplayOrderChange = (e: any) => {
-        setPassageDisplayOrder(parseInt(e.target.value));
+        setPassageDisplayOrder(e.target.value);
     };
 
     const handleStart = () => {
@@ -33,8 +34,8 @@ const PracticeSetup = () => {
             <Row style={{marginBottom: '20px'}}>
                 <Radio.Group onChange={handlePracticeModeChange} value={practiceMode}>
                     <Space direction="vertical">
-                        <Radio checked={practiceMode === 1} value={1}>By Reference</Radio>
-                        <Radio checked={practiceMode === 2} value={2}>By Passage Text</Radio>
+                        <Radio checked={practiceMode === PassageUtils.BY_REF} value={PassageUtils.BY_REF}>By Reference</Radio>
+                        <Radio checked={practiceMode === PassageUtils.BY_PSG_TXT} value={PassageUtils.BY_PSG_TXT}>By Passage Text</Radio>
                     </Space>
                 </Radio.Group>
             </Row>
@@ -44,9 +45,9 @@ const PracticeSetup = () => {
             <Row style={{marginBottom: '20px'}}>
                 <Radio.Group onChange={handlePassageDisplayOrderChange} value={passageDisplayOrder}>
                     <Space direction="vertical">
-                        <Radio value={1}>By Frequency</Radio>
-                        <Radio value={2}>By Random</Radio>
-                        <Radio value={3}>By Last Practiced Date/Time</Radio>
+                        <Radio value={PassageUtils.BY_FREQ}>By Frequency</Radio>
+                        <Radio value={PassageUtils.RAND}>By Random</Radio>
+                        <Radio value={PassageUtils.BY_LAST_PRACTICED}>By Last Practiced Date/Time</Radio>
                     </Space>
                 </Radio.Group>
             </Row>

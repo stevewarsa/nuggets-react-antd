@@ -1,5 +1,6 @@
 import {configureStore, createSlice} from "@reduxjs/toolkit";
 import {AppState} from "../model/AppState";
+import {Verse} from "../model/verse";
 
 const initialState: AppState = {
     practiceConfig: {},
@@ -12,22 +13,28 @@ const state = createSlice({
     initialState: initialState,
     reducers: {
         setPracticeConfig(state, action) {
-            console.log("setPracticeConfig (reducer).  Incoming action is:");
-            console.log(action);
+            // console.log("setPracticeConfig (reducer).  Incoming action is:");
+            // console.log(action);
             state.practiceConfig = action.payload;
         },
         setMemPassageList(state, action) {
-            console.log("setMemPassageList (reducer). Incoming action is:");
-            console.log(action);
+            // console.log("setMemPassageList (reducer). Incoming action is:");
+            // console.log(action);
             state.memPassageList = action.payload;
         },
+        setVersesForMemoryPassage(state, action) {
+            // console.log("setVersesForMemoryPassage (reducer). Incoming action is:");
+            // console.log(action);
+            const updateVersesActionPayload: {index: number, verses: Verse[]} = action.payload;
+            state.memPassageList[updateVersesActionPayload.index].verses = updateVersesActionPayload.verses;
+        },
         setSelectedMenuToPracticeSetup(state) {
-            console.log("setSelectedMenuToPracticeSetup (reducer)");
+            // console.log("setSelectedMenuToPracticeSetup (reducer)");
             state.selectedMenuKey = 2;
         },
         setSelectedMenuItem(state, action) {
-            console.log("setSelectedMenuItem (reducer) - action is:");
-            console.log(action);
+            // console.log("setSelectedMenuItem (reducer) - action is:");
+            // console.log(action);
             state.selectedMenuKey = action.payload;
         }
     }
