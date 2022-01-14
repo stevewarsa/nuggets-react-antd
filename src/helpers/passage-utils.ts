@@ -253,9 +253,9 @@ export class PassageUtils {
     let verseLen: number = passage.verses.length;
     let verseText: string = "";
     if (passage.passageRefAppendLetter && passage.passageRefAppendLetter.length > 0) {
-      verseText += this.getPassageStringNoIndex(passage, null, true, passage.passageRefAppendLetter);
+      verseText += this.getPassageStringNoIndex(passage, true, passage.passageRefAppendLetter);
     } else {
-      verseText += this.getPassageStringNoIndex(passage, null, true);
+      verseText += this.getPassageStringNoIndex(passage, true);
     }
     verseText += "\n\n";
     for (let i = 0; i < verseLen; i++) {
@@ -292,7 +292,7 @@ export class PassageUtils {
     return stringToModify;
   }
 
-  public static getPassageStringNoIndex(passage: Passage, transl: string, translShort: boolean, appendLetter?: string) {
+  public static getPassageStringNoIndex(passage: Passage, translShort: boolean, appendLetter?: string) {
     let verseNumbers: string;
     if (passage.startVerse === passage.endVerse) {
       verseNumbers = passage.startVerse + "";
@@ -310,11 +310,11 @@ export class PassageUtils {
     } else {
       regularBook = Constants.booksByNum[passage.bookId];
     }
-    if (passage.translationId) {
+    if (passage.translationId || passage.translationName) {
       if (translShort) {
-        return regularBook + " " + passage.chapter + ":" + verseNumbers + " (" + passage.translationId + ")";
+        return regularBook + " " + passage.chapter + ":" + verseNumbers + " (" + (passage.translationId ? passage.translationId : passage.translationName) + ")";
       } else {
-        return regularBook + " " + passage.chapter + ":" + verseNumbers + " (" + Constants.translationMediumNames[passage.translationId] + ")";
+        return regularBook + " " + passage.chapter + ":" + verseNumbers + " (" + Constants.translationMediumNames[(passage.translationId ? passage.translationId : passage.translationName)] + ")";
       }
     } else {
       return regularBook + " " + passage.chapter + ":" + verseNumbers;

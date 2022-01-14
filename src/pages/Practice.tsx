@@ -6,7 +6,7 @@ import SpinnerTimer from "../components/SpinnerTimer";
 import {Passage} from "../model/passage";
 import {PassageUtils} from "../helpers/passage-utils";
 import {Button, Col, Row, Space} from "antd";
-import {ArrowLeftOutlined, ArrowRightOutlined} from "@ant-design/icons";
+import {ArrowLeftOutlined, ArrowRightOutlined, CheckSquareOutlined, QuestionCircleOutlined} from "@ant-design/icons";
 import {Constants} from "../model/constants";
 
 const Practice = () => {
@@ -16,7 +16,9 @@ const Practice = () => {
     const [busy, setBusy] = useState({state: false, message: ""});
     const [practiceState, setPracticeState] = useState({
         memPassageList: [],
-        currentIndex: 0
+        currentIndex: 0,
+        showPsgRef: practiceConfig.practiceMode === PassageUtils.BY_REF,
+        showingQuestion: true
     } as PracticeState);
 
     const updatePassageInList = (passage: Passage) => {
@@ -47,22 +49,26 @@ const Practice = () => {
             return;
         }
 
-        if (!currPassage.verses || currPassage.verses.length === 0) {
-            const override = memTextOverrides.find(p => p.passageId === currPassage.passageId);
-            if (override) {
-                updatePassageInList(override);
-            } else {
-                setBusy({
-                    state: true,
-                    message: "Calling server to get passage " + (practiceState.currentIndex + 1) + " with passage id " +
-                        currPassage.passageId + "..."
-                });
-                console.log("displayPassageOnScreen - currPassage has no verses, so calling server to get verses");
-                const locMemoryPassageData: any = await memoryService.getPassage(currPassage, Constants.USER);
-                console.log("displayPassageOnScreen - back from getting passage text.  Here is the data returned:");
-                console.log(locMemoryPassageData.data);
-                updatePassageInList(locMemoryPassageData.data);
-                setBusy({state: false, message: ""});
+        if (practiceState.showPsgRef) {
+            // if we are showing the passage ref, we don't need to retrieve the verses (unnecessary http call)
+        } else {
+            if (!currPassage.verses || currPassage.verses.length === 0) {
+                const override = memTextOverrides.find(p => p.passageId === currPassage.passageId);
+                if (override) {
+                    updatePassageInList(override);
+                } else {
+                    setBusy({
+                        state: true,
+                        message: "Calling server to get passage " + (practiceState.currentIndex + 1) + " with passage id " +
+                            currPassage.passageId + "..."
+                    });
+                    console.log("displayPassageOnScreen - currPassage has no verses, so calling server to get verses");
+                    const locMemoryPassageData: any = await memoryService.getPassage(currPassage, Constants.USER);
+                    console.log("displayPassageOnScreen - back from getting passage text.  Here is the data returned:");
+                    console.log(locMemoryPassageData.data);
+                    updatePassageInList(locMemoryPassageData.data);
+                    setBusy({state: false, message: ""});
+                }
             }
         }
     };
@@ -74,6 +80,15 @@ const Practice = () => {
             console.log("Inside call server - calling memoryService.getMemoryPsgList()...");
             const locMemoryPassagesData: any = await memoryService.getMemoryPsgList(Constants.USER);
             console.log("Inside call server - BACK FROM calling memoryService.getMemoryPsgList()...");
+            // update the "append letter" if there is one
+            if (memTextOverrides && memTextOverrides.length > 0) {
+                locMemoryPassagesData.data.forEach(psg => {
+                    const foundOverride = memTextOverrides.find(o => o.passageId === psg.passageId);
+                    if (foundOverride) {
+                        psg.passageRefAppendLetter = foundOverride.passageRefAppendLetter;
+                    }
+                });
+            }
             let tempPassages: Passage[] = PassageUtils.sortAccordingToPracticeConfig(practiceConfig.passageDisplayOrder, locMemoryPassagesData.data);
             // if user is practicing by frequency, make it more challenging by randomizing
             // the passages within each frequency group
@@ -92,24 +107,32 @@ const Practice = () => {
     useEffect(() => {
         console.log("useEffect - calling displayPassageOnScreen()...");
         displayPassageOnScreen();
-    }, [practiceState.memPassageList[practiceState.currentIndex]]);
+    }, [practiceState.memPassageList[practiceState.currentIndex], practiceState.showingQuestion]);
 
     const handlePrev = () => {
         setPracticeState(prev => {
+            const showingPsgRef = practiceConfig.practiceMode === PassageUtils.BY_REF;
             if (prev.currentIndex === 0) {
-                return {...prev, currentIndex: prev.memPassageList.length - 1};
+                return {...prev, currentIndex: prev.memPassageList.length - 1, showingQuestion: true, showPsgRef: showingPsgRef};
             } else {
-                return {...prev, currentIndex: prev.currentIndex - 1};
+                return {...prev, currentIndex: prev.currentIndex - 1, showingQuestion: true, showPsgRef: showingPsgRef};
             }
         });
     };
     const handleNext = () => {
         setPracticeState(prev => {
+            const showingPsgRef = practiceConfig.practiceMode === PassageUtils.BY_REF;
             if (prev.currentIndex === (prev.memPassageList.length - 1)) {
-                return {...prev, currentIndex: 0};
+                return {...prev, currentIndex: 0, showingQuestion: true, showPsgRef: showingPsgRef};
             } else {
-                return {...prev, currentIndex: prev.currentIndex + 1};
+                return {...prev, currentIndex: prev.currentIndex + 1, showingQuestion: true, showPsgRef: showingPsgRef};
             }
+        });
+    };
+
+    const handleToggleAnswer = () => {
+        setPracticeState(prev => {
+            return {...prev, showingQuestion: !prev.showingQuestion, showPsgRef: !prev.showPsgRef};
         });
     };
 
@@ -122,14 +145,16 @@ const Practice = () => {
             </Row>
             <Row>
                 <Space>
-                <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
-                <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
+                    <Col span={6}><Button icon={practiceState.showingQuestion ? <QuestionCircleOutlined /> : <CheckSquareOutlined />} onClick={handleToggleAnswer}/></Col>
+                    <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
+                    <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
                 </Space>
             </Row>
-            {practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex && practiceState.memPassageList[practiceState.currentIndex].verses && practiceState.memPassageList[practiceState.currentIndex].verses.length ?
+            {practiceState.showPsgRef && practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex && practiceState.memPassageList[practiceState.currentIndex] &&
+                <p dangerouslySetInnerHTML={{__html: PassageUtils.getPassageStringNoIndex(practiceState.memPassageList[practiceState.currentIndex], true, practiceState.memPassageList[practiceState.currentIndex].passageRefAppendLetter)}}/>
+            }
+            {!practiceState.showPsgRef && practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex && practiceState.memPassageList[practiceState.currentIndex].verses && practiceState.memPassageList[practiceState.currentIndex].verses.length &&
                 <p dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(practiceState.memPassageList[practiceState.currentIndex], false)}}/>
-                :
-                <p>No passage text loaded</p>
             }
         </>
     );
@@ -137,5 +162,7 @@ const Practice = () => {
 interface PracticeState {
     currentIndex: number;
     memPassageList: Passage[];
+    showPsgRef: boolean;
+    showingQuestion: boolean;
 }
 export default Practice;
