@@ -6,6 +6,8 @@ import {PracticeConfig} from "../model/PracticeConfig";
 import {useHistory} from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {PassageUtils} from "../helpers/passage-utils";
+import memoryService from "../services/memory-service";
+import {Constants} from "../model/constants";
 
 const PracticeSetup = () => {
     const history = useHistory();
@@ -20,9 +22,11 @@ const PracticeSetup = () => {
         setPassageDisplayOrder(e.target.value);
     };
 
-    const handleStart = () => {
+    const handleStart = async () => {
         console.log("Handle Start");
         dispatcher(stateActions.setPracticeConfig({practiceMode: practiceMode, passageDisplayOrder: passageDisplayOrder} as PracticeConfig));
+        const locMemoryPassageOverridesData: any = await memoryService.getMemoryPassageTextOverrides(Constants.USER);
+        dispatcher(stateActions.setMemoryTextOverrides(locMemoryPassageOverridesData.data));
         history.push("/practice");
     }
 

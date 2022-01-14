@@ -5,6 +5,7 @@ import {Verse} from "../model/verse";
 const initialState: AppState = {
     practiceConfig: {},
     memPassageList: [],
+    memTextOverrides: [],
     selectedMenuKey: 1
 } as AppState;
 
@@ -36,6 +37,9 @@ const state = createSlice({
             // console.log("setSelectedMenuItem (reducer) - action is:");
             // console.log(action);
             state.selectedMenuKey = action.payload;
+        },
+        setMemoryTextOverrides(state, action) {
+            state.memTextOverrides = action.payload;
         }
     }
 });
