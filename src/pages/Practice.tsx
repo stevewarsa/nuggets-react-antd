@@ -152,10 +152,10 @@ const Practice = () => {
                     </Space>
                 </Row>
                 {practiceState.showPsgRef && practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex && practiceState.memPassageList[practiceState.currentIndex] &&
-                    <p style={{textAlign: "center"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(practiceState.memPassageList[practiceState.currentIndex], practiceState.currentIndex, practiceState.memPassageList.length, Constants.translationsShortNms.filter(t => t.code === practiceState.memPassageList[practiceState.currentIndex].translationName).map(t => t.translationName)[0], true, true, practiceState.memPassageList[practiceState.currentIndex].passageRefAppendLetter)}}/>
+                    <p className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(practiceState.memPassageList[practiceState.currentIndex], practiceState.currentIndex, practiceState.memPassageList.length, Constants.translationsShortNms.filter(t => t.code === practiceState.memPassageList[practiceState.currentIndex].translationName).map(t => t.translationName)[0], true, true, practiceState.memPassageList[practiceState.currentIndex].passageRefAppendLetter)}}/>
                 }
                 {!practiceState.showPsgRef && practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex && practiceState.memPassageList[practiceState.currentIndex].verses && practiceState.memPassageList[practiceState.currentIndex].verses.length &&
-                    <p style={{textAlign: "center"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(practiceState.memPassageList[practiceState.currentIndex], false)}}/>
+                    <p className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(practiceState.memPassageList[practiceState.currentIndex], false)}}/>
                 }
             </Swipe>
         </>
