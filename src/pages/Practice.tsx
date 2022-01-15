@@ -8,6 +8,7 @@ import {PassageUtils} from "../helpers/passage-utils";
 import {Button, Col, Row, Space} from "antd";
 import {ArrowLeftOutlined, ArrowRightOutlined, CheckSquareOutlined, QuestionCircleOutlined} from "@ant-design/icons";
 import {Constants} from "../model/constants";
+import Swipe from "react-easy-swipe";
 
 const Practice = () => {
     const dispatch = useDispatch();
@@ -140,9 +141,7 @@ const Practice = () => {
         <>
             {busy.state && <SpinnerTimer message={busy.message} />}
             <h3>Memory Verses</h3>
-            <Row>
-                <Col span={24}>{practiceState.currentIndex + 1} of {practiceState.memPassageList.length}</Col>
-            </Row>
+            <Swipe onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
             <Row>
                 <Space>
                     <Col span={6}><Button icon={practiceState.showingQuestion ? <QuestionCircleOutlined /> : <CheckSquareOutlined />} onClick={handleToggleAnswer}/></Col>
@@ -151,11 +150,12 @@ const Practice = () => {
                 </Space>
             </Row>
             {practiceState.showPsgRef && practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex && practiceState.memPassageList[practiceState.currentIndex] &&
-                <p dangerouslySetInnerHTML={{__html: PassageUtils.getPassageStringNoIndex(practiceState.memPassageList[practiceState.currentIndex], true, practiceState.memPassageList[practiceState.currentIndex].passageRefAppendLetter)}}/>
+                <p style={{textAlign: "center"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(practiceState.memPassageList[practiceState.currentIndex], practiceState.currentIndex, practiceState.memPassageList.length, Constants.translationsShortNms.filter(t => t.code === practiceState.memPassageList[practiceState.currentIndex].translationName).map(t => t.translationName)[0], true, true, practiceState.memPassageList[practiceState.currentIndex].passageRefAppendLetter)}}/>
             }
             {!practiceState.showPsgRef && practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex && practiceState.memPassageList[practiceState.currentIndex].verses && practiceState.memPassageList[practiceState.currentIndex].verses.length &&
-                <p dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(practiceState.memPassageList[practiceState.currentIndex], false)}}/>
+                <p style={{textAlign: "center"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(practiceState.memPassageList[practiceState.currentIndex], false)}}/>
             }
+            </Swipe>
         </>
     );
 };

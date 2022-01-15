@@ -11,3 +11,23 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.wordsOfChrist {
+  color: #FF0000;
+}
+.verse_num {
+  font-weight: normal;
+  font-size: 0.75em;
+}
+.bible_version {
+  color: #ff24ff;
+}
+
+.search_result {
+  color: #00FF00;
+}
+.nugget-view {
+  font-weight: bold;
+  line-height: 1.25em;
+  font-size: 1.5em;
+  height: 100%;
+}
