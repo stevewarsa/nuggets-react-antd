@@ -7,7 +7,7 @@ class MemoryService {
     }
 
     public getPassage(passage: Passage, user: string) {
-        console.log("MemoryService.getPassage - calling /nuggets/server/get_passage_text.php?user=" + user + "&translation=" + passage.translationName + "&book=" + passage.bookName + "&chapter=" + passage.chapter + "&start=" + passage.startVerse + "&end=" + passage.endVerse);
+        // console.log("MemoryService.getPassage - calling /nuggets/server/get_passage_text.php?user=" + user + "&translation=" + passage.translationName + "&book=" + passage.bookName + "&chapter=" + passage.chapter + "&start=" + passage.startVerse + "&end=" + passage.endVerse);
         return axios.get("/nuggets/server/get_passage_text.php?user=" + user + "&translation=" + passage.translationName + "&book=" + passage.bookName + "&chapter=" + passage.chapter + "&start=" + passage.startVerse + "&end=" + passage.endVerse);
     }
 

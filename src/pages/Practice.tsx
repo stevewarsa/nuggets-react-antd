@@ -59,10 +59,10 @@ const Practice = () => {
                 message: "Calling server to get passage " + (practiceState.currentIndex + 1) + " with passage id " +
                     currPassage.passageId + "..."
             });
-            console.log("populateVerses - currPassage has no verses, so calling server to get verses");
+            // console.log("populateVerses - currPassage has no verses, so calling server to get verses");
             const locMemoryPassageData: any = await memoryService.getPassage(currPassage, Constants.USER);
-            console.log("populateVerses - back from getting passage text.  Here is the data returned:");
-            console.log(locMemoryPassageData.data);
+            // console.log("populateVerses - back from getting passage text.  Here is the data returned:");
+            // console.log(locMemoryPassageData.data);
             if (copyToClipboard) {
                 const clipboardContent = PassageUtils.getPassageForClipboard(locMemoryPassageData.data);
                 if (StringUtils.isEmpty(clipboardContent)) {
@@ -79,11 +79,11 @@ const Practice = () => {
     }
 
     const displayPassageOnScreen = async () => {
-        console.log("displayPassageOnScreen - psgList:");
-        console.log(practiceState.memPassageList);
+        // console.log("displayPassageOnScreen - psgList:");
+        // console.log(practiceState.memPassageList);
         const currPassage = practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex ? practiceState.memPassageList[practiceState.currentIndex] : null;
-        console.log("displayPassageOnScreen - currPassage:");
-        console.log(currPassage);
+        // console.log("displayPassageOnScreen - currPassage:");
+        // console.log(currPassage);
         if (!currPassage || isNaN(currPassage.passageId) || !currPassage.translationName || !memTextOverrides) {
             if (!memTextOverrides) {
                 console.log("displayPassageOnScreen - currPassage (and memTextOverrides) not ready yet - returning");
@@ -106,9 +106,9 @@ const Practice = () => {
     useEffect(() => {
         const callServer = async () => {
             setBusy({state: true, message: "Loading memory passages from DB..."});
-            console.log("Inside call server - calling memoryService.getMemoryPsgList()...");
+            // console.log("Inside call server - calling memoryService.getMemoryPsgList()...");
             const locMemoryPassagesData: any = await memoryService.getMemoryPsgList(Constants.USER);
-            console.log("Inside call server - BACK FROM calling memoryService.getMemoryPsgList()...");
+            // console.log("Inside call server - BACK FROM calling memoryService.getMemoryPsgList()...");
             // update the "append letter" if there is one
             if (memTextOverrides && memTextOverrides.length > 0) {
                 locMemoryPassagesData.data.forEach(psg => {
@@ -124,7 +124,7 @@ const Practice = () => {
             if (practiceConfig.passageDisplayOrder === PassageUtils.BY_FREQ) {
                 tempPassages = PassageUtils.sortWithinFrequencyGroups(tempPassages, PassageUtils.BY_LAST_PRACTICED);
             }
-            console.log("Inside call server - setting memPassageList - there are " + tempPassages.length + " passages returned...");
+            // console.log("Inside call server - setting memPassageList - there are " + tempPassages.length + " passages returned...");
             setPracticeState(prev => {
                 return {...prev, memPassageList: tempPassages};
             });
@@ -134,7 +134,7 @@ const Practice = () => {
     }, [dispatch, practiceConfig]);
 
     useEffect(() => {
-        console.log("useEffect - calling displayPassageOnScreen()...");
+        // console.log("useEffect - calling displayPassageOnScreen()...");
         displayPassageOnScreen();
     }, [practiceState.memPassageList[practiceState.currentIndex], practiceState.showingQuestion]);
 
