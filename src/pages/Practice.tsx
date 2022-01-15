@@ -11,8 +11,6 @@ import {
     ArrowRightOutlined,
     CheckSquareOutlined,
     CopyOutlined,
-    DeleteOutlined,
-    EditOutlined,
     InfoCircleOutlined,
     LinkOutlined,
     MoreOutlined,
@@ -33,7 +31,8 @@ const Practice = () => {
         currentIndex: 0,
         showPsgRef: practiceConfig.practiceMode === PassageUtils.BY_REF,
         showingQuestion: true,
-        infoVisible: false
+        infoVisible: false,
+        interlinearUrl: null
     } as PracticeState);
 
     const updatePassageInList = (passage: Passage) => {
@@ -202,6 +201,17 @@ const Practice = () => {
                 const psgRef = PassageUtils.getPassageString(currPassage, practiceState.currentIndex, practiceState.memPassageList.length, null, false, false, currPassage.passageRefAppendLetter)
                 notification.info({message: psgRef + " copied!", placement: "bottomRight"})
             }
+        } else if (key === "2") {
+            // interlinear link
+            let urlQuery: string;
+            let currPassage = practiceState.memPassageList[practiceState.currentIndex];
+            if (currPassage.startVerse === currPassage.endVerse) {
+                urlQuery = currPassage.bookName + "+" + currPassage.chapter + ":" + currPassage.startVerse + "&t=nas"
+            } else {
+                urlQuery = currPassage.bookName + "+" + currPassage.chapter + ":" + currPassage.startVerse + "-" + currPassage.endVerse + "&t=nas"
+            }
+            window.open("https://www.biblestudytools.com/interlinear-bible/passage/?q=" + urlQuery, '_blank');
+
         }
     };
 
@@ -244,18 +254,18 @@ const Practice = () => {
                                     <Menu.Item key="1" icon={<CopyOutlined/>}>
                                         Copy
                                     </Menu.Item>
-                                    <Menu.Item key="2" icon={<EditOutlined />}>
-                                        Edit
-                                    </Menu.Item>
-                                    <Menu.Item key="3" icon={<DeleteOutlined />}>
-                                        Delete...
-                                    </Menu.Item>
-                                    <Menu.Item key="4" icon={<LinkOutlined />}>
+                                    <Menu.Item key="2" icon={<LinkOutlined />}>
                                         Interlinear View
                                     </Menu.Item>
                                 </Menu>
                             }>
-                                <MoreOutlined style={{borderStyle: "solid", borderWidth: "thin", borderColor: "gray", padding: "7px", backgroundColor: "white"}} />
+                                <MoreOutlined style={{
+                                    borderStyle: "solid",
+                                    borderWidth: "thin",
+                                    borderColor: "gray",
+                                    padding: "7px",
+                                    backgroundColor: "white"
+                                }} />
                             </Dropdown>
                         </Col>
                     </Space>
@@ -276,5 +286,6 @@ interface PracticeState {
     showPsgRef: boolean;
     showingQuestion: boolean;
     infoVisible: boolean;
+    interlinearUrl: string;
 }
 export default Practice;
