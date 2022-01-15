@@ -14,5 +14,9 @@ class MemoryService {
     public getMemoryPassageTextOverrides(user: string) {
         return axios.get("/nuggets/server/get_mempsg_text_overrides.php?user=" + user);
     }
+
+    public getMaxChaptersByBook() {
+        return axios.get("/nuggets/server/get_max_chapter_by_book.php");
+    }
 }
 export default new MemoryService();

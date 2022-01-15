@@ -6,7 +6,8 @@ const initialState: AppState = {
     practiceConfig: {},
     memPassageList: [],
     memTextOverrides: [],
-    selectedMenuKey: 1
+    selectedMenuKey: 1,
+    chapterSelection: null
 } as AppState;
 
 const state = createSlice({
@@ -40,6 +41,11 @@ const state = createSlice({
         },
         setMemoryTextOverrides(state, action) {
             state.memTextOverrides = action.payload;
+        },
+        setChapterSelection(state, action) {
+            console.log("setChapterSelection (reducer) - action payload is:");
+            console.log(action.payload);
+            state.chapterSelection = action.payload;
         }
     }
 });

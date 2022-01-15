@@ -6,4 +6,5 @@ export interface AppState {
     memPassageList: Passage[];
     memTextOverrides: Passage[];
     selectedMenuKey: number;
+    chapterSelection: {book: string, chapter: number, translation: string};
 }

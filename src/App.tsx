@@ -8,6 +8,8 @@ import Practice from "./pages/Practice";
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "./model/AppState";
 import {stateActions} from "./store";
+import SelectChapter from "./pages/SelectChapter";
+import ReadChapter from "./pages/ReadChapter";
 
 const App = () => {
     const history = useHistory();
@@ -49,7 +51,7 @@ const App = () => {
         {
             key: 7,
             label: "View Chapter",
-            path: "/chapterSelection"
+            path: "/selectChapter"
         },
         {
             key: 8,
@@ -93,6 +95,12 @@ const App = () => {
                         </Route>
                         <Route path="/practice" exact>
                             <Practice/>
+                        </Route>
+                        <Route path="/selectChapter" exact>
+                            <SelectChapter/>
+                        </Route>
+                        <Route path="/readChapter" exact>
+                            <ReadChapter/>
                         </Route>
                     </Switch>
                 </div>

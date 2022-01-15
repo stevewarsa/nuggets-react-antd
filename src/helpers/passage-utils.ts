@@ -29,7 +29,7 @@ export class PassageUtils {
     if (newStartVerse < 1) {
       newStartVerse = 1;
     }
-    if (maxVerse != -1 && newEndVerse > maxVerse) {
+    if (maxVerse !== -1 && newEndVerse > maxVerse) {
       newEndVerse = maxVerse;
     }
     let returnPassage: Passage = JSON.parse(JSON.stringify(passage));

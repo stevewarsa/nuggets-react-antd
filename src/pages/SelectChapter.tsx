@@ -1,0 +1,100 @@
+import {Button, Col, Row, Select} from "antd";
+import {useEffect, useState} from "react";
+import {Constants} from "../model/constants";
+import memoryService from "../services/memory-service";
+import {ReadFilled} from "@ant-design/icons";
+import {useDispatch} from "react-redux";
+import {stateActions} from "../store";
+import {useHistory} from "react-router-dom";
+
+const SelectChapter = () => {
+    const dispatcher = useDispatch();
+    const history = useHistory();
+    const {Option} = Select;
+    const [book, setBook] = useState("N/A");
+    const [chapter, setChapter] = useState("N/A");
+    const [translation, setTranslation] = useState("N/A");
+    const [bookChapters, setBookChapters] = useState([]);
+    const [maxChaptersByBook, setMaxChaptersByBook] = useState(null);
+
+    useEffect(() => {
+        const callServer = async () => {
+            const locMaxChaptersByBook = await memoryService.getMaxChaptersByBook();
+            setMaxChaptersByBook(locMaxChaptersByBook.data);
+        };
+        callServer();
+    }, []);
+
+    const handleBookChange = (value) => {
+        console.log(`selected book ${value}`);
+        setBook(value);
+        const maxChapter = maxChaptersByBook.filter(m => m.bookName === value)[0].maxChapter;
+        if (maxChapter > 0) {
+            let chapters = Array.from({length: maxChapter}, (e, i) => i + 1);
+            setBookChapters(chapters);
+        }
+    };
+
+    const handleChapterChange = (value) => {
+        console.log(`selected chapter ${value}`);
+        setChapter(value);
+    };
+
+    const handleTranslationChange = (value) => {
+        console.log(`selected translation ${value}`);
+        setTranslation(value);
+    };
+
+    const handleReadChapter = () => {
+        console.log("handleReadChapter - here are the selections:");
+        console.log("book: " + book + ", chapter: " + chapter + ", translation: " + translation);
+        dispatcher(stateActions.setChapterSelection({book: book, chapter: chapter, translation: translation}));
+        history.push("/readChapter");
+    };
+
+    return (
+        <>
+            <h1>Read Chapter</h1>
+            <Row style={{marginBottom: "5px"}}>
+                <Col span={24}>
+                    <Select style={{width: "100%"}} size="large" defaultValue={book} value={book} onChange={handleBookChange}>
+                        <Option value="N/A">{"--Select Book--"}</Option>
+                        {Object.keys(Constants.bookAbbrev).map(key => (
+                                <Option key={key} value={key}>{Constants.bookAbbrev[key][1]}</Option>
+                            )
+                        )}
+                    </Select>
+                </Col>
+            </Row>
+            <Row style={{marginBottom: "5px"}}>
+                <Col span={24}>
+                    <Select style={{width: "100%"}} size="large" value={chapter} onChange={handleChapterChange}>
+                        <Option value="N/A">{"--Select Chapter--"}</Option>
+                        {bookChapters.map(c => (
+                                <Option key={c} value={c}>{c}</Option>
+                            )
+                        )}
+                    </Select>
+                </Col>
+            </Row>
+            <Row style={{marginBottom: "20px"}}>
+                <Col span={24}>
+                    <Select style={{width: "100%"}} size="large" value={translation} onChange={handleTranslationChange}>
+                        <Option value="N/A">{"--Select Translation--"}</Option>
+                        {Object.keys(Constants.translationLongNames).map(key => (
+                                <Option key={key} value={key}>{Constants.translationLongNames[key]}</Option>
+                            )
+                        )}
+                    </Select>
+                </Col>
+            </Row>
+            <Row style={{marginBottom: "5px"}}>
+                <Col span={24}>
+                    <Button type="primary" icon={<ReadFilled/>} onClick={handleReadChapter}>Read Selected Chapter</Button>
+                </Col>
+            </Row>
+        </>
+    );
+};
+
+export default SelectChapter;
