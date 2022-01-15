@@ -308,7 +308,7 @@ export class PassageUtils {
     if (passage.bookName) {
       regularBook = this.getRegularBook(passage.bookId);
     } else {
-      regularBook = Constants.booksByNum[passage.bookId];
+      regularBook = Constants.bookAbbrev[Constants.booksByNum[passage.bookId]][1];
     }
     if (passage.translationId || passage.translationName) {
       if (translShort) {

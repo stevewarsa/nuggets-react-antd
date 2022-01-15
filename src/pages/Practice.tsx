@@ -69,7 +69,8 @@ const Practice = () => {
                     console.log("populateVerses - Unable to copy passage to clipboard...");
                 } else {
                     copy(clipboardContent);
-                    notification.info({message: "Current passage copied!", placement: "bottomRight"})
+                    const psgRef = PassageUtils.getPassageString(locMemoryPassageData.data, practiceState.currentIndex, practiceState.memPassageList.length, null, false, false, locMemoryPassageData.data.passageRefAppendLetter)
+                    notification.info({message: psgRef + " copied!", placement: "bottomRight"})
                 }
             }
             updatePassageInList(locMemoryPassageData.data);
@@ -198,7 +199,8 @@ const Practice = () => {
                 await populateVerses(currPassage, true);
             } else {
                 copy(clipboardContent);
-                notification.info({message: "Current passage copied!", placement: "bottomRight"})
+                const psgRef = PassageUtils.getPassageString(currPassage, practiceState.currentIndex, practiceState.memPassageList.length, null, false, false, currPassage.passageRefAppendLetter)
+                notification.info({message: psgRef + " copied!", placement: "bottomRight"})
             }
         }
     };
