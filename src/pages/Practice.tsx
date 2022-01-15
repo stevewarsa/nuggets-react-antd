@@ -5,10 +5,23 @@ import memoryService from "../services/memory-service";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {Passage} from "../model/passage";
 import {PassageUtils} from "../helpers/passage-utils";
-import {Button, Col, Row, Space} from "antd";
-import {ArrowLeftOutlined, ArrowRightOutlined, CheckSquareOutlined, QuestionCircleOutlined} from "@ant-design/icons";
+import {notification, Button, Col, Dropdown, Menu, Popover, Row, Space} from "antd";
+import {
+    ArrowLeftOutlined,
+    ArrowRightOutlined,
+    CheckSquareOutlined,
+    CopyOutlined,
+    DeleteOutlined,
+    EditOutlined,
+    InfoCircleOutlined,
+    LinkOutlined,
+    MoreOutlined,
+    QuestionCircleOutlined
+} from "@ant-design/icons";
 import {Constants} from "../model/constants";
 import Swipe from "react-easy-swipe";
+import copy from "copy-to-clipboard";
+import {StringUtils} from "../helpers/string.utils";
 
 const Practice = () => {
     const dispatch = useDispatch();
@@ -19,7 +32,8 @@ const Practice = () => {
         memPassageList: [],
         currentIndex: 0,
         showPsgRef: practiceConfig.practiceMode === PassageUtils.BY_REF,
-        showingQuestion: true
+        showingQuestion: true,
+        infoVisible: false
     } as PracticeState);
 
     const updatePassageInList = (passage: Passage) => {
@@ -34,6 +48,34 @@ const Practice = () => {
             return {...prev, memPassageList: locMemPassageList};
         });
     };
+
+    const populateVerses = async (currPassage: Passage, copyToClipboard: boolean) => {
+        const override = memTextOverrides.find(p => p.passageId === currPassage.passageId);
+        if (override) {
+            updatePassageInList(override);
+        } else {
+            setBusy({
+                state: true,
+                message: "Calling server to get passage " + (practiceState.currentIndex + 1) + " with passage id " +
+                    currPassage.passageId + "..."
+            });
+            console.log("populateVerses - currPassage has no verses, so calling server to get verses");
+            const locMemoryPassageData: any = await memoryService.getPassage(currPassage, Constants.USER);
+            console.log("populateVerses - back from getting passage text.  Here is the data returned:");
+            console.log(locMemoryPassageData.data);
+            if (copyToClipboard) {
+                const clipboardContent = PassageUtils.getPassageForClipboard(locMemoryPassageData.data);
+                if (StringUtils.isEmpty(clipboardContent)) {
+                    console.log("populateVerses - Unable to copy passage to clipboard...");
+                } else {
+                    copy(clipboardContent);
+                    notification.info({message: "Current passage copied!", placement: "bottomRight"})
+                }
+            }
+            updatePassageInList(locMemoryPassageData.data);
+            setBusy({state: false, message: ""});
+        }
+    }
 
     const displayPassageOnScreen = async () => {
         console.log("displayPassageOnScreen - psgList:");
@@ -54,22 +96,7 @@ const Practice = () => {
             // if we are showing the passage ref, we don't need to retrieve the verses (unnecessary http call)
         } else {
             if (!currPassage.verses || currPassage.verses.length === 0) {
-                const override = memTextOverrides.find(p => p.passageId === currPassage.passageId);
-                if (override) {
-                    updatePassageInList(override);
-                } else {
-                    setBusy({
-                        state: true,
-                        message: "Calling server to get passage " + (practiceState.currentIndex + 1) + " with passage id " +
-                            currPassage.passageId + "..."
-                    });
-                    console.log("displayPassageOnScreen - currPassage has no verses, so calling server to get verses");
-                    const locMemoryPassageData: any = await memoryService.getPassage(currPassage, Constants.USER);
-                    console.log("displayPassageOnScreen - back from getting passage text.  Here is the data returned:");
-                    console.log(locMemoryPassageData.data);
-                    updatePassageInList(locMemoryPassageData.data);
-                    setBusy({state: false, message: ""});
-                }
+                await populateVerses(currPassage, false);
             }
         }
     };
@@ -137,6 +164,45 @@ const Practice = () => {
         });
     };
 
+    const handleInfo = () => {
+        setPracticeState(prev => {
+            return {...prev, infoVisible: true};
+        });
+    };
+
+    const handleHideInfo = () => {
+        setPracticeState(prev => {
+            return {...prev, infoVisible: false};
+        });
+    };
+
+    const getFrequency = (psg: Passage) => {
+        if (!psg) {
+            return "N/A";
+        } else {
+            if (psg.frequencyDays === -1) {
+                return "Every Time";
+            } else {
+                return psg.frequencyDays.toString();
+            }
+        }
+    };
+
+    const handleMenuClick = async ({key}) => {
+        if (key === "1") {
+            // copy
+            let currPassage = practiceState.memPassageList[practiceState.currentIndex];
+            let clipboardContent = PassageUtils.getPassageForClipboard(currPassage);
+            if (StringUtils.isEmpty(clipboardContent)) {
+                console.log("calling populateVerses()...");
+                await populateVerses(currPassage, true);
+            } else {
+                copy(clipboardContent);
+                notification.info({message: "Current passage copied!", placement: "bottomRight"})
+            }
+        }
+    };
+
     return (
         <>
             {busy.state && <SpinnerTimer message={busy.message} />}
@@ -144,18 +210,59 @@ const Practice = () => {
                 <h1>Memory Verses</h1>
             </Row>
             <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
+                <Row style={{marginBottom: "10px"}} justify="center" align="middle">
+                    <Col>{practiceState.currentIndex + 1} of {practiceState.memPassageList.length}</Col>
+                    <Col style={{marginLeft: "5px"}}>
+                        <Popover
+                            content={
+                                <>
+                                    <ul>
+                                        <li>Frequency: {getFrequency(practiceState.memPassageList[practiceState.currentIndex])}</li>
+                                        <li>Last Practiced: {practiceState.memPassageList[practiceState.currentIndex]?.last_viewed_str}</li>
+                                    </ul>
+                                    <a onClick={handleHideInfo}>Close</a>
+                                </>
+                            }
+                            title="Additional Info"
+                            trigger="click"
+                            visible={practiceState.infoVisible}
+                        >
+                            <Button icon={<InfoCircleOutlined />} onClick={handleInfo}/>
+                        </Popover>
+                    </Col>
+                </Row>
                 <Row justify="center">
                     <Space>
                         <Col span={6}><Button icon={practiceState.showingQuestion ? <QuestionCircleOutlined /> : <CheckSquareOutlined />} onClick={handleToggleAnswer}/></Col>
                         <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
                         <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
+                        <Col span={6}>
+                            <Dropdown placement="bottomRight" trigger={["click"]} overlay={
+                                <Menu onClick={handleMenuClick}>
+                                    <Menu.Item key="1" icon={<CopyOutlined/>}>
+                                        Copy
+                                    </Menu.Item>
+                                    <Menu.Item key="2" icon={<EditOutlined />}>
+                                        Edit
+                                    </Menu.Item>
+                                    <Menu.Item key="3" icon={<DeleteOutlined />}>
+                                        Delete...
+                                    </Menu.Item>
+                                    <Menu.Item key="4" icon={<LinkOutlined />}>
+                                        Interlinear View
+                                    </Menu.Item>
+                                </Menu>
+                            }>
+                                <MoreOutlined style={{borderStyle: "solid", borderWidth: "thin", borderColor: "gray", padding: "7px", backgroundColor: "white"}} />
+                            </Dropdown>
+                        </Col>
                     </Space>
                 </Row>
                 {practiceState.showPsgRef && practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex && practiceState.memPassageList[practiceState.currentIndex] &&
-                    <p className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(practiceState.memPassageList[practiceState.currentIndex], practiceState.currentIndex, practiceState.memPassageList.length, Constants.translationsShortNms.filter(t => t.code === practiceState.memPassageList[practiceState.currentIndex].translationName).map(t => t.translationName)[0], true, true, practiceState.memPassageList[practiceState.currentIndex].passageRefAppendLetter)}}/>
+                    <p className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(practiceState.memPassageList[practiceState.currentIndex], practiceState.currentIndex, practiceState.memPassageList.length, Constants.translationsShortNms.filter(t => t.code === practiceState.memPassageList[practiceState.currentIndex].translationName).map(t => t.translationName)[0], false, false, practiceState.memPassageList[practiceState.currentIndex].passageRefAppendLetter)}}/>
                 }
                 {!practiceState.showPsgRef && practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex && practiceState.memPassageList[practiceState.currentIndex].verses && practiceState.memPassageList[practiceState.currentIndex].verses.length &&
-                    <p className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(practiceState.memPassageList[practiceState.currentIndex], false)}}/>
+                    <p style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(practiceState.memPassageList[practiceState.currentIndex], false)}}/>
                 }
             </Swipe>
         </>
@@ -166,5 +273,6 @@ interface PracticeState {
     memPassageList: Passage[];
     showPsgRef: boolean;
     showingQuestion: boolean;
+    infoVisible: boolean;
 }
 export default Practice;
