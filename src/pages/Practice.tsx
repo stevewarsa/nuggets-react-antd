@@ -140,21 +140,23 @@ const Practice = () => {
     return (
         <>
             {busy.state && <SpinnerTimer message={busy.message} />}
-            <h3>Memory Verses</h3>
-            <Swipe onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
-            <Row>
-                <Space>
-                    <Col span={6}><Button icon={practiceState.showingQuestion ? <QuestionCircleOutlined /> : <CheckSquareOutlined />} onClick={handleToggleAnswer}/></Col>
-                    <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
-                    <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
-                </Space>
+            <Row justify="center">
+                <h1>Memory Verses</h1>
             </Row>
-            {practiceState.showPsgRef && practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex && practiceState.memPassageList[practiceState.currentIndex] &&
-                <p style={{textAlign: "center"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(practiceState.memPassageList[practiceState.currentIndex], practiceState.currentIndex, practiceState.memPassageList.length, Constants.translationsShortNms.filter(t => t.code === practiceState.memPassageList[practiceState.currentIndex].translationName).map(t => t.translationName)[0], true, true, practiceState.memPassageList[practiceState.currentIndex].passageRefAppendLetter)}}/>
-            }
-            {!practiceState.showPsgRef && practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex && practiceState.memPassageList[practiceState.currentIndex].verses && practiceState.memPassageList[practiceState.currentIndex].verses.length &&
-                <p style={{textAlign: "center"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(practiceState.memPassageList[practiceState.currentIndex], false)}}/>
-            }
+            <Swipe onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
+                <Row justify="center">
+                    <Space>
+                        <Col span={6}><Button icon={practiceState.showingQuestion ? <QuestionCircleOutlined /> : <CheckSquareOutlined />} onClick={handleToggleAnswer}/></Col>
+                        <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
+                        <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
+                    </Space>
+                </Row>
+                {practiceState.showPsgRef && practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex && practiceState.memPassageList[practiceState.currentIndex] &&
+                    <p style={{textAlign: "center"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(practiceState.memPassageList[practiceState.currentIndex], practiceState.currentIndex, practiceState.memPassageList.length, Constants.translationsShortNms.filter(t => t.code === practiceState.memPassageList[practiceState.currentIndex].translationName).map(t => t.translationName)[0], true, true, practiceState.memPassageList[practiceState.currentIndex].passageRefAppendLetter)}}/>
+                }
+                {!practiceState.showPsgRef && practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex && practiceState.memPassageList[practiceState.currentIndex].verses && practiceState.memPassageList[practiceState.currentIndex].verses.length &&
+                    <p style={{textAlign: "center"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(practiceState.memPassageList[practiceState.currentIndex], false)}}/>
+                }
             </Swipe>
         </>
     );
