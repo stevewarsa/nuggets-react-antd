@@ -143,7 +143,7 @@ const Practice = () => {
             <Row justify="center">
                 <h1>Memory Verses</h1>
             </Row>
-            <Swipe onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
+            <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
                 <Row justify="center">
                     <Space>
                         <Col span={6}><Button icon={practiceState.showingQuestion ? <QuestionCircleOutlined /> : <CheckSquareOutlined />} onClick={handleToggleAnswer}/></Col>
