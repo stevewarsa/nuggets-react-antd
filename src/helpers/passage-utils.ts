@@ -205,6 +205,7 @@ export class PassageUtils {
     let verseLen: number = passage.verses.length;
     for (let i = 0; i < verseLen; i++) {
       let verseText: string = "";
+      let plainVerseText: string = "";
       let versePartLen: number = passage.verses[i].verseParts.length;
       for (let j = 0; j < versePartLen; j++) {
         let isMatch = false;
@@ -218,24 +219,29 @@ export class PassageUtils {
           if (isMatch) {
             verseText += "<span class='wordsOfChrist matchNugget'>";
             verseText += passage.verses[i].verseParts[j].verseText + " ";
+            plainVerseText += passage.verses[i].verseParts[j].verseText + " ";
             verseText += "</span>";
           } else {
             verseText += "<span class='wordsOfChrist'>";
             verseText += passage.verses[i].verseParts[j].verseText + " ";
+            plainVerseText += passage.verses[i].verseParts[j].verseText + " ";
             verseText += "</span>";
           }
         } else {
           if (isMatch) {
             verseText += "<span class='matchNugget'>";
             verseText += passage.verses[i].verseParts[j].verseText + " ";
+            plainVerseText += passage.verses[i].verseParts[j].verseText + " ";
             verseText += "</span>";
           } else {
             verseText += passage.verses[i].verseParts[j].verseText + " ";
+            plainVerseText += passage.verses[i].verseParts[j].verseText + " ";
           }
         }
       }
       let currVerse = new VerseNumAndText();
       currVerse.verseText = verseText;
+      currVerse.plainText = plainVerseText;
       currVerse.verseNum = passage.verses[i].verseParts[0].verseNumber;
       verses.push(currVerse);
     }
@@ -329,7 +335,8 @@ export class PassageUtils {
     }
     if (passage.translationId || passage.translationName) {
       if (translShort) {
-        return regularBook + " " + passage.chapter + ":" + verseNumbers + " (" + (passage.translationId ? passage.translationId : passage.translationName) + ")";
+        const matchingTranslation = Constants.translationsShortNms.find(t => t.code === (passage.translationId ? passage.translationId : passage.translationName));
+        return regularBook + " " + passage.chapter + ":" + verseNumbers + " (" + matchingTranslation.translationName + ")";
       } else {
         return regularBook + " " + passage.chapter + ":" + verseNumbers + " (" + Constants.translationMediumNames[(passage.translationId ? passage.translationId : passage.translationName)] + ")";
       }

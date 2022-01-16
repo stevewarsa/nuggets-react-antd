@@ -44,7 +44,7 @@ const ReadChapter = () => {
                 let clipboardString = psgRef + "\n\n";
                 for (let verse of verseSelectionRequest.versesForSelection) {
                     if (verse.verseNum >= passage.startVerse && verse.verseNum <= passage.endVerse) {
-                        clipboardString += verse.verseText;
+                        clipboardString += verse.plainText;
                     }
                 }
                 copy(clipboardString);

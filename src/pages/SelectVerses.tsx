@@ -44,7 +44,7 @@ const SelectVerses = () => {
                         {v.verseNum + ". "}
                     </Col>
                     <Col key={v.verseNum + "vtxt"} span={20}>
-                        {v.verseText}
+                        <p dangerouslySetInnerHTML={{__html: v.verseText}}/>
                     </Col>
                 </Row>
             ))}
