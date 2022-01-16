@@ -22,7 +22,7 @@ const App = () => {
     useEffect(() => {
         const callServer = async () => {
             const locMaxChaptersByBook = await memoryService.getMaxChaptersByBook();
-            dispatcher(stateActions.setMaxChaptersByBook(locMaxChaptersByBook.data))
+            dispatcher(stateActions.setMaxChaptersByBook(locMaxChaptersByBook.data));
         };
         callServer();
     }, []);

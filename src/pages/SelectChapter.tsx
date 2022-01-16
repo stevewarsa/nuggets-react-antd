@@ -10,11 +10,12 @@ import {AppState} from "../model/AppState";
 const SelectChapter = () => {
     const dispatcher = useDispatch();
     const maxChaptersByBook = useSelector((state: AppState) => state.maxChaptersByBook);
+    const chapterConfig = useSelector((state: AppState) => state.chapterSelection);
     const history = useHistory();
     const {Option} = Select;
-    const [book, setBook] = useState("N/A");
-    const [chapter, setChapter] = useState("N/A");
-    const [translation, setTranslation] = useState("N/A");
+    const [book, setBook] = useState(chapterConfig ? chapterConfig.book : "N/A");
+    const [chapter, setChapter] = useState(chapterConfig ? chapterConfig.chapter : "N/A");
+    const [translation, setTranslation] = useState(chapterConfig ? chapterConfig.translation : "N/A");
     const [bookChapters, setBookChapters] = useState([]);
 
     const handleBookChange = (value) => {

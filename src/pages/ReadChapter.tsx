@@ -1,6 +1,6 @@
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
-import {Button, Col, Dropdown, Menu, notification, Row, Space} from "antd";
+import {Button, Col, Dropdown, Menu, notification, Row, Select, Space} from "antd";
 import {useEffect, useState} from "react";
 import memoryService from "../services/memory-service";
 import {Passage} from "../model/passage";
@@ -17,6 +17,7 @@ import {stateActions} from "../store";
 const ReadChapter = () => {
     const dispatcher = useDispatch();
     const chapterConfig = useSelector((state: AppState) => state.chapterSelection);
+    const {Option} = Select;
     const [currPassage, setCurrPassage] = useState<Passage>(null);
     console.log("ReadChapter component - here is the chapter config:");
     console.log(chapterConfig);
@@ -51,6 +52,10 @@ const ReadChapter = () => {
         }
     };
 
+    const handleTranslationChange = (value) => {
+        dispatcher(stateActions.setChapterSelection({...chapterConfig, translation: value}));
+    };
+
     return (
         <>
             <Row justify="center">
@@ -60,6 +65,13 @@ const ReadChapter = () => {
                 <Row justify="center">
                     <Space>
                         <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
+                        <Select style={{width: "100%"}} size="large" value={chapterConfig.translation} onChange={handleTranslationChange}>
+                            <Option value="N/A">{"--Select Translation--"}</Option>
+                            {Constants.translationsShortNms.map(trans => (
+                                    <Option key={trans.code} value={trans.code}>{trans.translationName}</Option>
+                                )
+                            )}
+                        </Select>
                         <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
                         <Col span={6}>
                             <Dropdown placement="bottomRight" trigger={["click"]} overlay={
