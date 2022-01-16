@@ -19,9 +19,10 @@ import {
 import {Constants} from "../model/constants";
 import Swipe from "react-easy-swipe";
 import {StringUtils} from "../helpers/string.utils";
+import {stateActions} from "../store";
 
 const Practice = () => {
-    const dispatch = useDispatch();
+    const dispatcher = useDispatch();
     const practiceConfig = useSelector((state: AppState) => state.practiceConfig);
     const memTextOverrides = useSelector((state: AppState) => state.memTextOverrides);
     const [busy, setBusy] = useState({state: false, message: ""});
@@ -89,6 +90,7 @@ const Practice = () => {
             return;
         }
 
+        dispatcher(stateActions.setChapterSelection({chapter: currPassage.chapter, book: currPassage.bookName, translation: currPassage.translationName}));
         if (practiceState.showPsgRef) {
             // if we are showing the passage ref, we don't need to retrieve the verses (unnecessary http call)
         } else {
@@ -127,7 +129,7 @@ const Practice = () => {
             setBusy({state: false, message: ""});
         };
         callServer();
-    }, [dispatch, practiceConfig]);
+    }, [dispatcher, practiceConfig]);
 
     useEffect(() => {
         // console.log("useEffect - calling displayPassageOnScreen()...");
@@ -191,7 +193,7 @@ const Practice = () => {
             // copy
             let clipboardContent = PassageUtils.getPassageForClipboard(currPassage);
             if (StringUtils.isEmpty(clipboardContent)) {
-                console.log("calling populateVerses()...");
+                // console.log("calling populateVerses()...");
                 await populateVerses(currPassage, true);
             } else {
                 notification.info({message: PassageUtils.copyPassageToClipboard(currPassage) + " copied!", placement: "bottomRight"})
