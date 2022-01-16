@@ -10,6 +10,8 @@ import {AppState} from "./model/AppState";
 import {stateActions} from "./store";
 import SelectChapter from "./pages/SelectChapter";
 import ReadChapter from "./pages/ReadChapter";
+import {useEffect} from "react";
+import memoryService from "./services/memory-service";
 
 const App = () => {
     const history = useHistory();
@@ -17,6 +19,13 @@ const App = () => {
     const selectedMenu = useSelector((state: AppState) => state.selectedMenuKey);
     // console.log("App - selectedMenu from store is " + selectedMenu);
     const { Header, Content, Footer } = Layout;
+    useEffect(() => {
+        const callServer = async () => {
+            const locMaxChaptersByBook = await memoryService.getMaxChaptersByBook();
+            dispatcher(stateActions.setMaxChaptersByBook(locMaxChaptersByBook.data))
+        };
+        callServer();
+    }, []);
     const menuItems = [
         {
             key: 1,

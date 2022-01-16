@@ -1,29 +1,21 @@
 import {Button, Col, Row, Select} from "antd";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {Constants} from "../model/constants";
-import memoryService from "../services/memory-service";
 import {ReadFilled} from "@ant-design/icons";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {stateActions} from "../store";
 import {useHistory} from "react-router-dom";
+import {AppState} from "../model/AppState";
 
 const SelectChapter = () => {
     const dispatcher = useDispatch();
+    const maxChaptersByBook = useSelector((state: AppState) => state.maxChaptersByBook);
     const history = useHistory();
     const {Option} = Select;
     const [book, setBook] = useState("N/A");
     const [chapter, setChapter] = useState("N/A");
     const [translation, setTranslation] = useState("N/A");
     const [bookChapters, setBookChapters] = useState([]);
-    const [maxChaptersByBook, setMaxChaptersByBook] = useState(null);
-
-    useEffect(() => {
-        const callServer = async () => {
-            const locMaxChaptersByBook = await memoryService.getMaxChaptersByBook();
-            setMaxChaptersByBook(locMaxChaptersByBook.data);
-        };
-        callServer();
-    }, []);
 
     const handleBookChange = (value) => {
         console.log(`selected book ${value}`);

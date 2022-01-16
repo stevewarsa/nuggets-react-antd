@@ -1,5 +1,6 @@
 import axios from "axios";
 import {Passage} from "../model/passage";
+import {Constants} from "../model/constants";
 
 class MemoryService {
     public getMemoryPsgList(user: string) {
@@ -18,5 +19,22 @@ class MemoryService {
     public getMaxChaptersByBook() {
         return axios.get("/nuggets/server/get_max_chapter_by_book.php");
     }
+    public getChapter(book: string, chapter: number, translation: string) {
+        let bookId: number = this.getBookId(book);
+        return axios.get("/nuggets/server/get_chapter.php?bookId=" + bookId + "&chapter=" + chapter + "&translation=" + translation);
+    }
+
+    public getBookId(bookName: string): number {
+        let keys: string[] = Object.keys(Constants.booksByNum);
+        for (let key of keys) {
+            let keyNum: number = parseInt(key);
+            let foundBookName: string = Constants.booksByNum[key];
+            if (bookName === foundBookName) {
+                return keyNum;
+            }
+        }
+        return -1;
+    }
+
 }
 export default new MemoryService();

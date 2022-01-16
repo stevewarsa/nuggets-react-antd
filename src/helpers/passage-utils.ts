@@ -1,7 +1,6 @@
 import {Passage} from "../model/passage";
 import {Constants} from "../model/constants";
-import {VerseNumAndText} from "../model/verse-num-and-text";
-import {MemUser} from "../model/mem-user";
+import copy from "copy-to-clipboard";
 
 export class PassageUtils {
   public static readonly RAND: string = "rand";
@@ -10,16 +9,16 @@ export class PassageUtils {
   public static readonly BY_REF: string = "by_ref";
   public static readonly BY_PSG_TXT: string = "by_psgtxt";
 
-  public static getPreferredTranslationFromPrefs(prefs: any[], defaultTranslation: string): string {
-    if (prefs && prefs.length > 0) {
-      for (let pref of prefs) {
-        if (pref.key === "preferred_translation" && pref.value && pref.value.length > 0) {
-          return pref.value;
-        }
-      }
-    }
-    return defaultTranslation;
-  }
+  // public static getPreferredTranslationFromPrefs(prefs: any[], defaultTranslation: string): string {
+  //   if (prefs && prefs.length > 0) {
+  //     for (let pref of prefs) {
+  //       if (pref.key === "preferred_translation" && pref.value && pref.value.length > 0) {
+  //         return pref.value;
+  //       }
+  //     }
+  //   }
+  //   return defaultTranslation;
+  // }
 
   public static getSurroundingVerses(passage: Passage, maxVerseByBookChapter: any[]): Passage {
     let maxVerse: number = this.getMaxVerseByBookAndChapter(
@@ -38,8 +37,24 @@ export class PassageUtils {
     return returnPassage;
   }
 
-  public static deepClonePassage(passage: Passage): Passage {
-    return JSON.parse(JSON.stringify(passage));
+  public static openInterlinearLink(passage: Passage) {
+    let urlQuery: string;
+    if (passage.startVerse === passage.endVerse) {
+      urlQuery = passage.bookName + "+" + passage.chapter + ":" + passage.startVerse + "&t=nas"
+    } else {
+      urlQuery = passage.bookName + "+" + passage.chapter + ":" + passage.startVerse + "-" + passage.endVerse + "&t=nas"
+    }
+    window.open("https://www.biblestudytools.com/interlinear-bible/passage/?q=" + urlQuery, '_blank');
+  }
+
+  // public static deepClonePassage(passage: Passage): Passage {
+  //   return JSON.parse(JSON.stringify(passage));
+  // }
+
+  public static copyPassageToClipboard(passage: Passage): string {
+    let clipboardContent = PassageUtils.getPassageForClipboard(passage);
+    copy(clipboardContent);
+    return PassageUtils.getPassageString(passage, -1, 0, null, false, false, null);
   }
 
   public static getMaxVerseByBookAndChapter(bibleBookKey: string, chapter: number, defaultVal: number, maxVerseByBookChapter: any[]): number {
@@ -59,46 +74,47 @@ export class PassageUtils {
     return defaultVal;
   }
 
-  public static getNextIndex(currentIndex: number, numberOfPassages: number, next: boolean): number {
-    let newIndex: number;
-    if (next) {
-      if (currentIndex === (numberOfPassages - 1)) {
-        newIndex = 0;
-      } else {
-        newIndex = currentIndex + 1;
-      }
-    } else {
-      if (currentIndex === 0) {
-        newIndex = numberOfPassages - 1;
-      } else {
-        newIndex = currentIndex - 1;
-      }
-    }
-    return newIndex;
-  }
+  // public static getNextIndex(currentIndex: number, numberOfPassages: number, next: boolean): number {
+  //   let newIndex: number;
+  //   if (next) {
+  //     if (currentIndex === (numberOfPassages - 1)) {
+  //       newIndex = 0;
+  //     } else {
+  //       newIndex = currentIndex + 1;
+  //     }
+  //   } else {
+  //     if (currentIndex === 0) {
+  //       newIndex = numberOfPassages - 1;
+  //     } else {
+  //       newIndex = currentIndex - 1;
+  //     }
+  //   }
+  //   return newIndex;
+  // }
 
   public static getBookId(bookKey: string): number {
     let keys: any[] = Object.keys(Constants.booksByNum);
     for (let key of keys) {
-      let book: string = Constants.booksByNum[key];
+      const iKey = parseInt(key);
+      let book: string = Constants.booksByNum[iKey];
       if (bookKey === book) {
-        return key;
+        return iKey;
       }
     }
     return -1;
   }
 
-  public static getUnformattedPassageTextNoVerseNumbers(passage: Passage): string {
-    let verseLen = passage.verses.length;
-    let verseText = "";
-    for (let i = 0; i < verseLen; i++) {
-      let versePartLen = passage.verses[i].verseParts.length;
-      for (let j = 0; j < versePartLen; j++) {
-        verseText += passage.verses[i].verseParts[j].verseText + " ";
-      }
-    }
-    return verseText;
-  }
+  // public static getUnformattedPassageTextNoVerseNumbers(passage: Passage): string {
+  //   let verseLen = passage.verses.length;
+  //   let verseText = "";
+  //   for (let i = 0; i < verseLen; i++) {
+  //     let versePartLen = passage.verses[i].verseParts.length;
+  //     for (let j = 0; j < versePartLen; j++) {
+  //       verseText += passage.verses[i].verseParts[j].verseText + " ";
+  //     }
+  //   }
+  //   return verseText;
+  // }
 
   public static getFormattedPassageText(passage: Passage, showVerseNumbers: boolean): string {
     let verseLen: number = passage.verses.length;
@@ -125,126 +141,126 @@ export class PassageUtils {
     return verseText;
   }
 
-  public static getFormattedPassageTextHighlightMatches(passage: Passage, showVerseNumbers: boolean,
-                                                        matches: {
-                                                          nuggetId: number,
-                                                          bookId: number,
-                                                          chapter: number,
-                                                          startVerse: number,
-                                                          endVerse: number}[]): string {
-    let verseLen: number = passage.verses.length;
-    let verseText: string = "";
-    for (let i = 0; i < verseLen; i++) {
-      let versePartLen: number = passage.verses[i].verseParts.length;
-      for (let j = 0; j < versePartLen; j++) {
-        if (j === 0 && showVerseNumbers) {
-          verseText += "<span class='verse_num'>"
-            + passage.verses[i].verseParts[j].verseNumber
-            + "</span> ";
-        }
-        let isMatch = false;
-        for (let match of matches) {
-          if (passage.verses[i].verseParts[j].verseNumber >= match.startVerse && passage.verses[i].verseParts[j].verseNumber <= match.endVerse) {
-            isMatch = true;
-            break;
-          }
-        }
-        if (passage.verses[i].verseParts[j].wordsOfChrist) {
-          if (isMatch) {
-            verseText += "<span class='wordsOfChrist matchNugget'>";
-            verseText += passage.verses[i].verseParts[j].verseText
-              + " ";
-            verseText += "</span>";
-          } else {
-            verseText += "<span class='wordsOfChrist'>";
-            verseText += passage.verses[i].verseParts[j].verseText
-              + " ";
-            verseText += "</span>";
-          }
-        } else {
-          if (isMatch) {
-            verseText += "<span class='matchNugget'>";
-            verseText += passage.verses[i].verseParts[j].verseText
-              + " ";
-            verseText += "</span>";
-          } else {
-            verseText += passage.verses[i].verseParts[j].verseText
-              + " ";
-          }
-        }
-      }
-    }
-    return verseText;
-  }
+  // public static getFormattedPassageTextHighlightMatches(passage: Passage, showVerseNumbers: boolean,
+  //                                                       matches: {
+  //                                                         nuggetId: number,
+  //                                                         bookId: number,
+  //                                                         chapter: number,
+  //                                                         startVerse: number,
+  //                                                         endVerse: number}[]): string {
+  //   let verseLen: number = passage.verses.length;
+  //   let verseText: string = "";
+  //   for (let i = 0; i < verseLen; i++) {
+  //     let versePartLen: number = passage.verses[i].verseParts.length;
+  //     for (let j = 0; j < versePartLen; j++) {
+  //       if (j === 0 && showVerseNumbers) {
+  //         verseText += "<span class='verse_num'>"
+  //           + passage.verses[i].verseParts[j].verseNumber
+  //           + "</span> ";
+  //       }
+  //       let isMatch = false;
+  //       for (let match of matches) {
+  //         if (passage.verses[i].verseParts[j].verseNumber >= match.startVerse && passage.verses[i].verseParts[j].verseNumber <= match.endVerse) {
+  //           isMatch = true;
+  //           break;
+  //         }
+  //       }
+  //       if (passage.verses[i].verseParts[j].wordsOfChrist) {
+  //         if (isMatch) {
+  //           verseText += "<span class='wordsOfChrist matchNugget'>";
+  //           verseText += passage.verses[i].verseParts[j].verseText
+  //             + " ";
+  //           verseText += "</span>";
+  //         } else {
+  //           verseText += "<span class='wordsOfChrist'>";
+  //           verseText += passage.verses[i].verseParts[j].verseText
+  //             + " ";
+  //           verseText += "</span>";
+  //         }
+  //       } else {
+  //         if (isMatch) {
+  //           verseText += "<span class='matchNugget'>";
+  //           verseText += passage.verses[i].verseParts[j].verseText
+  //             + " ";
+  //           verseText += "</span>";
+  //         } else {
+  //           verseText += passage.verses[i].verseParts[j].verseText
+  //             + " ";
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return verseText;
+  // }
 
-  public static getFormattedVersesAsArray(passage: Passage,
-                                          matches: {
-                                            nuggetId: number,
-                                            bookId: number,
-                                            chapter: number,
-                                            startVerse: number,
-                                            endVerse: number}[]): VerseNumAndText[] {
-    let verses: VerseNumAndText[] = [];
-    let verseLen: number = passage.verses.length;
-    for (let i = 0; i < verseLen; i++) {
-      let verseText: string = "";
-      let versePartLen: number = passage.verses[i].verseParts.length;
-      for (let j = 0; j < versePartLen; j++) {
-        let isMatch = false;
-        for (let match of matches) {
-          if (passage.verses[i].verseParts[j].verseNumber >= match.startVerse && passage.verses[i].verseParts[j].verseNumber <= match.endVerse) {
-            isMatch = true;
-            break;
-          }
-        }
-        if (passage.verses[i].verseParts[j].wordsOfChrist) {
-          if (isMatch) {
-            verseText += "<span class='wordsOfChrist matchNugget'>";
-            verseText += passage.verses[i].verseParts[j].verseText + " ";
-            verseText += "</span>";
-          } else {
-            verseText += "<span class='wordsOfChrist'>";
-            verseText += passage.verses[i].verseParts[j].verseText + " ";
-            verseText += "</span>";
-          }
-        } else {
-          if (isMatch) {
-            verseText += "<span class='matchNugget'>";
-            verseText += passage.verses[i].verseParts[j].verseText + " ";
-            verseText += "</span>";
-          } else {
-            verseText += passage.verses[i].verseParts[j].verseText + " ";
-          }
-        }
-      }
-      let currVerse = new VerseNumAndText();
-      currVerse.verseText = verseText;
-      currVerse.verseNum = passage.verses[i].verseParts[0].verseNumber;
-      verses.push(currVerse);
-    }
-    return verses;
-  }
+  // public static getFormattedVersesAsArray(passage: Passage,
+  //                                         matches: {
+  //                                           nuggetId: number,
+  //                                           bookId: number,
+  //                                           chapter: number,
+  //                                           startVerse: number,
+  //                                           endVerse: number}[]): VerseNumAndText[] {
+  //   let verses: VerseNumAndText[] = [];
+  //   let verseLen: number = passage.verses.length;
+  //   for (let i = 0; i < verseLen; i++) {
+  //     let verseText: string = "";
+  //     let versePartLen: number = passage.verses[i].verseParts.length;
+  //     for (let j = 0; j < versePartLen; j++) {
+  //       let isMatch = false;
+  //       for (let match of matches) {
+  //         if (passage.verses[i].verseParts[j].verseNumber >= match.startVerse && passage.verses[i].verseParts[j].verseNumber <= match.endVerse) {
+  //           isMatch = true;
+  //           break;
+  //         }
+  //       }
+  //       if (passage.verses[i].verseParts[j].wordsOfChrist) {
+  //         if (isMatch) {
+  //           verseText += "<span class='wordsOfChrist matchNugget'>";
+  //           verseText += passage.verses[i].verseParts[j].verseText + " ";
+  //           verseText += "</span>";
+  //         } else {
+  //           verseText += "<span class='wordsOfChrist'>";
+  //           verseText += passage.verses[i].verseParts[j].verseText + " ";
+  //           verseText += "</span>";
+  //         }
+  //       } else {
+  //         if (isMatch) {
+  //           verseText += "<span class='matchNugget'>";
+  //           verseText += passage.verses[i].verseParts[j].verseText + " ";
+  //           verseText += "</span>";
+  //         } else {
+  //           verseText += passage.verses[i].verseParts[j].verseText + " ";
+  //         }
+  //       }
+  //     }
+  //     let currVerse = new VerseNumAndText();
+  //     currVerse.verseText = verseText;
+  //     currVerse.verseNum = passage.verses[i].verseParts[0].verseNumber;
+  //     verses.push(currVerse);
+  //   }
+  //   return verses;
+  // }
 
-  public static getPassageForClipboardAsArray(passage: Passage): VerseNumAndText[] {
-    if (!passage || !passage.verses || passage.verses.length === 0) {
-      return [];
-    }
-    let passageArray: VerseNumAndText[] = [];
-    let verseLen: number = passage.verses.length;
-    for (let i = 0; i < verseLen; i++) {
-      let verseText: string = "";
-      let versePartLen: number = passage.verses[i].verseParts.length;
-      for (let j = 0; j < versePartLen; j++) {
-        verseText += passage.verses[i].verseParts[j].verseText
-          + " ";
-      }
-      let verse: VerseNumAndText = new VerseNumAndText();
-      verse.verseNum = passage.verses[i].verseParts[0].verseNumber;
-      verse.verseText = verseText;
-      passageArray.push(verse);
-    }
-    return passageArray;
-  }
+  // public static getPassageForClipboardAsArray(passage: Passage): VerseNumAndText[] {
+  //   if (!passage || !passage.verses || passage.verses.length === 0) {
+  //     return [];
+  //   }
+  //   let passageArray: VerseNumAndText[] = [];
+  //   let verseLen: number = passage.verses.length;
+  //   for (let i = 0; i < verseLen; i++) {
+  //     let verseText: string = "";
+  //     let versePartLen: number = passage.verses[i].verseParts.length;
+  //     for (let j = 0; j < versePartLen; j++) {
+  //       verseText += passage.verses[i].verseParts[j].verseText
+  //         + " ";
+  //     }
+  //     let verse: VerseNumAndText = new VerseNumAndText();
+  //     verse.verseNum = passage.verses[i].verseParts[0].verseNumber;
+  //     verse.verseText = verseText;
+  //     passageArray.push(verse);
+  //   }
+  //   return passageArray;
+  // }
 
   public static getPassageForClipboard(passage: Passage): string {
     if (!passage || !passage.verses || passage.verses.length === 0) {
@@ -268,10 +284,10 @@ export class PassageUtils {
     return verseText;
   }
 
-  public static getFormattedPassageTextHighlight(passage: Passage, textToHighlight: string, showVerseNumbers: boolean) {
-    var formattedText = this.getFormattedPassageText(passage, showVerseNumbers);
-    return this.updateAllMatches(textToHighlight, formattedText);
-  }
+  // public static getFormattedPassageTextHighlight(passage: Passage, textToHighlight: string, showVerseNumbers: boolean) {
+  //   var formattedText = this.getFormattedPassageText(passage, showVerseNumbers);
+  //   return this.updateAllMatches(textToHighlight, formattedText);
+  // }
 
   public static updateAllMatches(find: string, str: string) {
     let stringToHighlight = find.replace("*", "(.*?)");
@@ -382,20 +398,20 @@ export class PassageUtils {
     return arr;
   }
 
-  public static sortUserListByName(users: MemUser[]): MemUser[] {
-    return users.sort((a: MemUser, b: MemUser) => {
-      let nameA = a.userName.toUpperCase();
-      let nameB = b.userName.toUpperCase();
-      if (nameA < nameB) {
-        return -1;
-      }
-      if (nameA > nameB) {
-        return 1;
-      }
-      // names must be equal
-      return 0;
-    });
-  }
+  // public static sortUserListByName(users: MemUser[]): MemUser[] {
+  //   return users.sort((a: MemUser, b: MemUser) => {
+  //     let nameA = a.userName.toUpperCase();
+  //     let nameB = b.userName.toUpperCase();
+  //     if (nameA < nameB) {
+  //       return -1;
+  //     }
+  //     if (nameA > nameB) {
+  //       return 1;
+  //     }
+  //     // names must be equal
+  //     return 0;
+  //   });
+  // }
 
   public static sortWithinFrequencyGroups(passages: Passage[], order: string): Passage[] {
     let frequencyGroups = {};
@@ -433,10 +449,10 @@ export class PassageUtils {
     return returnPassageArray;
   }
 
-  public static sortPassagesByBibleBookOrder(passages: Passage[]): Passage[] {
-    passages = passages.sort((a: Passage, b: Passage) => {
-      return (a.bookId - b.bookId);
-    });
-    return passages;
-  }
+  // public static sortPassagesByBibleBookOrder(passages: Passage[]): Passage[] {
+  //   passages = passages.sort((a: Passage, b: Passage) => {
+  //     return (a.bookId - b.bookId);
+  //   });
+  //   return passages;
+  // }
 }

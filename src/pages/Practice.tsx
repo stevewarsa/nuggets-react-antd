@@ -18,7 +18,6 @@ import {
 } from "@ant-design/icons";
 import {Constants} from "../model/constants";
 import Swipe from "react-easy-swipe";
-import copy from "copy-to-clipboard";
 import {StringUtils} from "../helpers/string.utils";
 
 const Practice = () => {
@@ -67,9 +66,7 @@ const Practice = () => {
                 if (StringUtils.isEmpty(clipboardContent)) {
                     console.log("populateVerses - Unable to copy passage to clipboard...");
                 } else {
-                    copy(clipboardContent);
-                    const psgRef = PassageUtils.getPassageString(locMemoryPassageData.data, practiceState.currentIndex, practiceState.memPassageList.length, null, false, false, locMemoryPassageData.data.passageRefAppendLetter)
-                    notification.info({message: psgRef + " copied!", placement: "bottomRight"})
+                    notification.info({message: PassageUtils.copyPassageToClipboard(locMemoryPassageData.data) + " copied!", placement: "bottomRight"})
                 }
             }
             updatePassageInList(locMemoryPassageData.data);
@@ -189,29 +186,19 @@ const Practice = () => {
     };
 
     const handleMenuClick = async ({key}) => {
+        let currPassage = practiceState.memPassageList[practiceState.currentIndex];
         if (key === "1") {
             // copy
-            let currPassage = practiceState.memPassageList[practiceState.currentIndex];
             let clipboardContent = PassageUtils.getPassageForClipboard(currPassage);
             if (StringUtils.isEmpty(clipboardContent)) {
                 console.log("calling populateVerses()...");
                 await populateVerses(currPassage, true);
             } else {
-                copy(clipboardContent);
-                const psgRef = PassageUtils.getPassageString(currPassage, practiceState.currentIndex, practiceState.memPassageList.length, null, false, false, currPassage.passageRefAppendLetter)
-                notification.info({message: psgRef + " copied!", placement: "bottomRight"})
+                notification.info({message: PassageUtils.copyPassageToClipboard(currPassage) + " copied!", placement: "bottomRight"})
             }
         } else if (key === "2") {
             // interlinear link
-            let urlQuery: string;
-            let currPassage = practiceState.memPassageList[practiceState.currentIndex];
-            if (currPassage.startVerse === currPassage.endVerse) {
-                urlQuery = currPassage.bookName + "+" + currPassage.chapter + ":" + currPassage.startVerse + "&t=nas"
-            } else {
-                urlQuery = currPassage.bookName + "+" + currPassage.chapter + ":" + currPassage.startVerse + "-" + currPassage.endVerse + "&t=nas"
-            }
-            window.open("https://www.biblestudytools.com/interlinear-bible/passage/?q=" + urlQuery, '_blank');
-
+            PassageUtils.openInterlinearLink(currPassage);
         }
     };
 
