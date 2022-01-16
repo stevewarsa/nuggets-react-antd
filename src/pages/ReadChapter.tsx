@@ -13,14 +13,46 @@ import {
 import {PassageUtils} from "../helpers/passage-utils";
 import {Constants} from "../model/constants";
 import {stateActions} from "../store";
+import {useHistory} from "react-router-dom";
+import {VerseSelectionRequest} from "../model/verse-selection-request";
+import copy from "copy-to-clipboard";
 
 const ReadChapter = () => {
     const dispatcher = useDispatch();
+    const history = useHistory();
     const chapterConfig = useSelector((state: AppState) => state.chapterSelection);
+    const verseSelectionRequest = useSelector((state: AppState) => state.verseSelectionRequest);
     const {Option} = Select;
     const [currPassage, setCurrPassage] = useState<Passage>(null);
+    // const [verseSelectionRequestSent, setVerseSelectionRequestSent] = useState(false);
     console.log("ReadChapter component - here is the chapter config:");
     console.log(chapterConfig);
+
+    useEffect(() => {
+        if (verseSelectionRequest) {
+            console.log("useEffect - here's the verseSelectionRequest sent back to me, and following that will be the current passage:");
+            console.log(verseSelectionRequest);
+            const selectedVerses = verseSelectionRequest.versesForSelection.filter(v => v.selected);
+            if (selectedVerses.length == 1 || selectedVerses.length == 2) {
+                const passage = new Passage();
+                passage.startVerse = selectedVerses[0].verseNum;
+                passage.endVerse = selectedVerses.length == 1 ? passage.startVerse : selectedVerses[1].verseNum;
+                passage.bookName = chapterConfig.book;
+                passage.translationName = chapterConfig.translation;
+                passage.chapter = chapterConfig.chapter;
+                const psgRef = PassageUtils.getPassageStringNoIndex(passage, true);
+                let clipboardString = psgRef + "\n\n";
+                for (let verse of verseSelectionRequest.versesForSelection) {
+                    if (verse.verseNum >= passage.startVerse && verse.verseNum <= passage.endVerse) {
+                        clipboardString += verse.verseText;
+                    }
+                }
+                copy(clipboardString);
+                notification.info({message: psgRef + " copied!", placement: "bottomRight"});
+            }
+        }
+    }, [verseSelectionRequest]);
+
     useEffect(() => {
         const callServer = async () => {
             const chapterResponse = await memoryService.getChapter(chapterConfig.book, chapterConfig.chapter, chapterConfig.translation);
@@ -45,7 +77,11 @@ const ReadChapter = () => {
     const handleMenuClick = ({key}) => {
         if (key === "1") {
             // copy
-            notification.info({message: PassageUtils.copyPassageToClipboard(currPassage) + " copied!", placement: "bottomRight"})
+            const formattedVersesAsArray = PassageUtils.getFormattedVersesAsArray(currPassage, []);
+            console.log("handleMenuClick - Here are the verses for selection:");
+            console.log(formattedVersesAsArray);
+            dispatcher(stateActions.setVerseSelectionRequest({versesForSelection: formattedVersesAsArray, actionToPerform: "copy", backToPath: "/readChapter"} as VerseSelectionRequest));
+            history.push("/selectVerses");
         } else if (key === "2") {
             // interlinear link
             PassageUtils.openInterlinearLink(currPassage);

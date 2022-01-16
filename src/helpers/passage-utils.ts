@@ -1,6 +1,7 @@
 import {Passage} from "../model/passage";
 import {Constants} from "../model/constants";
 import copy from "copy-to-clipboard";
+import {VerseNumAndText} from "../model/versenum-and-text";
 
 export class PassageUtils {
   public static readonly RAND: string = "rand";
@@ -193,53 +194,53 @@ export class PassageUtils {
   //   return verseText;
   // }
 
-  // public static getFormattedVersesAsArray(passage: Passage,
-  //                                         matches: {
-  //                                           nuggetId: number,
-  //                                           bookId: number,
-  //                                           chapter: number,
-  //                                           startVerse: number,
-  //                                           endVerse: number}[]): VerseNumAndText[] {
-  //   let verses: VerseNumAndText[] = [];
-  //   let verseLen: number = passage.verses.length;
-  //   for (let i = 0; i < verseLen; i++) {
-  //     let verseText: string = "";
-  //     let versePartLen: number = passage.verses[i].verseParts.length;
-  //     for (let j = 0; j < versePartLen; j++) {
-  //       let isMatch = false;
-  //       for (let match of matches) {
-  //         if (passage.verses[i].verseParts[j].verseNumber >= match.startVerse && passage.verses[i].verseParts[j].verseNumber <= match.endVerse) {
-  //           isMatch = true;
-  //           break;
-  //         }
-  //       }
-  //       if (passage.verses[i].verseParts[j].wordsOfChrist) {
-  //         if (isMatch) {
-  //           verseText += "<span class='wordsOfChrist matchNugget'>";
-  //           verseText += passage.verses[i].verseParts[j].verseText + " ";
-  //           verseText += "</span>";
-  //         } else {
-  //           verseText += "<span class='wordsOfChrist'>";
-  //           verseText += passage.verses[i].verseParts[j].verseText + " ";
-  //           verseText += "</span>";
-  //         }
-  //       } else {
-  //         if (isMatch) {
-  //           verseText += "<span class='matchNugget'>";
-  //           verseText += passage.verses[i].verseParts[j].verseText + " ";
-  //           verseText += "</span>";
-  //         } else {
-  //           verseText += passage.verses[i].verseParts[j].verseText + " ";
-  //         }
-  //       }
-  //     }
-  //     let currVerse = new VerseNumAndText();
-  //     currVerse.verseText = verseText;
-  //     currVerse.verseNum = passage.verses[i].verseParts[0].verseNumber;
-  //     verses.push(currVerse);
-  //   }
-  //   return verses;
-  // }
+  public static getFormattedVersesAsArray(passage: Passage,
+                                          matches: {
+                                            nuggetId: number,
+                                            bookId: number,
+                                            chapter: number,
+                                            startVerse: number,
+                                            endVerse: number}[]): VerseNumAndText[] {
+    let verses: VerseNumAndText[] = [];
+    let verseLen: number = passage.verses.length;
+    for (let i = 0; i < verseLen; i++) {
+      let verseText: string = "";
+      let versePartLen: number = passage.verses[i].verseParts.length;
+      for (let j = 0; j < versePartLen; j++) {
+        let isMatch = false;
+        for (let match of matches) {
+          if (passage.verses[i].verseParts[j].verseNumber >= match.startVerse && passage.verses[i].verseParts[j].verseNumber <= match.endVerse) {
+            isMatch = true;
+            break;
+          }
+        }
+        if (passage.verses[i].verseParts[j].wordsOfChrist) {
+          if (isMatch) {
+            verseText += "<span class='wordsOfChrist matchNugget'>";
+            verseText += passage.verses[i].verseParts[j].verseText + " ";
+            verseText += "</span>";
+          } else {
+            verseText += "<span class='wordsOfChrist'>";
+            verseText += passage.verses[i].verseParts[j].verseText + " ";
+            verseText += "</span>";
+          }
+        } else {
+          if (isMatch) {
+            verseText += "<span class='matchNugget'>";
+            verseText += passage.verses[i].verseParts[j].verseText + " ";
+            verseText += "</span>";
+          } else {
+            verseText += passage.verses[i].verseParts[j].verseText + " ";
+          }
+        }
+      }
+      let currVerse = new VerseNumAndText();
+      currVerse.verseText = verseText;
+      currVerse.verseNum = passage.verses[i].verseParts[0].verseNumber;
+      verses.push(currVerse);
+    }
+    return verses;
+  }
 
   // public static getPassageForClipboardAsArray(passage: Passage): VerseNumAndText[] {
   //   if (!passage || !passage.verses || passage.verses.length === 0) {
@@ -322,7 +323,7 @@ export class PassageUtils {
 
     let regularBook: string;
     if (passage.bookName) {
-      regularBook = this.getRegularBook(passage.bookId);
+      regularBook = this.getRegularBook(this.getBookId(passage.bookName));
     } else {
       regularBook = Constants.bookAbbrev[Constants.booksByNum[passage.bookId]][1];
     }

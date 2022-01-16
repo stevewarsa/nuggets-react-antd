@@ -12,6 +12,7 @@ import SelectChapter from "./pages/SelectChapter";
 import ReadChapter from "./pages/ReadChapter";
 import {useEffect} from "react";
 import memoryService from "./services/memory-service";
+import SelectVerses from "./pages/SelectVerses";
 
 const App = () => {
     const history = useHistory();
@@ -110,6 +111,9 @@ const App = () => {
                         </Route>
                         <Route path="/readChapter" exact>
                             <ReadChapter/>
+                        </Route>
+                        <Route path="/selectVerses" exact>
+                            <SelectVerses/>
                         </Route>
                     </Switch>
                 </div>

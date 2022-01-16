@@ -196,7 +196,7 @@ const Practice = () => {
                 // console.log("calling populateVerses()...");
                 await populateVerses(currPassage, true);
             } else {
-                notification.info({message: PassageUtils.copyPassageToClipboard(currPassage) + " copied!", placement: "bottomRight"})
+                notification.info({message: PassageUtils.copyPassageToClipboard(currPassage) + " copied!", placement: "bottomRight"});
             }
         } else if (key === "2") {
             // interlinear link

@@ -10,7 +10,8 @@ const initialState: AppState = {
     memPassageList: [],
     memTextOverrides: [],
     selectedMenuKey: 1,
-    chapterSelection: null
+    chapterSelection: null,
+    verseSelectionRequest: null
 } as AppState;
 
 const state = createSlice({
@@ -78,18 +79,25 @@ const state = createSlice({
                     } else {
                         state.chapterSelection.book = Constants.booksByNum[bookId - 1];
                     }
-                    const maxChapterForBook = state.maxChaptersByBook.find(m => m.bookName === state.chapterSelection.book).maxChapter;
-                    state.chapterSelection.chapter = maxChapterForBook;
+                    state.chapterSelection.chapter = state.maxChaptersByBook.find(m => m.bookName === state.chapterSelection.book).maxChapter;
                 } else {
                     state.chapterSelection.chapter--;
                 }
             }
+        },
+        setVerseSelectionRequest(state, action) {
+            console.log("setVersesForSelection (reducer) - here is the payload:");
+            console.log(action.payload);
+            state.verseSelectionRequest = action.payload;
         }
     }
 });
 
 const store = configureStore({
-    reducer: state.reducer
+    reducer: state.reducer,
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+        serializableCheck: false,
+    })
 });
 export const stateActions = state.actions;
 export default store;
