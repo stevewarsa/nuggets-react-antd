@@ -24,6 +24,22 @@ class MemoryService {
         return axios.get("/nuggets/server/get_chapter.php?bookId=" + bookId + "&chapter=" + chapter + "&translation=" + translation);
     }
 
+    public getReadingPlanProgress(user: string, dayOfWeek: string) {
+        return axios.get("/nuggets/server/get_reading_plan_progress.php?user=" + user + "&dayOfWeek=" + dayOfWeek);
+    }
+
+    public getAllReadingPlanProgress(user: string) {
+        return axios.get("/nuggets/server/get_all_reading_plan_progress.php?user=" + user);
+    }
+
+    public updateReadingPlan(user: string, dayOfWeek: string, book: string, bookId: number, chapter: number) {
+        return axios.get("/nuggets/server/update_reading_plan.php?user=" + user + "&dayOfWeek=" + dayOfWeek + "&book=" + book + "&bookId=" + bookId + "&chapter=" + chapter);
+    }
+
+    public getPreferences(user: string) {
+        return axios.get("/nuggets/server/get_preferences.php?user=" + user);
+    }
+
     public getBookId(bookName: string): number {
         let keys: string[] = Object.keys(Constants.booksByNum);
         for (let key of keys) {

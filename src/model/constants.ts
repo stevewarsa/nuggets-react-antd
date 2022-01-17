@@ -4,6 +4,17 @@ export class Constants {
     public static ACTION_COPY: string[] = ["COPY", "Copy Quote to Clipboard"];
     public static USER: string = "SteveWarsa";
 
+    public static days: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    public static booksByDay = {
+        "Sunday": ["romans", "1-corinthians", "2-corinthians", "galatians", "ephesians", "philippians", "colossians", "1-thessalonians", "2-thessalonians", "1-timothy", "2-timothy", "titus", "philemon", "hebrews", "james", "1-peter", "2-peter", "1-john", "2-john", "3-john", "jude"],
+        "Monday": ["genesis", "exodus", "leviticus", "numbers", "deuteronomy"],
+        "Tuesday": ["joshua", "judges", "ruth", "1-samuel", "2-samuel", "1-kings", "2-kings", "1-chronicles", "2-chronicles", "ezra", "nehemiah", "esther"],
+        "Wednesday": ["psalms"],
+        "Thursday": ["job", "proverbs", "ecclesiastes", "song-of-solomon"],
+        "Friday": ["isaiah", "jeremiah", "lamentations", "ezekiel", "daniel", "hosea", "joel", "amos", "obadiah", "jonah", "micah", "nahum", "habakkuk", "zephaniah", "haggai", "zechariah", "malachi", "revelation"],
+        "Saturday": ["matthew", "mark", "luke", "john", "acts"]
+    };
+
     public static translations: any[] = [
         { code: 'asv', translationName: 'ASV - American Standard Version' },
         { code: 'bbe', translationName: 'BBE - Bible in Basic English' },

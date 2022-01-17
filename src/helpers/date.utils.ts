@@ -51,6 +51,10 @@ export class DateUtils {
     return isAfter(DateUtils.handleStringOrDate(date1), DateUtils.handleStringOrDate(date2));
   }
 
+  static getDayOfWeek(date?: Date): string {
+    return format(date ? date : new Date(), "eeee");
+  }
+
   /**
    * Checks if date is in the past
    *

@@ -10,16 +10,16 @@ export class PassageUtils {
   public static readonly BY_REF: string = "by_ref";
   public static readonly BY_PSG_TXT: string = "by_psgtxt";
 
-  // public static getPreferredTranslationFromPrefs(prefs: any[], defaultTranslation: string): string {
-  //   if (prefs && prefs.length > 0) {
-  //     for (let pref of prefs) {
-  //       if (pref.key === "preferred_translation" && pref.value && pref.value.length > 0) {
-  //         return pref.value;
-  //       }
-  //     }
-  //   }
-  //   return defaultTranslation;
-  // }
+  public static getPreferredTranslationFromPrefs(prefs: any[], defaultTranslation: string): string {
+    if (prefs && prefs.length > 0) {
+      for (let pref of prefs) {
+        if (pref.key === "preferred_translation" && pref.value && pref.value.length > 0) {
+          return pref.value;
+        }
+      }
+    }
+    return defaultTranslation;
+  }
 
   public static getSurroundingVerses(passage: Passage, maxVerseByBookChapter: any[]): Passage {
     let maxVerse: number = this.getMaxVerseByBookAndChapter(

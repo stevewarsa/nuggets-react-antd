@@ -11,7 +11,8 @@ const initialState: AppState = {
     memTextOverrides: [],
     selectedMenuKey: 1,
     chapterSelection: null,
-    verseSelectionRequest: null
+    verseSelectionRequest: null,
+    maxChaptersByBook: []
 } as AppState;
 
 const state = createSlice({
