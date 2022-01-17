@@ -74,7 +74,8 @@ const BibleReadingPlan = () => {
     }, []);
 
     const handleRead = () => {
-        console.log("handleRead");
+        console.log("handleRead - translation:");
+        console.log(translation);
     };
 
     return (
