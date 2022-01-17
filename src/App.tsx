@@ -13,6 +13,7 @@ import ReadChapter from "./pages/ReadChapter";
 import {useEffect} from "react";
 import memoryService from "./services/memory-service";
 import SelectVerses from "./pages/SelectVerses";
+import BibleReadingPlan from "./pages/BibleReadingPlan";
 
 const App = () => {
     const history = useHistory();
@@ -26,7 +27,7 @@ const App = () => {
             dispatcher(stateActions.setMaxChaptersByBook(locMaxChaptersByBook.data));
         };
         callServer();
-    }, []);
+    }, [dispatcher]);
     const menuItems = [
         {
             key: 1,
@@ -111,6 +112,9 @@ const App = () => {
                         </Route>
                         <Route path="/readChapter" exact>
                             <ReadChapter/>
+                        </Route>
+                        <Route path="/bibleReadingPlan" exact>
+                            <BibleReadingPlan/>
                         </Route>
                         <Route path="/selectVerses" exact>
                             <SelectVerses/>

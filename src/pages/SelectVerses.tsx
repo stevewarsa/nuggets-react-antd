@@ -21,8 +21,8 @@ const SelectVerses = () => {
     }, [verseSelectionRequest.versesForSelection]);
 
     const handleSubmit = () => {
-        console.log("Handle submit - selected verses:");
-        console.log(locVerses.filter(v => v.selected));
+        // console.log("Handle submit - selected verses:");
+        // console.log(locVerses.filter(v => v.selected));
         dispatcher(stateActions.setVerseSelectionRequest({...verseSelectionRequest, versesForSelection: locVerses} as VerseSelectionRequest));
         history.push(verseSelectionRequest.backToPath);
     };

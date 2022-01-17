@@ -25,13 +25,13 @@ const ReadChapter = () => {
     const {Option} = Select;
     const [currPassage, setCurrPassage] = useState<Passage>(null);
     // const [verseSelectionRequestSent, setVerseSelectionRequestSent] = useState(false);
-    console.log("ReadChapter component - here is the chapter config:");
-    console.log(chapterConfig);
+    // console.log("ReadChapter component - here is the chapter config:");
+    // console.log(chapterConfig);
 
     useEffect(() => {
         if (verseSelectionRequest) {
-            console.log("useEffect - here's the verseSelectionRequest sent back to me, and following that will be the current passage:");
-            console.log(verseSelectionRequest);
+            // console.log("useEffect - here's the verseSelectionRequest sent back to me, and following that will be the current passage:");
+            // console.log(verseSelectionRequest);
             const selectedVerses = verseSelectionRequest.versesForSelection.filter(v => v.selected);
             if (selectedVerses.length == 1 || selectedVerses.length == 2) {
                 const passage = new Passage();
@@ -57,8 +57,8 @@ const ReadChapter = () => {
         const callServer = async () => {
             const chapterResponse = await memoryService.getChapter(chapterConfig.book, chapterConfig.chapter, chapterConfig.translation);
             (chapterResponse.data as Passage).translationId = (chapterResponse.data as Passage).translationName = chapterConfig.translation;
-            console.log("Here is the chapter received back:");
-            console.log(chapterResponse.data);
+            // console.log("Here is the chapter received back:");
+            // console.log(chapterResponse.data);
             setCurrPassage(chapterResponse.data as Passage);
         };
         if (chapterConfig) {
@@ -78,8 +78,8 @@ const ReadChapter = () => {
         if (key === "1") {
             // copy
             const formattedVersesAsArray = PassageUtils.getFormattedVersesAsArray(currPassage, []);
-            console.log("handleMenuClick - Here are the verses for selection:");
-            console.log(formattedVersesAsArray);
+            // console.log("handleMenuClick - Here are the verses for selection:");
+            // console.log(formattedVersesAsArray);
             dispatcher(stateActions.setVerseSelectionRequest({versesForSelection: formattedVersesAsArray, actionToPerform: "copy", backToPath: "/readChapter"} as VerseSelectionRequest));
             history.push("/selectVerses");
         } else if (key === "2") {

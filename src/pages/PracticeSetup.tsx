@@ -23,7 +23,7 @@ const PracticeSetup = () => {
     };
 
     const handleStart = async () => {
-        console.log("Handle Start");
+        // console.log("Handle Start");
         dispatcher(stateActions.setPracticeConfig({practiceMode: practiceMode, passageDisplayOrder: passageDisplayOrder} as PracticeConfig));
         const locMemoryPassageOverridesData: any = await memoryService.getMemoryPassageTextOverrides(Constants.USER);
         dispatcher(stateActions.setMemoryTextOverrides(locMemoryPassageOverridesData.data));

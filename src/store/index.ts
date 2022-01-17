@@ -50,8 +50,8 @@ const state = createSlice({
             state.memTextOverrides = action.payload;
         },
         setChapterSelection(state, action) {
-            console.log("setChapterSelection (reducer) - action payload is:");
-            console.log(action.payload);
+            // console.log("setChapterSelection (reducer) - action payload is:");
+            // console.log(action.payload);
             state.chapterSelection = action.payload;
         },
         nextChapter(state) {
@@ -86,8 +86,8 @@ const state = createSlice({
             }
         },
         setVerseSelectionRequest(state, action) {
-            console.log("setVersesForSelection (reducer) - here is the payload:");
-            console.log(action.payload);
+            // console.log("setVersesForSelection (reducer) - here is the payload:");
+            // console.log(action.payload);
             state.verseSelectionRequest = action.payload;
         }
     }

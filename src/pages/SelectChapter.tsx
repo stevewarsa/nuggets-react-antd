@@ -19,7 +19,7 @@ const SelectChapter = () => {
     const [bookChapters, setBookChapters] = useState([]);
 
     const handleBookChange = (value) => {
-        console.log(`selected book ${value}`);
+        // console.log(`selected book ${value}`);
         setBook(value);
         const maxChapter = maxChaptersByBook.filter(m => m.bookName === value)[0].maxChapter;
         if (maxChapter > 0) {
@@ -29,18 +29,18 @@ const SelectChapter = () => {
     };
 
     const handleChapterChange = (value) => {
-        console.log(`selected chapter ${value}`);
+        // console.log(`selected chapter ${value}`);
         setChapter(value);
     };
 
     const handleTranslationChange = (value) => {
-        console.log(`selected translation ${value}`);
+        // console.log(`selected translation ${value}`);
         setTranslation(value);
     };
 
     const handleReadChapter = () => {
-        console.log("handleReadChapter - here are the selections:");
-        console.log("book: " + book + ", chapter: " + chapter + ", translation: " + translation);
+        // console.log("handleReadChapter - here are the selections:");
+        // console.log("book: " + book + ", chapter: " + chapter + ", translation: " + translation);
         dispatcher(stateActions.setChapterSelection({book: book, chapter: chapter, translation: translation}));
         history.push("/readChapter");
     };
