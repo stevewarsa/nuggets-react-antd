@@ -54,11 +54,6 @@ const MainMenu = () => {
                     key: "2.1",
                     label: "Search Full Bible",
                     action: "/searchFullBible"
-                },
-                {
-                    key: "2.2",
-                    label: "Search Facts and Quotes",
-                    action: "/searchFactsAndQuotes"
                 }
             ]
         },
