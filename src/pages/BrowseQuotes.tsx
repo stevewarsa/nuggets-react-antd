@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import memoryService from "../services/memory-service";
 import {Constants} from "../model/constants";
 import {Quote} from "../model/quote";

@@ -7,7 +7,7 @@ import App from './App';
 import store from "./store";
 
 ReactDOM.render(
-    <BrowserRouter>
+    <BrowserRouter  basename="/bible-app">
         <Provider store={store}>
             <App />
         </Provider>

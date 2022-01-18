@@ -87,11 +87,12 @@ const BibleReadingPlan = () => {
         const response = await memoryService.updateReadingPlan(Constants.USER, todaysReading.dayOfWeek, todaysReading.bookName, todaysReading.bookId, todaysReading.chapter);
         if (response.data === "success") {
             dispatcher(stateActions.setChapterSelection({book: todaysReading.bookName, chapter: todaysReading.chapter, translation: translation}));
+            setBusy({state: false, message: ""});
             history.push("/readChapter");
         } else {
             console.log("Got back " + response.data + " from server.  Not forwarding to /readChapter");
+            setBusy({state: false, message: ""});
         }
-        setBusy({state: false, message: ""});
     };
 
     if (busy.state) {
