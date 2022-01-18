@@ -19,7 +19,9 @@ const BrowseQuotes = () => {
         const callServer = async () => {
             setBusy({state: true, message: "Retrieving quotes from server..."});
             const quoteListResponse = await memoryService.getQuoteList(Constants.USER);
-            setAllQuotes((quoteListResponse.data as Quote[]).filter(q => StringUtils.isEmpty(q.approved) || q.approved === "Y"));
+            const quotes: Quote[] = (quoteListResponse.data as Quote[]).filter(q => StringUtils.isEmpty(q.approved) || q.approved === "Y");
+            PassageUtils.shuffleArray(quotes);
+            setAllQuotes(quotes);
             setBusy({state: false, message: ""});
         };
         callServer();
