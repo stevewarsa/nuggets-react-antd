@@ -1,6 +1,7 @@
 import axios from "axios";
 import {Passage} from "../model/passage";
 import {Constants} from "../model/constants";
+import {Quote} from "../model/quote";
 
 class MemoryService {
     public getMemoryPsgList(user: string) {
@@ -38,6 +39,10 @@ class MemoryService {
 
     public getPreferences(user: string) {
         return axios.get("/nuggets/server/get_preferences.php?user=" + user);
+    }
+
+    public getQuoteList(userName: string) {
+        return axios.get<Quote[]>("/nuggets/server/get_quote_list.php?user=" + userName);
     }
 
     public getBookId(bookName: string): number {

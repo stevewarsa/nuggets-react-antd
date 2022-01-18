@@ -14,6 +14,7 @@ import {useEffect} from "react";
 import memoryService from "./services/memory-service";
 import SelectVerses from "./pages/SelectVerses";
 import BibleReadingPlan from "./pages/BibleReadingPlan";
+import BrowseQuotes from "./pages/BrowseQuotes";
 
 const App = () => {
     const history = useHistory();
@@ -118,6 +119,9 @@ const App = () => {
                         </Route>
                         <Route path="/selectVerses" exact>
                             <SelectVerses/>
+                        </Route>
+                        <Route path="/browseQuotes" exact>
+                            <BrowseQuotes/>
                         </Route>
                     </Switch>
                 </div>
