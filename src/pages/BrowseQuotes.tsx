@@ -72,7 +72,8 @@ const BrowseQuotes = () => {
     const handleSearchString = (evt) => {
         setSearchString(evt.target.value);
         if (searchString.length > 2) {
-            const results = allQuotes.filter(q => q.answer.toUpperCase().includes(searchString.toUpperCase()));
+            //const results = allQuotes.filter(q => q.answer.toUpperCase().includes(searchString.toUpperCase()));
+            const results = doFuzzySearch(searchString, allQuotes);
             setSearchResults(results);
         }
     };
