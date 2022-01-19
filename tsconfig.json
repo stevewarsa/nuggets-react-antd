@@ -21,6 +21,14 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
-  ]
+    "src", "types", "@types/jest"
+  ],
+  "exclude": ["node_modules"],
+  "jest": {
+    "globals": {
+      "ts-jest": {
+        "tsConfigFile": "tsconfig.jest.json"
+      }
+    }
+  }
 }

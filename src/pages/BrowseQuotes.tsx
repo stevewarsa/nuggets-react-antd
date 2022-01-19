@@ -167,4 +167,20 @@ const BrowseQuotes = () => {
     );
 };
 
+export const doFuzzySearch = (searchCriteria: string, quotes: Quote[]): Quote[] => {
+    const words = searchCriteria.split(" ").map(word => word.toUpperCase().trim());
+    return quotes.filter(qt => {
+        const quoteText = qt.answer.toUpperCase();
+        let matches = false;
+        if (quoteText.includes(searchCriteria.toUpperCase().trim())) {
+            matches = true;
+        }
+        const quoteWords = quoteText.split(" ").map(word => word.trim());
+        if (words.some(word => quoteWords.includes(word))) {
+            matches = true;
+        }
+        return matches;
+    });
+}
+
 export default BrowseQuotes;
