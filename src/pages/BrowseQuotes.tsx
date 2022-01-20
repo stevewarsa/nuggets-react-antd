@@ -177,10 +177,22 @@ export const doFuzzySearch = (searchCriteria: string, quotes: Quote[]): Quote[] 
             matches = true;
         }
         const quoteWords = quoteText.split(" ").map(word => word.trim());
-        if (words.some(word => quoteWords.includes(word))) {
-            matches = true;
+        let allWordsMatch = true;
+        for (let word of words) {
+            let currWordFound = false;
+            for (let quoteWord of quoteWords) {
+                // not exact match, but must include current word in a quote word (e.g. steve is included in steven)
+                if (quoteWord.includes(word)) {
+                    currWordFound = true;
+                    break;
+                }
+            }
+            if (!currWordFound) {
+                allWordsMatch = false;
+                break;
+            }
         }
-        return matches;
+        return allWordsMatch || matches;
     });
 }
 
