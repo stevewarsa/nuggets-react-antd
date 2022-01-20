@@ -40,6 +40,12 @@ class MemoryService {
         return axios.get<Quote[]>("/bible-app/server/get_quote_list.php?user=" + userName);
     }
 
+    public addNonBibleQuote(quote: any, user: string) {
+        quote.user = user;
+        quote.category = 'quote';
+        return axios.post("/bible-app/server/add_nonbible_memory_fact.php", quote);
+    }
+
     public getBookId(bookName: string): number {
         let keys: string[] = Object.keys(Constants.booksByNum);
         for (let key of keys) {

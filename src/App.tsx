@@ -15,6 +15,7 @@ import memoryService from "./services/memory-service";
 import SelectVerses from "./pages/SelectVerses";
 import BibleReadingPlan from "./pages/BibleReadingPlan";
 import BrowseQuotes from "./pages/BrowseQuotes";
+import AddQuote from "./pages/AddQuote";
 
 const App = () => {
     const history = useHistory();
@@ -122,6 +123,9 @@ const App = () => {
                         </Route>
                         <Route path="/browseQuotes" exact>
                             <BrowseQuotes/>
+                        </Route>
+                        <Route path="/addQuote" exact>
+                            <AddQuote/>
                         </Route>
                     </Switch>
                 </div>
