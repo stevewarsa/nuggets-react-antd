@@ -52,8 +52,8 @@ export class PassageUtils {
   //   return JSON.parse(JSON.stringify(passage));
   // }
 
-  public static copyPassageToClipboard(passage: Passage): string {
-    let clipboardContent = PassageUtils.getPassageForClipboard(passage);
+  public static copyPassageToClipboard(passage: Passage, noTransl: boolean): string {
+    let clipboardContent = PassageUtils.getPassageForClipboard(passage, noTransl);
     copy(clipboardContent);
     return PassageUtils.getPassageString(passage, -1, 0, null, false, false, null);
   }
@@ -269,16 +269,16 @@ export class PassageUtils {
   //   return passageArray;
   // }
 
-  public static getPassageForClipboard(passage: Passage): string {
+  public static getPassageForClipboard(passage: Passage, noTransl: boolean): string {
     if (!passage || !passage.verses || passage.verses.length === 0) {
       return "";
     }
     let verseLen: number = passage.verses.length;
     let verseText: string = "";
     if (passage.passageRefAppendLetter && passage.passageRefAppendLetter.length > 0) {
-      verseText += this.getPassageStringNoIndex(passage, true, passage.passageRefAppendLetter);
+      verseText += this.getPassageStringNoIndex(passage, true, noTransl, passage.passageRefAppendLetter);
     } else {
-      verseText += this.getPassageStringNoIndex(passage, true);
+      verseText += this.getPassageStringNoIndex(passage, true, noTransl);
     }
     verseText += "\n\n";
     for (let i = 0; i < verseLen; i++) {
@@ -298,18 +298,12 @@ export class PassageUtils {
 
   public static updateAllMatches(find: string, str: string) {
     let stringToHighlight = find.replace("*", "(.*?)");
-    console.log("PassageUtils.updateAllMatches - Here is the regex wildcard: '" + stringToHighlight + "'");
+    //console.log("PassageUtils.updateAllMatches - Here is the regex wildcard: '" + stringToHighlight + "'");
     if (stringToHighlight === "") {
-      return;
+      return str;
     }
     let regex: RegExp = new RegExp(stringToHighlight, 'i');
-    str = str.replace(regex, "<span class='search_result'>$&</span>");
-    // let parts: string[] = find.split('*');
-    // for (let part of parts) {
-    //   let regex: RegExp = new RegExp(part, 'ig');
-    //   str = str.replace(regex, "<span class='search_result'>$&</span>");
-    // }
-    return str;
+    return str.replace(regex, "<span class='search_result'>$&</span>");
   }
 
   public static updateLineFeedsWithBr(stringToModify: string): string {
@@ -318,7 +312,7 @@ export class PassageUtils {
     return stringToModify;
   }
 
-  public static getPassageStringNoIndex(passage: Passage, translShort: boolean, appendLetter?: string) {
+  public static getPassageStringNoIndex(passage: Passage, translShort: boolean, noTransl: boolean, appendLetter?: string) {
     let verseNumbers: string;
     if (passage.startVerse === passage.endVerse) {
       verseNumbers = passage.startVerse + "";
@@ -339,9 +333,9 @@ export class PassageUtils {
     if (passage.translationId || passage.translationName) {
       if (translShort) {
         const matchingTranslation = Constants.translationsShortNms.find(t => t.code === (passage.translationId ? passage.translationId : passage.translationName));
-        return regularBook + " " + passage.chapter + ":" + verseNumbers + " (" + matchingTranslation.translationName + ")";
+        return regularBook + " " + passage.chapter + ":" + verseNumbers + (noTransl ? "" : " (" + matchingTranslation.translationName + ")");
       } else {
-        return regularBook + " " + passage.chapter + ":" + verseNumbers + " (" + Constants.translationMediumNames[(passage.translationId ? passage.translationId : passage.translationName)] + ")";
+        return regularBook + " " + passage.chapter + ":" + verseNumbers + (noTransl ? "" : " (" + Constants.translationMediumNames[(passage.translationId ? passage.translationId : passage.translationName)] + ")");
       }
     } else {
       return regularBook + " " + passage.chapter + ":" + verseNumbers;
@@ -392,15 +386,15 @@ export class PassageUtils {
   }
 
   public static sortAccordingToPracticeConfig(order: string, arr: any[]): any[] {
-    if (order == PassageUtils.RAND) {
+    if (order === PassageUtils.RAND) {
       //console.log("displayOrder=rand");
       this.shuffleArray(arr);
-    } else if (order == PassageUtils.BY_FREQ) {
+    } else if (order === PassageUtils.BY_FREQ) {
       //console.log("displayOrder=by_freq");
       arr = arr.sort((a: Passage, b: Passage) => {
         return (a.frequencyDays - b.frequencyDays);
       });
-    } else if (order == PassageUtils.BY_LAST_PRACTICED) {
+    } else if (order === PassageUtils.BY_LAST_PRACTICED) {
       //console.log("displayOrder=by_last_practiced_time");
       arr = arr.sort((a: Passage, b: Passage) => {
         return (a.last_viewed_num - b.last_viewed_num);

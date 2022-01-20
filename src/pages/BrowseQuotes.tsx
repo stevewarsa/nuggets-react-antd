@@ -78,7 +78,6 @@ const BrowseQuotes = () => {
         setSearchString(evt.target.value);
     };
     useEffect(() => {
-        console.log("Current search criteria entered: " + searchString); // not late
         if (searchString.length > 2) {
             const results = doFuzzySearch(searchString, allQuotes);
             setSearchResults(results);

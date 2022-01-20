@@ -33,14 +33,14 @@ const ReadChapter = () => {
             // console.log("useEffect - here's the verseSelectionRequest sent back to me, and following that will be the current passage:");
             // console.log(verseSelectionRequest);
             const selectedVerses = verseSelectionRequest.versesForSelection.filter(v => v.selected);
-            if (selectedVerses.length == 1 || selectedVerses.length == 2) {
+            if (selectedVerses.length === 1 || selectedVerses.length === 2) {
                 const passage = new Passage();
                 passage.startVerse = selectedVerses[0].verseNum;
-                passage.endVerse = selectedVerses.length == 1 ? passage.startVerse : selectedVerses[1].verseNum;
+                passage.endVerse = selectedVerses.length === 1 ? passage.startVerse : selectedVerses[1].verseNum;
                 passage.bookName = chapterConfig.book;
                 passage.translationName = chapterConfig.translation;
                 passage.chapter = chapterConfig.chapter;
-                const psgRef = PassageUtils.getPassageStringNoIndex(passage, true);
+                const psgRef = PassageUtils.getPassageStringNoIndex(passage, true, true);
                 let clipboardString = psgRef + "\n\n";
                 for (let verse of verseSelectionRequest.versesForSelection) {
                     if (verse.verseNum >= passage.startVerse && verse.verseNum <= passage.endVerse) {

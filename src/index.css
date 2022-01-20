@@ -23,7 +23,8 @@ code {
 }
 
 .search_result {
-  color: #00FF00;
+  color: forestgreen;
+  font-weight: bold;
 }
 .nugget-view {
   font-weight: bold;

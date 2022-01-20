@@ -63,11 +63,11 @@ const Practice = () => {
             // console.log("populateVerses - back from getting passage text.  Here is the data returned:");
             // console.log(locMemoryPassageData.data);
             if (copyToClipboard) {
-                const clipboardContent = PassageUtils.getPassageForClipboard(locMemoryPassageData.data);
+                const clipboardContent = PassageUtils.getPassageForClipboard(locMemoryPassageData.data, true);
                 if (StringUtils.isEmpty(clipboardContent)) {
                     console.log("populateVerses - Unable to copy passage to clipboard...");
                 } else {
-                    notification.info({message: PassageUtils.copyPassageToClipboard(locMemoryPassageData.data) + " copied!", placement: "bottomRight"})
+                    notification.info({message: PassageUtils.copyPassageToClipboard(locMemoryPassageData.data, true) + " copied!", placement: "bottomRight"})
                 }
             }
             updatePassageInList(locMemoryPassageData.data);
@@ -191,12 +191,12 @@ const Practice = () => {
         let currPassage = practiceState.memPassageList[practiceState.currentIndex];
         if (key === "1") {
             // copy
-            let clipboardContent = PassageUtils.getPassageForClipboard(currPassage);
+            let clipboardContent = PassageUtils.getPassageForClipboard(currPassage, true);
             if (StringUtils.isEmpty(clipboardContent)) {
                 // console.log("calling populateVerses()...");
                 await populateVerses(currPassage, true);
             } else {
-                notification.info({message: PassageUtils.copyPassageToClipboard(currPassage) + " copied!", placement: "bottomRight"});
+                notification.info({message: PassageUtils.copyPassageToClipboard(currPassage, true) + " copied!", placement: "bottomRight"});
             }
         } else if (key === "2") {
             // interlinear link
