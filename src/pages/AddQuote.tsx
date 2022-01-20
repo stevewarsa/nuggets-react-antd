@@ -1,6 +1,6 @@
 import {PlusCircleOutlined} from "@ant-design/icons";
 import {Button, Col, Input, Row} from "antd";
-import {useEffect, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import memoryService from "../services/memory-service";
 import {Constants} from "../model/constants";
 import SpinnerTimer from "../components/SpinnerTimer";
@@ -8,7 +8,6 @@ import {useHistory} from "react-router-dom";
 
 const AddQuote = () => {
     const history = useHistory();
-    const [rowCount, setRowCount] = useState(10);
     const [quote, setQuote] = useState("");
     const [busy, setBusy] = useState({state: false, message: ""});
     const { TextArea } = Input;
@@ -17,16 +16,6 @@ const AddQuote = () => {
     const handleInput = (evt) => {
         setQuote(evt.target.value);
     };
-
-    useEffect(() => {
-        if (!ref.current || !ref.current.cols) {
-            return;
-        }
-        console.log("Effect - ref: ");
-        console.log(ref.current);
-        let lineFeeds = quote.split("\n").length * 2;
-        setRowCount(Math.ceil((quote.length + lineFeeds) / ref.current.cols));
-    }, [quote]);
 
     const handleAddQuote = async () => {
         setBusy({state: true, message: "Adding new quote..."});
@@ -53,7 +42,7 @@ const AddQuote = () => {
                 <h2><PlusCircleOutlined/> Add Quote</h2>
                 <Row style={{marginBottom: "5px"}}>
                     <Col span={24}>
-                        <TextArea autoSize={{ minRows: 5, maxRows: 10 }} style={{width: "100%"}} autoFocus ref={ref} rows={rowCount} value={quote} onChange={handleInput}/>
+                        <TextArea autoSize={{ minRows: 5, maxRows: 10 }} style={{width: "100%"}} autoFocus ref={ref} value={quote} onChange={handleInput}/>
                     </Col>
                 </Row>
                 <Row>
