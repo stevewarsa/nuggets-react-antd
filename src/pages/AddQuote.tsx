@@ -52,12 +52,12 @@ const AddQuote = () => {
             <>
                 <h2><PlusCircleOutlined/> Add Quote</h2>
                 <Row style={{marginBottom: "5px"}}>
-                    <Col>
-                        <TextArea autoFocus ref={ref} rows={rowCount} value={quote} onChange={handleInput}/>
+                    <Col span={24}>
+                        <TextArea autoSize={{ minRows: 5, maxRows: 10 }} style={{width: "100%"}} autoFocus ref={ref} rows={rowCount} value={quote} onChange={handleInput}/>
                     </Col>
                 </Row>
                 <Row>
-                    <Col><Button type="primary" onClick={handleAddQuote}>Add Quote</Button></Col>
+                    <Col><Button disabled={!quote || quote.trim().length === 0} type="primary" onClick={handleAddQuote}>Add Quote</Button></Col>
                 </Row>
             </>
         );
