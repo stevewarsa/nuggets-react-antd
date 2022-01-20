@@ -9,13 +9,14 @@ import Swipe from "react-easy-swipe";
 import {ArrowLeftOutlined, ArrowRightOutlined, CopyOutlined, MoreOutlined, SearchOutlined} from "@ant-design/icons";
 import {PassageUtils} from "../helpers/passage-utils";
 import copy from "copy-to-clipboard";
+import {QuoteMatch} from "../model/quote-match";
 
 const BrowseQuotes = () => {
     const [allQuotes, setAllQuotes] = useState<Quote[]>([]);
     const [busy, setBusy] = useState({state: false, message: ""});
     const [currentIndex, setCurrentIndex] = useState(0);
     const [searchVisible, setSearchVisible] = useState(false);
-    const [searchResults, setSearchResults] = useState<Quote[]>([]);
+    const [searchResults, setSearchResults] = useState<QuoteMatch[]>([]);
     const [searchString, setSearchString] = useState("");
 
     useEffect(() => {
@@ -70,13 +71,20 @@ const BrowseQuotes = () => {
     };
 
     const handleSearchString = (evt) => {
+        const locSearchStr = evt.target.value;
+        if (!locSearchStr || locSearchStr === "") {
+            return;
+        }
         setSearchString(evt.target.value);
+    };
+    useEffect(() => {
+        console.log("Current search criteria entered: " + searchString); // not late
         if (searchString.length > 2) {
-            //const results = allQuotes.filter(q => q.answer.toUpperCase().includes(searchString.toUpperCase()));
             const results = doFuzzySearch(searchString, allQuotes);
             setSearchResults(results);
         }
-    };
+
+    }, [searchString]);
 
     const handleCloseSearch = () => {
         setSearchVisible(false);
@@ -115,13 +123,13 @@ const BrowseQuotes = () => {
                                         </Row>
                                         {searchResults.length > 0 && <Row><Col><p>{searchResults.length + " matches"}</p></Col></Row>}
                                         {searchResults.length > 0 && searchResults.map(q => (
-                                            <div key={q.objectionId + "div"} style={{borderStyle: "solid", borderWidth: "1px", marginBottom: "5px"}}>
-                                                <Row key={q.objectionId + "quoterow"} style={{marginBottom: "5px"}}>
-                                                    <Col span={24} key={q.objectionId + "quote"}>{q.answer}</Col>
+                                            <div key={q.originalQuote.objectionId + "div"} style={{borderStyle: "solid", borderWidth: "1px", marginBottom: "5px"}}>
+                                                <Row key={q.originalQuote.objectionId + "quoterow"} style={{marginBottom: "5px"}}>
+                                                    <Col span={24} key={q.originalQuote.objectionId + "quote"} dangerouslySetInnerHTML={{__html: q.annotatedText}}/>
                                                 </Row>
-                                                <Row key={q.objectionId + "buttonrow"} >
-                                                    <Col span={24} key={q.objectionId + "buttoncol"} >
-                                                        <Button key={q.objectionId + "button"}  type="link" onClick={() => goTo(q.objectionId)}>Go To</Button>
+                                                <Row key={q.originalQuote.objectionId + "buttonrow"} >
+                                                    <Col span={24} key={q.originalQuote.objectionId + "buttoncol"} >
+                                                        <Button key={q.originalQuote.objectionId + "button"}  type="link" onClick={() => goTo(q.originalQuote.objectionId)}>Go To</Button>
                                                     </Col>
                                                 </Row>
                                             </div>
@@ -168,32 +176,43 @@ const BrowseQuotes = () => {
     );
 };
 
-export const doFuzzySearch = (searchCriteria: string, quotes: Quote[]): Quote[] => {
+export const doFuzzySearch = (searchCriteria: string, quotes: Quote[]): QuoteMatch[] => {
     const words = searchCriteria.split(" ").map(word => word.toUpperCase().trim());
-    return quotes.filter(qt => {
+    return quotes.map(qt => {
+        let quoteMatch: QuoteMatch = {annotatedText: null, originalQuote: qt} as QuoteMatch;
         const quoteText = qt.answer.toUpperCase();
-        let matches = false;
         if (quoteText.includes(searchCriteria.toUpperCase().trim())) {
-            matches = true;
-        }
-        const quoteWords = quoteText.split(" ").map(word => word.trim());
-        let allWordsMatch = true;
-        for (let word of words) {
-            let currWordFound = false;
-            for (let quoteWord of quoteWords) {
-                // not exact match, but must include current word in a quote word (e.g. steve is included in steven)
-                if (quoteWord.includes(word)) {
-                    currWordFound = true;
+            quoteMatch.annotatedText = PassageUtils.updateAllMatches(searchCriteria, qt.answer);
+        } else {
+            const quoteWords = quoteText.split(" ").map(word => word.trim());
+            let foundWords: string[] = [];
+            let allWordsMatch = true;
+            for (let word of words) {
+                let currWordFound = false;
+                for (let quoteWord of quoteWords) {
+                    // not exact match, but must include current word in a quote word (e.g. steve is included in steven)
+                    if (quoteWord.includes(word)) {
+                        currWordFound = true;
+                        break;
+                    }
+                }
+                if (!currWordFound) {
+                    allWordsMatch = false;
                     break;
+                } else {
+                    foundWords.push(word);
                 }
             }
-            if (!currWordFound) {
-                allWordsMatch = false;
-                break;
+            if (foundWords.length > 0 && allWordsMatch) {
+                quoteMatch.annotatedText = qt.answer;
+                for (let foundWord of foundWords) {
+                    quoteMatch.annotatedText = PassageUtils.updateAllMatches(foundWord, quoteMatch.annotatedText);
+                }
             }
         }
-        return allWordsMatch || matches;
-    });
+
+        return quoteMatch;
+    }).filter(qt => qt.annotatedText !== null);
 }
 
 export default BrowseQuotes;
