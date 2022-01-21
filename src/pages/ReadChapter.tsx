@@ -51,7 +51,7 @@ const ReadChapter = () => {
                 notification.info({message: psgRef + " copied!", placement: "bottomRight"});
             }
         }
-    }, [verseSelectionRequest]);
+    }, [verseSelectionRequest, chapterConfig.book, chapterConfig.chapter, chapterConfig.translation]);
 
     useEffect(() => {
         const callServer = async () => {

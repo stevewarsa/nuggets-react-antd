@@ -11,7 +11,6 @@ import SpinnerTimer from "../components/SpinnerTimer";
 import {useIsMounted} from "../helpers/is-mounted";
 
 const Login = () => {
-    const user = useSelector((appState: AppState) => appState.user);
     const dispatcher = useDispatch();
     const navigate = useNavigate();
     const allUsers = useSelector((appState: AppState) => appState.allUsers);
@@ -31,7 +30,7 @@ const Login = () => {
             navigate("/mainMenu");
             return;
         }
-    }, [dispatcher, navigate]);
+    }, [dispatcher, navigate, isMounted]);
 
     useEffect(() => {
         form.resetFields();

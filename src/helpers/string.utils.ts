@@ -15,23 +15,7 @@ export class StringUtils {
       }
       return str.trim();
     }
-  
-    /**
-     * removes non-ASCII characters from the given string and trims it
-     *
-     * @static
-     * @param {string} str
-     * @returns {string}
-     *
-     * @memberOf StringUtils
-     */
-    static sanitize(str: string): string {
-      if (!str) {
-        return str;
-      }
-      return StringUtils.trim(str.replace(/[^\x20-\x7e\x0a\x0d]/g, ""));
-    }
-  
+
     /**
      * returns true if the given string is null/undefined or empty after trim
      *
@@ -60,12 +44,13 @@ export class StringUtils {
     }
   
     /**
-     * appends given messages into one string delimited by <BR>, limits number of messages appended to optional parameter maxMessages 
+     * appends given messages into one string delimited by <BR>, limits number of messages appended to optional parameter maxMessages
      * @static
-     * @param {string[]} messages 
-     * @param {number} [maxMessages=0] 
-     * @returns {string} 
-   
+     * @param {string[]} messages
+     * @param {number} [maxMessages=0]
+     * @param delimiter
+     * @returns {string}
+
      */
     static formatListOfMessages(messages: string[], maxMessages = 0, delimiter = "<BR>"): string {
       if (!messages.length) {

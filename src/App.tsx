@@ -1,4 +1,4 @@
-import {Route, Navigate, Routes} from "react-router-dom";
+import {Route, Navigate, Routes, useLocation} from "react-router-dom";
 import 'antd/dist/antd.css';
 import MainMenu from "./pages/MainMenu";
 import {Layout, Menu} from "antd";
@@ -22,6 +22,9 @@ import { useNavigate } from 'react-router-dom';
 
 const App = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const pathAfterLogin = useSelector((appState: AppState) => appState.pathAfterLogin);
+    console.log("Here is the location:", location);
     const dispatcher = useDispatch();
     const selectedMenu = useSelector((state: AppState) => state.selectedMenuKey);
     const user = useSelector((state: AppState) => state.user);
@@ -35,10 +38,21 @@ const App = () => {
             dispatcher(stateActions.setAllUsers(allUsers.data));
         };
         callServer();
-        if (StringUtils.isEmpty(user)) {
 
-        }
     }, [dispatcher]);
+    useEffect(() => {
+        if (StringUtils.isEmpty(user)) {
+            if (!StringUtils.isEmpty(location.pathname) && !["/login", "/", "/mainMenu", "/readChapter", "/selectVerses", "/practice"].includes(location.pathname)) {
+                console.log("App.useEffect - setting pathAfterLogin to " + location.pathname);
+                dispatcher(stateActions.setPathAfterLogin(location.pathname));
+            }
+        } else {
+            // user is logged in, so see if there is a path after login - if so redirect there
+            if (!StringUtils.isEmpty(pathAfterLogin)) {
+                navigate(pathAfterLogin);
+            }
+        }
+    }, [location.pathname, user, pathAfterLogin]);
     const menuItems = [
         {
             key: 1,
@@ -103,7 +117,7 @@ const App = () => {
             <Content style={{ padding: '0 50px', marginTop: '20px' }}>
                 <div className="site-layout-content">
                     <Routes>
-                        <Route path="/" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <Navigate to="/main" />} />
+                        <Route path="/" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <Navigate to="/mainMenu" />} />
                         <Route path="/login" element={StringUtils.isEmpty(user) ?  <Login/> : <Navigate to="/mainMenu" />}/>
                         <Route path="/mainMenu" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <MainMenu/>}/>
                         <Route path="/about" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <About/>}/>

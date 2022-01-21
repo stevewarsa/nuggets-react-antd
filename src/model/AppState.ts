@@ -14,4 +14,5 @@ export interface AppState {
     user: string;
     allUsers: MemUser[];
     startingQuote: number;
+    pathAfterLogin: string;
 }

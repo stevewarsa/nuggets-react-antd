@@ -18,7 +18,7 @@ const SelectVerses = () => {
             v[i].selected = i === 0 || i === (v.length - 1);
         }
         setLocVerses(v);
-    }, [verseSelectionRequest.versesForSelection]);
+    }, [verseSelectionRequest.versesForSelection, locVerses]);
 
     const handleSubmit = () => {
         // console.log("Handle submit - selected verses:");
