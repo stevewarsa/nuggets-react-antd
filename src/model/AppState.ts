@@ -1,6 +1,7 @@
 import {PracticeConfig} from "./PracticeConfig";
 import {Passage} from "./passage";
 import {VerseSelectionRequest} from "./verse-selection-request";
+import {MemUser} from "./mem-user";
 
 export interface AppState {
     practiceConfig: PracticeConfig;
@@ -10,4 +11,6 @@ export interface AppState {
     chapterSelection: {book: string, chapter: number, translation: string};
     maxChaptersByBook: {bookName: string, maxChapter: number}[];
     verseSelectionRequest: VerseSelectionRequest;
+    user: string;
+    allUsers: MemUser[];
 }

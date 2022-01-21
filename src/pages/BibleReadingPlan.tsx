@@ -27,11 +27,12 @@ const BibleReadingPlan = () => {
     const [todaysReading, setTodaysReading] = useState<ReadingHistoryEntry>(null);
     const [translation, setTranslation] = useState("niv");
     const [busy, setBusy] = useState({state: false, message: ""});
+    const user = useSelector((state: AppState) => state.user);
 
     useEffect(() => {
         const callServer = async () => {
             setBusy({state: true, message: "Loading reading plan history..."});
-            const allReadingPlan = await memoryService.getAllReadingPlanProgress(Constants.USER);
+            const allReadingPlan = await memoryService.getAllReadingPlanProgress(user);
             const data: ReadingHistoryEntry[] = allReadingPlan.data as ReadingHistoryEntry[];
             setAllReadingPlanProgress(data);
             let nextReadingEntry: ReadingHistoryEntry;
@@ -75,7 +76,7 @@ const BibleReadingPlan = () => {
                 nextReadingEntry.dateRead = DateUtils.formatDate(new Date(), "yyyy-MM-dd");
             }
             setTodaysReading(nextReadingEntry);
-            const preferencesResponse = await memoryService.getPreferences(Constants.USER);
+            const preferencesResponse = await memoryService.getPreferences(user);
             setTranslation(PassageUtils.getPreferredTranslationFromPrefs(preferencesResponse.data, "niv"));
             setBusy({state: false, message: ""});
         };
@@ -84,7 +85,7 @@ const BibleReadingPlan = () => {
 
     const handleRead = async () => {
         setBusy({state: true, message: "Updating reading plan progress..."});
-        const response = await memoryService.updateReadingPlan(Constants.USER, todaysReading.dayOfWeek, todaysReading.bookName, todaysReading.bookId, todaysReading.chapter);
+        const response = await memoryService.updateReadingPlan(user, todaysReading.dayOfWeek, todaysReading.bookName, todaysReading.bookId, todaysReading.chapter);
         if (response.data === "success") {
             dispatcher(stateActions.setChapterSelection({book: todaysReading.bookName, chapter: todaysReading.chapter, translation: translation}));
             setBusy({state: false, message: ""});

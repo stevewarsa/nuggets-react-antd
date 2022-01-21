@@ -16,6 +16,7 @@ import SelectVerses from "./pages/SelectVerses";
 import BibleReadingPlan from "./pages/BibleReadingPlan";
 import BrowseQuotes from "./pages/BrowseQuotes";
 import AddQuote from "./pages/AddQuote";
+import Login from "./pages/Login";
 
 const App = () => {
     const history = useHistory();
@@ -27,6 +28,8 @@ const App = () => {
         const callServer = async () => {
             const locMaxChaptersByBook = await memoryService.getMaxChaptersByBook();
             dispatcher(stateActions.setMaxChaptersByBook(locMaxChaptersByBook.data));
+            const allUsers = await memoryService.getAllUsers();
+            dispatcher(stateActions.setAllUsers(allUsers.data));
         };
         callServer();
     }, [dispatcher]);
@@ -95,7 +98,10 @@ const App = () => {
                 <div className="site-layout-content">
                     <Switch>
                         <Route path="/" exact>
-                            <Redirect to="/mainMenu"/>
+                            <Redirect to="/login"/>
+                        </Route>
+                        <Route path="/login" exact>
+                            <Login/>
                         </Route>
                         <Route path="/mainMenu" exact>
                             <MainMenu/>

@@ -2,6 +2,7 @@ import axios from "axios";
 import {Passage} from "../model/passage";
 import {Constants} from "../model/constants";
 import {Quote} from "../model/quote";
+import {MemUser} from "../model/mem-user";
 
 class MemoryService {
     public getMemoryPsgList(user: string) {
@@ -58,5 +59,12 @@ class MemoryService {
         return -1;
     }
 
+    public getAllUsers() {
+        return axios.get<MemUser[]>("/bible-app/server/get_all_users.php");
+    }
+
+    public doLogin(userName: string) {
+        return axios.get<string>("/bible-app/server/nuggets_login.php?user=" + userName);
+    }
 }
 export default new MemoryService();

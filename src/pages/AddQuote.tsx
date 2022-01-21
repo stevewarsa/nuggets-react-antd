@@ -1,17 +1,19 @@
 import {PlusCircleOutlined} from "@ant-design/icons";
 import {Button, Col, Input, Row} from "antd";
-import {useRef, useState} from "react";
+import {useState} from "react";
 import memoryService from "../services/memory-service";
 import {Constants} from "../model/constants";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {useHistory} from "react-router-dom";
+import {useSelector} from "react-redux";
+import {AppState} from "../model/AppState";
 
 const AddQuote = () => {
     const history = useHistory();
     const [quote, setQuote] = useState("");
     const [busy, setBusy] = useState({state: false, message: ""});
     const { TextArea } = Input;
-    const ref = useRef<HTMLTextAreaElement>();
+    const user = useSelector((state: AppState) => state.user);
 
     const handleInput = (evt) => {
         setQuote(evt.target.value);
@@ -25,7 +27,7 @@ const AddQuote = () => {
             sourceId: null,
             fromUser: null
         };
-        const response = await memoryService.addNonBibleQuote(qtParam, Constants.USER);
+        const response = await memoryService.addNonBibleQuote(qtParam, user);
         if (response.data.objectionId > 1) {
             setBusy({state: false, message: ""});
             history.push("/browseQuotes");
@@ -42,7 +44,7 @@ const AddQuote = () => {
                 <h2><PlusCircleOutlined/> Add Quote</h2>
                 <Row style={{marginBottom: "5px"}}>
                     <Col span={24}>
-                        <TextArea autoSize={{ minRows: 5, maxRows: 10 }} style={{width: "100%"}} autoFocus ref={ref} value={quote} onChange={handleInput}/>
+                        <TextArea autoSize={{ minRows: 5, maxRows: 10 }} style={{width: "100%"}} autoFocus value={quote} onChange={handleInput}/>
                     </Col>
                 </Row>
                 <Row>

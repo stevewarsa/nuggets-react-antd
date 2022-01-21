@@ -10,6 +10,8 @@ import {ArrowLeftOutlined, ArrowRightOutlined, CopyOutlined, MoreOutlined, Searc
 import {PassageUtils} from "../helpers/passage-utils";
 import copy from "copy-to-clipboard";
 import {QuoteMatch} from "../model/quote-match";
+import {useSelector} from "react-redux";
+import {AppState} from "../model/AppState";
 
 const BrowseQuotes = () => {
     const [allQuotes, setAllQuotes] = useState<Quote[]>([]);
@@ -18,11 +20,11 @@ const BrowseQuotes = () => {
     const [searchVisible, setSearchVisible] = useState(false);
     const [searchResults, setSearchResults] = useState<QuoteMatch[]>([]);
     const [searchString, setSearchString] = useState("");
-
+    const user = useSelector((state: AppState) => state.user);
     useEffect(() => {
         const callServer = async () => {
             setBusy({state: true, message: "Retrieving quotes from server..."});
-            const quoteListResponse = await memoryService.getQuoteList(Constants.USER);
+            const quoteListResponse = await memoryService.getQuoteList(user);
             const quotes: Quote[] = quoteListResponse.data.filter(({objectionId, answer}, index, a) =>
                 a.findIndex(e => objectionId === e.objectionId && answer === e.answer) === index)
                 .filter(q => StringUtils.isEmpty(q.approved) || q.approved === "Y");

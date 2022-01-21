@@ -25,6 +25,7 @@ const Practice = () => {
     const dispatcher = useDispatch();
     const practiceConfig = useSelector((state: AppState) => state.practiceConfig);
     const memTextOverrides = useSelector((state: AppState) => state.memTextOverrides);
+    const user = useSelector((state: AppState) => state.user);
     const [busy, setBusy] = useState({state: false, message: ""});
     const [practiceState, setPracticeState] = useState({
         memPassageList: [],
@@ -59,7 +60,7 @@ const Practice = () => {
                     currPassage.passageId + "..."
             });
             // console.log("populateVerses - currPassage has no verses, so calling server to get verses");
-            const locMemoryPassageData: any = await memoryService.getPassage(currPassage, Constants.USER);
+            const locMemoryPassageData: any = await memoryService.getPassage(currPassage, user);
             // console.log("populateVerses - back from getting passage text.  Here is the data returned:");
             // console.log(locMemoryPassageData.data);
             if (copyToClipboard) {
@@ -105,7 +106,7 @@ const Practice = () => {
         const callServer = async () => {
             setBusy({state: true, message: "Loading memory passages from DB..."});
             // console.log("Inside call server - calling memoryService.getMemoryPsgList()...");
-            const locMemoryPassagesData: any = await memoryService.getMemoryPsgList(Constants.USER);
+            const locMemoryPassagesData: any = await memoryService.getMemoryPsgList(user);
             // console.log("Inside call server - BACK FROM calling memoryService.getMemoryPsgList()...");
             // update the "append letter" if there is one
             if (memTextOverrides && memTextOverrides.length > 0) {

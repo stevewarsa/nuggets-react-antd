@@ -12,7 +12,9 @@ const initialState: AppState = {
     selectedMenuKey: 1,
     chapterSelection: null,
     verseSelectionRequest: null,
-    maxChaptersByBook: []
+    maxChaptersByBook: [],
+    user: null,
+    allUsers: []
 } as AppState;
 
 const state = createSlice({
@@ -90,6 +92,13 @@ const state = createSlice({
             // console.log("setVersesForSelection (reducer) - here is the payload:");
             // console.log(action.payload);
             state.verseSelectionRequest = action.payload;
+        },
+        setUser(state, action) {
+            console.log("setUser (reducer) - action.payload: " + action.payload);
+            state.user = action.payload;
+        },
+        setAllUsers(state, action) {
+            state.allUsers = action.payload;
         }
     }
 });

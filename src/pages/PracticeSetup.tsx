@@ -4,16 +4,17 @@ import {CaretRightOutlined} from "@ant-design/icons";
 import {stateActions} from "../store";
 import {PracticeConfig} from "../model/PracticeConfig";
 import {useHistory} from "react-router-dom";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {PassageUtils} from "../helpers/passage-utils";
 import memoryService from "../services/memory-service";
-import {Constants} from "../model/constants";
+import {AppState} from "../model/AppState";
 
 const PracticeSetup = () => {
     const history = useHistory();
     const dispatcher = useDispatch();
     const [practiceMode, setPracticeMode] = useState(PassageUtils.BY_REF);
     const [passageDisplayOrder, setPassageDisplayOrder] = useState(PassageUtils.BY_FREQ);
+    const user = useSelector((state: AppState) => state.user);
 
     const handlePracticeModeChange = (e: any) => {
         setPracticeMode(e.target.value);
@@ -23,9 +24,9 @@ const PracticeSetup = () => {
     };
 
     const handleStart = async () => {
-        // console.log("Handle Start");
+        console.log("Handle Start - user: " + user);
         dispatcher(stateActions.setPracticeConfig({practiceMode: practiceMode, passageDisplayOrder: passageDisplayOrder} as PracticeConfig));
-        const locMemoryPassageOverridesData: any = await memoryService.getMemoryPassageTextOverrides(Constants.USER);
+        const locMemoryPassageOverridesData: any = await memoryService.getMemoryPassageTextOverrides(user);
         dispatcher(stateActions.setMemoryTextOverrides(locMemoryPassageOverridesData.data));
         history.push("/practice");
     }
