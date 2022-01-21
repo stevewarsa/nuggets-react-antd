@@ -8,8 +8,10 @@ import {useNavigate} from "react-router-dom";
 import memoryService from "../services/memory-service";
 import {AppState} from "../model/AppState";
 import SpinnerTimer from "../components/SpinnerTimer";
+import {useIsMounted} from "../helpers/is-mounted";
 
 const Login = () => {
+    const user = useSelector((appState: AppState) => appState.user);
     const dispatcher = useDispatch();
     const navigate = useNavigate();
     const allUsers = useSelector((appState: AppState) => appState.allUsers);
@@ -17,13 +19,17 @@ const Login = () => {
     const [initVals, setInitVals] = useState({username: "", remember: false, selectUserName: "N/A"});
     const [form] = Form.useForm();
     const [busy, setBusy] = useState({state: false, message: ""});
-
+    const isMounted = useIsMounted();
     useEffect(() => {
+        if (!isMounted.current) {
+            return;
+        }
         const userName = CookieUtils.getCookie('user.name');
         if (!StringUtils.isEmpty(userName)) {
             // log 'em right in...
             dispatcher(stateActions.setUser(userName));
             navigate("/mainMenu");
+            return;
         }
     }, [dispatcher, navigate]);
 

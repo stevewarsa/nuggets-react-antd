@@ -103,18 +103,18 @@ const App = () => {
             <Content style={{ padding: '0 50px', marginTop: '20px' }}>
                 <div className="site-layout-content">
                     <Routes>
-                        <Route path="/" element={<Navigate to="/login" />} />
-                        <Route path="/login" element={<Login/>}/>
-                        <Route path="/mainMenu" element={<MainMenu/>}/>
-                        <Route path="/about" element={<About/>}/>
-                        <Route path="/practiceSetup" element={<PracticeSetup/>}/>
-                        <Route path="/practice" element={<Practice/>}/>
-                        <Route path="/selectChapter" element={<SelectChapter/>}/>
-                        <Route path="/readChapter" element={<ReadChapter/>}/>
-                        <Route path="/bibleReadingPlan" element={<BibleReadingPlan/>}/>
-                        <Route path="/selectVerses" element={<SelectVerses/>}/>
-                        <Route path="/browseQuotes" element={<BrowseQuotes/>}/>
-                        <Route path="/addQuote" element={<AddQuote/>}/>
+                        <Route path="/" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <Navigate to="/main" />} />
+                        <Route path="/login" element={StringUtils.isEmpty(user) ?  <Login/> : <Navigate to="/mainMenu" />}/>
+                        <Route path="/mainMenu" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <MainMenu/>}/>
+                        <Route path="/about" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <About/>}/>
+                        <Route path="/practiceSetup" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <PracticeSetup/>}/>
+                        <Route path="/practice" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <Practice/>}/>
+                        <Route path="/selectChapter" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <SelectChapter/>}/>
+                        <Route path="/readChapter" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <ReadChapter/>}/>
+                        <Route path="/bibleReadingPlan" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <BibleReadingPlan/>}/>
+                        <Route path="/selectVerses" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <SelectVerses/>}/>
+                        <Route path="/browseQuotes" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <BrowseQuotes/>}/>
+                        <Route path="/addQuote" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <AddQuote/>}/>
                     </Routes>
                 </div>
             </Content>
