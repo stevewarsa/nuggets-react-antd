@@ -1,6 +1,5 @@
 import {useEffect, useState} from "react";
 import memoryService from "../services/memory-service";
-import {Constants} from "../model/constants";
 import {Quote} from "../model/quote";
 import {StringUtils} from "../helpers/string.utils";
 import SpinnerTimer from "../components/SpinnerTimer";
@@ -21,6 +20,7 @@ const BrowseQuotes = () => {
     const [searchResults, setSearchResults] = useState<QuoteMatch[]>([]);
     const [searchString, setSearchString] = useState("");
     const user = useSelector((state: AppState) => state.user);
+    const startingQuote = useSelector((state: AppState) => state.startingQuote);
     useEffect(() => {
         const callServer = async () => {
             setBusy({state: true, message: "Retrieving quotes from server..."});
@@ -33,7 +33,13 @@ const BrowseQuotes = () => {
             setBusy({state: false, message: ""});
         };
         callServer();
-    }, []);
+    }, [user]);
+
+    useEffect(() => {
+        if (startingQuote > 0) {
+            setCurrentIndex(allQuotes.findIndex(qt => qt.objectionId === startingQuote));
+        }
+    }, [allQuotes, startingQuote]);
 
     const handleNext = () => {
         setCurrentIndex(prev => {
@@ -85,7 +91,7 @@ const BrowseQuotes = () => {
             setSearchResults(results);
         }
 
-    }, [searchString]);
+    }, [searchString, allQuotes]);
 
     const handleCloseSearch = () => {
         setSearchVisible(false);

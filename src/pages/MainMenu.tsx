@@ -2,12 +2,12 @@ import React from 'react';
 import {AimOutlined, ReadOutlined, SearchOutlined, SketchOutlined} from "@ant-design/icons";
 import {Collapse, List, Space} from "antd";
 import 'antd/dist/antd.css';
-import {useHistory} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {stateActions} from "../store";
 
 const MainMenu = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const dispatcher = useDispatch();
     const { Panel } = Collapse;
     const menuItems = [
@@ -294,7 +294,7 @@ const MainMenu = () => {
             // this is practice setup
             dispatcher(stateActions.setSelectedMenuToPracticeSetup());
         }
-        history.push(item.action);
+        navigate(item.action);
     };
     return (
         <Collapse accordion>

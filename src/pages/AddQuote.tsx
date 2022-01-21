@@ -2,14 +2,15 @@ import {PlusCircleOutlined} from "@ant-design/icons";
 import {Button, Col, Input, Row} from "antd";
 import {useState} from "react";
 import memoryService from "../services/memory-service";
-import {Constants} from "../model/constants";
 import SpinnerTimer from "../components/SpinnerTimer";
-import {useHistory} from "react-router-dom";
-import {useSelector} from "react-redux";
+import {useNavigate} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
+import {stateActions} from "../store";
 
 const AddQuote = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
+    const dispatcher = useDispatch();
     const [quote, setQuote] = useState("");
     const [busy, setBusy] = useState({state: false, message: ""});
     const { TextArea } = Input;
@@ -30,7 +31,8 @@ const AddQuote = () => {
         const response = await memoryService.addNonBibleQuote(qtParam, user);
         if (response.data.objectionId > 1) {
             setBusy({state: false, message: ""});
-            history.push("/browseQuotes");
+            dispatcher(stateActions.setStartingQuote(response.data.objectionId));
+            navigate("/browseQuotes");
         } else {
             setBusy({state: false, message: ""});
         }

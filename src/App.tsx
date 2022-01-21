@@ -1,4 +1,4 @@
-import {Redirect, Route, Switch, useHistory} from "react-router-dom";
+import {Route, Navigate, Routes} from "react-router-dom";
 import 'antd/dist/antd.css';
 import MainMenu from "./pages/MainMenu";
 import {Layout, Menu} from "antd";
@@ -17,11 +17,14 @@ import BibleReadingPlan from "./pages/BibleReadingPlan";
 import BrowseQuotes from "./pages/BrowseQuotes";
 import AddQuote from "./pages/AddQuote";
 import Login from "./pages/Login";
+import {StringUtils} from "./helpers/string.utils";
+import { useNavigate } from 'react-router-dom';
 
 const App = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const dispatcher = useDispatch();
     const selectedMenu = useSelector((state: AppState) => state.selectedMenuKey);
+    const user = useSelector((state: AppState) => state.user);
     // console.log("App - selectedMenu from store is " + selectedMenu);
     const { Header, Content, Footer } = Layout;
     useEffect(() => {
@@ -32,6 +35,9 @@ const App = () => {
             dispatcher(stateActions.setAllUsers(allUsers.data));
         };
         callServer();
+        if (StringUtils.isEmpty(user)) {
+
+        }
     }, [dispatcher]);
     const menuItems = [
         {
@@ -83,7 +89,7 @@ const App = () => {
 
     const handleMenuItem = (item: {key: number, label: string, path: string}) => {
         // console.log(item.label);
-        history.push(item.path);
+        navigate(item.path);
         dispatcher(stateActions.setSelectedMenuItem(item.key));
     }
 
@@ -96,44 +102,20 @@ const App = () => {
             </Header>
             <Content style={{ padding: '0 50px', marginTop: '20px' }}>
                 <div className="site-layout-content">
-                    <Switch>
-                        <Route path="/" exact>
-                            <Redirect to="/login"/>
-                        </Route>
-                        <Route path="/login" exact>
-                            <Login/>
-                        </Route>
-                        <Route path="/mainMenu" exact>
-                            <MainMenu/>
-                        </Route>
-                        <Route path="/about" exact>
-                            <About/>
-                        </Route>
-                        <Route path="/practiceSetup" exact>
-                            <PracticeSetup/>
-                        </Route>
-                        <Route path="/practice" exact>
-                            <Practice/>
-                        </Route>
-                        <Route path="/selectChapter" exact>
-                            <SelectChapter/>
-                        </Route>
-                        <Route path="/readChapter" exact>
-                            <ReadChapter/>
-                        </Route>
-                        <Route path="/bibleReadingPlan" exact>
-                            <BibleReadingPlan/>
-                        </Route>
-                        <Route path="/selectVerses" exact>
-                            <SelectVerses/>
-                        </Route>
-                        <Route path="/browseQuotes" exact>
-                            <BrowseQuotes/>
-                        </Route>
-                        <Route path="/addQuote" exact>
-                            <AddQuote/>
-                        </Route>
-                    </Switch>
+                    <Routes>
+                        <Route path="/" element={<Navigate to="/login" />} />
+                        <Route path="/login" element={<Login/>}/>
+                        <Route path="/mainMenu" element={<MainMenu/>}/>
+                        <Route path="/about" element={<About/>}/>
+                        <Route path="/practiceSetup" element={<PracticeSetup/>}/>
+                        <Route path="/practice" element={<Practice/>}/>
+                        <Route path="/selectChapter" element={<SelectChapter/>}/>
+                        <Route path="/readChapter" element={<ReadChapter/>}/>
+                        <Route path="/bibleReadingPlan" element={<BibleReadingPlan/>}/>
+                        <Route path="/selectVerses" element={<SelectVerses/>}/>
+                        <Route path="/browseQuotes" element={<BrowseQuotes/>}/>
+                        <Route path="/addQuote" element={<AddQuote/>}/>
+                    </Routes>
                 </div>
             </Content>
             <Footer style={{ textAlign: 'center' }}>Bible Nuggets ©2022 Created by Steve Warsa</Footer>

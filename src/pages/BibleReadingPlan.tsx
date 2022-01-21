@@ -7,7 +7,7 @@ import memoryService from "../services/memory-service";
 import {PassageUtils} from "../helpers/passage-utils";
 import {Button, Card, Col, Divider, Row} from "antd";
 import {stateActions} from "../store";
-import {useHistory} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import SpinnerTimer from "../components/SpinnerTimer";
 
 interface ReadingHistoryEntry {
@@ -20,7 +20,7 @@ interface ReadingHistoryEntry {
 
 const BibleReadingPlan = () => {
     const dispatcher = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const maxChaptersByBook = useSelector((state: AppState) => state.maxChaptersByBook);
     const currentDayOfWeek = DateUtils.getDayOfWeek();
     const [allReadingPlanProgress, setAllReadingPlanProgress] = useState<ReadingHistoryEntry[]>([]);
@@ -81,7 +81,7 @@ const BibleReadingPlan = () => {
             setBusy({state: false, message: ""});
         };
         callServer();
-    }, []);
+    }, [currentDayOfWeek, maxChaptersByBook, user]);
 
     const handleRead = async () => {
         setBusy({state: true, message: "Updating reading plan progress..."});
@@ -89,7 +89,7 @@ const BibleReadingPlan = () => {
         if (response.data === "success") {
             dispatcher(stateActions.setChapterSelection({book: todaysReading.bookName, chapter: todaysReading.chapter, translation: translation}));
             setBusy({state: false, message: ""});
-            history.push("/readChapter");
+            navigate("/readChapter");
         } else {
             console.log("Got back " + response.data + " from server.  Not forwarding to /readChapter");
             setBusy({state: false, message: ""});

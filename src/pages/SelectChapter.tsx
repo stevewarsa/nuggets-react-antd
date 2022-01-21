@@ -4,14 +4,14 @@ import {Constants} from "../model/constants";
 import {ReadFilled} from "@ant-design/icons";
 import {useDispatch, useSelector} from "react-redux";
 import {stateActions} from "../store";
-import {useHistory} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {AppState} from "../model/AppState";
 
 const SelectChapter = () => {
     const dispatcher = useDispatch();
     const maxChaptersByBook = useSelector((state: AppState) => state.maxChaptersByBook);
     const chapterConfig = useSelector((state: AppState) => state.chapterSelection);
-    const history = useHistory();
+    const navigate = useNavigate();
     const {Option} = Select;
     const [book, setBook] = useState(chapterConfig ? chapterConfig.book : "N/A");
     const [chapter, setChapter] = useState(chapterConfig ? chapterConfig.chapter : "N/A");
@@ -42,7 +42,7 @@ const SelectChapter = () => {
         // console.log("handleReadChapter - here are the selections:");
         // console.log("book: " + book + ", chapter: " + chapter + ", translation: " + translation);
         dispatcher(stateActions.setChapterSelection({book: book, chapter: chapter, translation: translation}));
-        history.push("/readChapter");
+        navigate("/readChapter");
     };
 
     return (

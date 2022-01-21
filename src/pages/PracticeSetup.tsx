@@ -3,14 +3,14 @@ import {useState} from "react";
 import {CaretRightOutlined} from "@ant-design/icons";
 import {stateActions} from "../store";
 import {PracticeConfig} from "../model/PracticeConfig";
-import {useHistory} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {PassageUtils} from "../helpers/passage-utils";
 import memoryService from "../services/memory-service";
 import {AppState} from "../model/AppState";
 
 const PracticeSetup = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const dispatcher = useDispatch();
     const [practiceMode, setPracticeMode] = useState(PassageUtils.BY_REF);
     const [passageDisplayOrder, setPassageDisplayOrder] = useState(PassageUtils.BY_FREQ);
@@ -28,7 +28,7 @@ const PracticeSetup = () => {
         dispatcher(stateActions.setPracticeConfig({practiceMode: practiceMode, passageDisplayOrder: passageDisplayOrder} as PracticeConfig));
         const locMemoryPassageOverridesData: any = await memoryService.getMemoryPassageTextOverrides(user);
         dispatcher(stateActions.setMemoryTextOverrides(locMemoryPassageOverridesData.data));
-        history.push("/practice");
+        navigate("/practice");
     }
 
     return (

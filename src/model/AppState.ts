@@ -13,4 +13,5 @@ export interface AppState {
     verseSelectionRequest: VerseSelectionRequest;
     user: string;
     allUsers: MemUser[];
+    startingQuote: number;
 }

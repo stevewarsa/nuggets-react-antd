@@ -1,6 +1,6 @@
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import memoryService from "../services/memory-service";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {Passage} from "../model/passage";
@@ -36,7 +36,7 @@ const Practice = () => {
         interlinearUrl: null
     } as PracticeState);
 
-    const updatePassageInList = (passage: Passage) => {
+    const updatePassageInList = useCallback((passage: Passage) => {
         setPracticeState((prev: PracticeState) => {
             const locPsg = {
                 ...prev.memPassageList[practiceState.currentIndex],
@@ -47,9 +47,9 @@ const Practice = () => {
             locMemPassageList[prev.currentIndex] = locPsg;
             return {...prev, memPassageList: locMemPassageList};
         });
-    };
+    }, [practiceState.currentIndex]);
 
-    const populateVerses = async (currPassage: Passage, copyToClipboard: boolean) => {
+    const populateVerses = useCallback(async (currPassage: Passage, copyToClipboard: boolean) => {
         const override = memTextOverrides.find(p => p.passageId === currPassage.passageId);
         if (override) {
             updatePassageInList(override);
@@ -74,9 +74,9 @@ const Practice = () => {
             updatePassageInList(locMemoryPassageData.data);
             setBusy({state: false, message: ""});
         }
-    }
+    }, [memTextOverrides, practiceState.currentIndex, updatePassageInList, user]);
 
-    const displayPassageOnScreen = async () => {
+    const displayPassageOnScreen = useCallback(async () => {
         // console.log("displayPassageOnScreen - psgList:");
         // console.log(practiceState.memPassageList);
         const currPassage = practiceState.memPassageList && practiceState.memPassageList.length > practiceState.currentIndex ? practiceState.memPassageList[practiceState.currentIndex] : null;
@@ -99,7 +99,7 @@ const Practice = () => {
                 await populateVerses(currPassage, false);
             }
         }
-    };
+    }, [dispatcher, memTextOverrides, populateVerses, practiceState.currentIndex, practiceState.memPassageList, practiceState.showPsgRef]);
 
     // grab the memory verses from the server based on the practice config...
     useEffect(() => {
@@ -130,12 +130,12 @@ const Practice = () => {
             setBusy({state: false, message: ""});
         };
         callServer();
-    }, [dispatcher, practiceConfig]);
+    }, [dispatcher, practiceConfig, memTextOverrides, user]);
 
     useEffect(() => {
         // console.log("useEffect - calling displayPassageOnScreen()...");
         displayPassageOnScreen();
-    }, [practiceState.memPassageList[practiceState.currentIndex], practiceState.showingQuestion]);
+    }, [practiceState.memPassageList[practiceState.currentIndex], practiceState.showingQuestion, displayPassageOnScreen]);
 
     const handlePrev = () => {
         setPracticeState(prev => {
@@ -222,7 +222,7 @@ const Practice = () => {
                                         <li>Frequency: {getFrequency(practiceState.memPassageList[practiceState.currentIndex])}</li>
                                         <li>Last Practiced: {practiceState.memPassageList[practiceState.currentIndex]?.last_viewed_str}</li>
                                     </ul>
-                                    <a onClick={handleHideInfo}>Close</a>
+                                    <Button type="link" onClick={handleHideInfo}>Close</Button>
                                 </>
                             }
                             title="Additional Info"

@@ -4,14 +4,14 @@ import {CookieUtils} from "../helpers/cookie-utils";
 import {StringUtils} from "../helpers/string.utils";
 import {useDispatch, useSelector} from "react-redux";
 import {stateActions} from "../store";
-import {useHistory} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import memoryService from "../services/memory-service";
 import {AppState} from "../model/AppState";
 import SpinnerTimer from "../components/SpinnerTimer";
 
 const Login = () => {
     const dispatcher = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const allUsers = useSelector((appState: AppState) => appState.allUsers);
     const {Option} = Select;
     const [initVals, setInitVals] = useState({username: "", remember: false, selectUserName: "N/A"});
@@ -23,15 +23,15 @@ const Login = () => {
         if (!StringUtils.isEmpty(userName)) {
             // log 'em right in...
             dispatcher(stateActions.setUser(userName));
-            history.push("/mainMenu");
+            navigate("/mainMenu");
         }
-    }, []);
+    }, [dispatcher, navigate]);
 
     useEffect(() => {
         form.resetFields();
-    }, [initVals]);
+    }, [initVals, form]);
 
-    const onFinish = async (values: any) => {
+    const onFinish = async () => {
         setBusy({state: true, message: "Logging in..."});
         console.log('Success:', initVals);
         const user = StringUtils.isEmpty(initVals.username) ? initVals.selectUserName : initVals.username;
@@ -39,7 +39,7 @@ const Login = () => {
         if (response.data === "success") {
             dispatcher(stateActions.setUser(user));
             setBusy({state: false, message: ""});
-            history.push("/mainMenu");
+            navigate("/mainMenu");
         } else {
             console.log("onFinish - response: " + response.data);
             setBusy({state: false, message: ""});

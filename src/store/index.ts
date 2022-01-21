@@ -14,7 +14,8 @@ const initialState: AppState = {
     verseSelectionRequest: null,
     maxChaptersByBook: [],
     user: null,
-    allUsers: []
+    allUsers: [],
+    startingQuote: -1
 } as AppState;
 
 const state = createSlice({
@@ -99,6 +100,9 @@ const state = createSlice({
         },
         setAllUsers(state, action) {
             state.allUsers = action.payload;
+        },
+        setStartingQuote(state, action) {
+            state.startingQuote = action.payload;
         }
     }
 });

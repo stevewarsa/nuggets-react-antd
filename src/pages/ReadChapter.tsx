@@ -13,13 +13,13 @@ import {
 import {PassageUtils} from "../helpers/passage-utils";
 import {Constants} from "../model/constants";
 import {stateActions} from "../store";
-import {useHistory} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {VerseSelectionRequest} from "../model/verse-selection-request";
 import copy from "copy-to-clipboard";
 
 const ReadChapter = () => {
     const dispatcher = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const chapterConfig = useSelector((state: AppState) => state.chapterSelection);
     const verseSelectionRequest = useSelector((state: AppState) => state.verseSelectionRequest);
     const {Option} = Select;
@@ -81,7 +81,7 @@ const ReadChapter = () => {
             // console.log("handleMenuClick - Here are the verses for selection:");
             // console.log(formattedVersesAsArray);
             dispatcher(stateActions.setVerseSelectionRequest({versesForSelection: formattedVersesAsArray, actionToPerform: "copy", backToPath: "/readChapter"} as VerseSelectionRequest));
-            history.push("/selectVerses");
+            navigate("/selectVerses");
         } else if (key === "2") {
             // interlinear link
             PassageUtils.openInterlinearLink(currPassage);

@@ -3,12 +3,12 @@ import {AppState} from "../model/AppState";
 import {Button, Checkbox, Col, Row} from "antd";
 import {useEffect, useState} from "react";
 import {VerseNumAndText} from "../model/versenum-and-text";
-import {useHistory} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {stateActions} from "../store";
 import {VerseSelectionRequest} from "../model/verse-selection-request";
 
 const SelectVerses = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const dispatcher = useDispatch();
     const verseSelectionRequest = useSelector((appState: AppState) => appState.verseSelectionRequest);
     const [locVerses, setLocVerses] = useState(verseSelectionRequest ? [...verseSelectionRequest.versesForSelection] : []);
@@ -24,7 +24,7 @@ const SelectVerses = () => {
         // console.log("Handle submit - selected verses:");
         // console.log(locVerses.filter(v => v.selected));
         dispatcher(stateActions.setVerseSelectionRequest({...verseSelectionRequest, versesForSelection: locVerses} as VerseSelectionRequest));
-        history.push(verseSelectionRequest.backToPath);
+        navigate(verseSelectionRequest.backToPath);
     };
 
     const handleSelectVerse = (verse: VerseNumAndText) => {
