@@ -41,6 +41,13 @@ const BrowseQuotes = () => {
         }
     }, [allQuotes, startingQuote]);
 
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }, [currentIndex]);
+
     const handleNext = () => {
         setCurrentIndex(prev => {
             if (prev === allQuotes.length -1) {

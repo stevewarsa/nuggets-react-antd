@@ -132,7 +132,7 @@ const App = () => {
                     </Routes>
                 </div>
             </Content>
-            <Footer style={{ textAlign: 'center' }}>Bible Nuggets ©2022 Created by Steve Warsa</Footer>
+            <Footer style={{ textAlign: 'center' }}>Bible Nuggets ©{new Date().getFullYear()} Created by Steve Warsa</Footer>
         </Layout>
     );
 }
