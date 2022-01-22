@@ -33,7 +33,7 @@ const Login = () => {
             navigate("/mainMenu");
         }
         // @ts-ignore
-    }, [location.state.from.pathname, navigate]);
+    }, [location.state, navigate]);
 
     useEffect(() => {
         if (!isMounted.current) {

@@ -78,6 +78,11 @@ const MainMenu = () => {
                     label: "Add Quote",
                     action: "/addQuote"
                 },
+                {
+                    key: "3.4",
+                    label: "Search Quotes",
+                    action: "/searchQuotes"
+                }
                 // {
                 //     key: "3.4",
                 //     label: "Search Facts and Quotes",

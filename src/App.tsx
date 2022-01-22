@@ -19,6 +19,7 @@ import AddQuote from "./pages/AddQuote";
 import Login from "./pages/Login";
 import { useNavigate } from 'react-router-dom';
 import ProtectedRoutes from "./components/ProtectedRoutes";
+import SearchQuotes from "./pages/SearchQuotes";
 
 const App = () => {
     const navigate = useNavigate();
@@ -113,6 +114,7 @@ const App = () => {
                             <Route path="/bibleReadingPlan" element={<BibleReadingPlan/>}/>
                             <Route path="/selectVerses" element={<SelectVerses/>}/>
                             <Route path="/browseQuotes" element={<BrowseQuotes/>}/>
+                            <Route path="/searchQuotes" element={<SearchQuotes/>}/>
                             <Route path="/addQuote" element={<AddQuote/>}/>
                         </Route>
                     </Routes>
