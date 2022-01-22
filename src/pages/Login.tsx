@@ -1,10 +1,10 @@
 import {Button, Checkbox, Form, Input, Select} from "antd";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {CookieUtils} from "../helpers/cookie-utils";
 import {StringUtils} from "../helpers/string.utils";
 import {useDispatch, useSelector} from "react-redux";
 import {stateActions} from "../store";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import memoryService from "../services/memory-service";
 import {AppState} from "../model/AppState";
 import SpinnerTimer from "../components/SpinnerTimer";
@@ -13,12 +13,28 @@ import {useIsMounted} from "../helpers/is-mounted";
 const Login = () => {
     const dispatcher = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
     const allUsers = useSelector((appState: AppState) => appState.allUsers);
     const {Option} = Select;
     const [initVals, setInitVals] = useState({username: "", remember: false, selectUserName: "N/A"});
     const [form] = Form.useForm();
     const [busy, setBusy] = useState({state: false, message: ""});
     const isMounted = useIsMounted();
+
+    const redirectAfterLogin = useCallback(() => {
+        // @ts-ignore
+        if (location.state?.from?.pathname && !["/readChapter", "/selectVerses", "/practice"].includes(location.state.from.pathname)) {
+            // @ts-ignore
+            console.log("location.state.from is populated with: ", location.state.from.pathname);
+            // @ts-ignore
+            navigate(location.state.from.pathname);
+        } else {
+            console.log("location.state.from is NOT populated");
+            navigate("/mainMenu");
+        }
+        // @ts-ignore
+    }, [location.state.from.pathname, navigate]);
+
     useEffect(() => {
         if (!isMounted.current) {
             return;
@@ -27,10 +43,10 @@ const Login = () => {
         if (!StringUtils.isEmpty(userName)) {
             // log 'em right in...
             dispatcher(stateActions.setUser(userName));
-            navigate("/mainMenu");
+            redirectAfterLogin();
             return;
         }
-    }, [dispatcher, navigate, isMounted]);
+    }, [dispatcher, navigate, isMounted, redirectAfterLogin]);
 
     useEffect(() => {
         form.resetFields();
@@ -49,7 +65,7 @@ const Login = () => {
             }
             dispatcher(stateActions.setUser(user));
             setBusy({state: false, message: ""});
-            navigate("/mainMenu");
+            redirectAfterLogin();
         } else {
             //console.log("onFinish - response: " + response.data);
             setBusy({state: false, message: ""});

@@ -1,4 +1,4 @@
-import {Route, Navigate, Routes, useLocation} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import 'antd/dist/antd.css';
 import MainMenu from "./pages/MainMenu";
 import {Layout, Menu} from "antd";
@@ -17,17 +17,14 @@ import BibleReadingPlan from "./pages/BibleReadingPlan";
 import BrowseQuotes from "./pages/BrowseQuotes";
 import AddQuote from "./pages/AddQuote";
 import Login from "./pages/Login";
-import {StringUtils} from "./helpers/string.utils";
 import { useNavigate } from 'react-router-dom';
+import ProtectedRoutes from "./components/ProtectedRoutes";
 
 const App = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-    const pathAfterLogin = useSelector((appState: AppState) => appState.pathAfterLogin);
     //console.log("Here is the location:", location);
     const dispatcher = useDispatch();
     const selectedMenu = useSelector((state: AppState) => state.selectedMenuKey);
-    const user = useSelector((state: AppState) => state.user);
     // console.log("App - selectedMenu from store is " + selectedMenu);
     const { Header, Content, Footer } = Layout;
     useEffect(() => {
@@ -40,19 +37,6 @@ const App = () => {
         callServer();
 
     }, [dispatcher]);
-    useEffect(() => {
-        if (StringUtils.isEmpty(user)) {
-            if (!StringUtils.isEmpty(location.pathname) && !["/login", "/", "/mainMenu", "/readChapter", "/selectVerses", "/practice"].includes(location.pathname)) {
-                //console.log("App.useEffect - setting pathAfterLogin to " + location.pathname);
-                dispatcher(stateActions.setPathAfterLogin(location.pathname));
-            }
-        } else {
-            // user is logged in, so see if there is a path after login - if so redirect there
-            if (!StringUtils.isEmpty(pathAfterLogin)) {
-                navigate(pathAfterLogin);
-            }
-        }
-    }, [dispatcher, navigate, location.pathname, user, pathAfterLogin]);
     const menuItems = [
         {
             key: 1,
@@ -117,18 +101,20 @@ const App = () => {
             <Content style={{ padding: '0 50px', marginTop: '20px' }}>
                 <div className="site-layout-content">
                     <Routes>
-                        <Route path="/" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <Navigate to="/mainMenu" />} />
-                        <Route path="/login" element={StringUtils.isEmpty(user) ?  <Login/> : <Navigate to="/mainMenu" />}/>
-                        <Route path="/mainMenu" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <MainMenu/>}/>
-                        <Route path="/about" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <About/>}/>
-                        <Route path="/practiceSetup" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <PracticeSetup/>}/>
-                        <Route path="/practice" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <Practice/>}/>
-                        <Route path="/selectChapter" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <SelectChapter/>}/>
-                        <Route path="/readChapter" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <ReadChapter/>}/>
-                        <Route path="/bibleReadingPlan" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <BibleReadingPlan/>}/>
-                        <Route path="/selectVerses" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <SelectVerses/>}/>
-                        <Route path="/browseQuotes" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <BrowseQuotes/>}/>
-                        <Route path="/addQuote" element={StringUtils.isEmpty(user) ? <Navigate to="/login" /> : <AddQuote/>}/>
+                        <Route path="/" element={<Login/>} />
+                        <Route path="/login" element={<Login/>}/>
+                        <Route element={<ProtectedRoutes/>}>
+                            <Route path="/mainMenu" element={<MainMenu/>}/>
+                            <Route path="/about" element={<About/>}/>
+                            <Route path="/practiceSetup" element={<PracticeSetup/>}/>
+                            <Route path="/practice" element={<Practice/>}/>
+                            <Route path="/selectChapter" element={<SelectChapter/>}/>
+                            <Route path="/readChapter" element={<ReadChapter/>}/>
+                            <Route path="/bibleReadingPlan" element={<BibleReadingPlan/>}/>
+                            <Route path="/selectVerses" element={<SelectVerses/>}/>
+                            <Route path="/browseQuotes" element={<BrowseQuotes/>}/>
+                            <Route path="/addQuote" element={<AddQuote/>}/>
+                        </Route>
                     </Routes>
                 </div>
             </Content>

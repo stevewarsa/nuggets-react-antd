@@ -15,8 +15,7 @@ const initialState: AppState = {
     maxChaptersByBook: [],
     user: null,
     allUsers: [],
-    startingQuote: -1,
-    pathAfterLogin: null
+    startingQuote: -1
 } as AppState;
 
 const state = createSlice({
@@ -104,9 +103,6 @@ const state = createSlice({
         },
         setStartingQuote(state, action) {
             state.startingQuote = action.payload;
-        },
-        setPathAfterLogin(state, action) {
-            state.pathAfterLogin = action.payload;
         }
     }
 });
