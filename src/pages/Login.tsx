@@ -42,6 +42,11 @@ const Login = () => {
         const user = StringUtils.isEmpty(initVals.username) ? initVals.selectUserName : initVals.username;
         const response = await memoryService.doLogin(user);
         if (response.data === "success") {
+            if (initVals.remember) {
+                // write cookie so they won't have to login next time
+                console.log("Writing out cookies for automatic login");
+                CookieUtils.setCookie('user.name', user, 365);
+            }
             dispatcher(stateActions.setUser(user));
             setBusy({state: false, message: ""});
             navigate("/mainMenu");
