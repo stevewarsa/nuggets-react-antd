@@ -24,7 +24,7 @@ const App = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const pathAfterLogin = useSelector((appState: AppState) => appState.pathAfterLogin);
-    console.log("Here is the location:", location);
+    //console.log("Here is the location:", location);
     const dispatcher = useDispatch();
     const selectedMenu = useSelector((state: AppState) => state.selectedMenuKey);
     const user = useSelector((state: AppState) => state.user);
@@ -43,7 +43,7 @@ const App = () => {
     useEffect(() => {
         if (StringUtils.isEmpty(user)) {
             if (!StringUtils.isEmpty(location.pathname) && !["/login", "/", "/mainMenu", "/readChapter", "/selectVerses", "/practice"].includes(location.pathname)) {
-                console.log("App.useEffect - setting pathAfterLogin to " + location.pathname);
+                //console.log("App.useEffect - setting pathAfterLogin to " + location.pathname);
                 dispatcher(stateActions.setPathAfterLogin(location.pathname));
             }
         } else {
@@ -52,7 +52,7 @@ const App = () => {
                 navigate(pathAfterLogin);
             }
         }
-    }, [location.pathname, user, pathAfterLogin]);
+    }, [dispatcher, navigate, location.pathname, user, pathAfterLogin]);
     const menuItems = [
         {
             key: 1,
@@ -111,7 +111,7 @@ const App = () => {
         <Layout className="layout">
             <Header>
                 <Menu theme="light" mode="horizontal" selectedKeys={[selectedMenu.toString()]} defaultSelectedKeys={['1']}>
-                    {menuItems.map(item => (<Menu.Item key={item.key} onClick={() => handleMenuItem(item)}>{item.label}</Menu.Item>))}
+                    {menuItems.map(item => <Menu.Item key={item.key} onClick={() => handleMenuItem(item)}>{item.label}</Menu.Item>)}
                 </Menu>
             </Header>
             <Content style={{ padding: '0 50px', marginTop: '20px' }}>

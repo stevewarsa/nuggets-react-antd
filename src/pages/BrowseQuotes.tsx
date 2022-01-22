@@ -58,7 +58,8 @@ const BrowseQuotes = () => {
 
     const handleNext = () => {
         setCurrentIndex(prev => {
-            if (prev === allQuotes.length -1) {
+            const quoteList = filteredQuotes ? filteredQuotes : allQuotes;
+            if (prev === quoteList.length -1) {
                 return 0;
             } else {
                 return prev + 1;
@@ -68,8 +69,9 @@ const BrowseQuotes = () => {
 
     const handlePrev = () => {
         setCurrentIndex(prev => {
+            const quoteList = filteredQuotes ? filteredQuotes : allQuotes;
             if (prev === 0) {
-                return allQuotes.length - 1;
+                return quoteList.length - 1;
             } else {
                 return prev - 1;
             }
@@ -79,7 +81,7 @@ const BrowseQuotes = () => {
     const handleMenuClick = ({key}) => {
         if (key === "1") {
             // copy
-            let clipboardContent = allQuotes[currentIndex].answer;
+            let clipboardContent = filteredQuotes ? filteredQuotes[currentIndex].answer : allQuotes[currentIndex].answer;
             if (!StringUtils.isEmpty(clipboardContent)) {
                 copy(clipboardContent);
                 notification.info({message: "Quote copied!", placement: "bottomRight"});
@@ -139,11 +141,16 @@ const BrowseQuotes = () => {
         <>
             {busy.state && <SpinnerTimer message={busy.message} />}
             {!busy.state && <Row justify="center">
-                <h1>Browse Quotes</h1>
+                <Col span={24}>
                 <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
-                    <Row style={{marginBottom: "10px"}} justify="center" align="middle">
-                        <Col>{currentIndex + 1} of {filteredQuotes ? filteredQuotes.length : allQuotes.length}</Col>
-                        <Col style={{marginLeft: "5px"}}>
+                    <Row style={{marginBottom: "10px", textAlign: "center"}} justify="center" align="middle">
+                        <Col span={24}>
+                            <h1>Browse Quotes</h1>
+                        </Col>
+                    </Row>
+                    <Row style={{marginBottom: "10px", textAlign: "center"}} justify="center">
+                        <Col span={12}>{currentIndex + 1} of {filteredQuotes ? filteredQuotes.length : allQuotes.length}</Col>
+                        <Col span={12} style={{marginLeft: "5px"}}>
                             <Popover style={{width: "100%"}}
                                 content={
                                     <>
@@ -154,7 +161,6 @@ const BrowseQuotes = () => {
                                             <Col><Button style={{marginRight: "5px"}} type="default" onClick={handleCloseSearch}>Close</Button></Col>
                                             <Col><Button type="default" onClick={handleClear}>Clear</Button></Col>
                                             {!filteredQuotes && <Col><Button type="default" onClick={handleFilter}>Filter to These Results</Button></Col>}
-                                            {/*{filteredQuotes && <Col><Button type="default" onClick={handleClearFilter}>Clear Filter</Button></Col>}*/}
                                         </Row>
                                         {searchResults.length > 0 && <Row><Col><p>{searchResults.length + " matches"}</p></Col></Row>}
                                         {searchResults.length > 0 && searchResults.map(q => (
@@ -204,12 +210,27 @@ const BrowseQuotes = () => {
                         </Space>
                     </Row>
                     {!filteredQuotes && allQuotes && allQuotes.length > currentIndex && !StringUtils.isEmpty(allQuotes[currentIndex].answer) &&
-                        <p style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(allQuotes[currentIndex].answer)}}/>
+                        <Row>
+                            <Col span={24}>
+                                <p
+                                    style={{marginTop: "10px"}}
+                                    className="nugget-view"
+                                    dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(allQuotes[currentIndex].answer)}}/>
+                            </Col>
+                        </Row>
                     }
                     {filteredQuotes && filteredQuotes.length > currentIndex && !StringUtils.isEmpty(filteredQuotes[currentIndex].answer) &&
-                        <p style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(filteredQuotes[currentIndex].answer)}}/>
+                        <Row>
+                            <Col span={24}>
+                                <p
+                                    style={{marginTop: "10px"}}
+                                    className="nugget-view"
+                                    dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(filteredQuotes[currentIndex].answer)}}/>
+                            </Col>
+                        </Row>
                     }
                 </Swipe>
+                </Col>
             </Row>}
         </>
     );

@@ -38,20 +38,20 @@ const Login = () => {
 
     const onFinish = async () => {
         setBusy({state: true, message: "Logging in..."});
-        console.log('Success:', initVals);
+        //console.log('Success:', initVals);
         const user = StringUtils.isEmpty(initVals.username) ? initVals.selectUserName : initVals.username;
         const response = await memoryService.doLogin(user);
         if (response.data === "success") {
             if (initVals.remember) {
                 // write cookie so they won't have to login next time
-                console.log("Writing out cookies for automatic login");
+                //console.log("Writing out cookies for automatic login");
                 CookieUtils.setCookie('user.name', user, 365);
             }
             dispatcher(stateActions.setUser(user));
             setBusy({state: false, message: ""});
             navigate("/mainMenu");
         } else {
-            console.log("onFinish - response: " + response.data);
+            //console.log("onFinish - response: " + response.data);
             setBusy({state: false, message: ""});
         }
     };
