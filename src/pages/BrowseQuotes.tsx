@@ -59,7 +59,7 @@ const BrowseQuotes = () => {
     const handleNext = () => {
         setCurrentIndex(prev => {
             const quoteList = filteredQuotes ? filteredQuotes : allQuotes;
-            if (prev === quoteList.length -1) {
+            if (prev === quoteList.length - 1) {
                 return 0;
             } else {
                 return prev + 1;
@@ -139,99 +139,108 @@ const BrowseQuotes = () => {
 
     return (
         <>
-            {busy.state && <SpinnerTimer message={busy.message} />}
-            {!busy.state && <Row justify="center">
-                <Col span={24}>
-                <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
-                    <Row style={{marginBottom: "10px", textAlign: "center"}} justify="center" align="middle">
+            {busy.state && <SpinnerTimer message={busy.message}/>}
+            <Row justify="center">
+                <h1>Browse Quotes</h1>
+            </Row>
+            <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
+                <Row style={{marginBottom: "10px"}} justify="center" align="middle">
+                    <Col>{currentIndex + 1} of {filteredQuotes ? filteredQuotes.length : allQuotes.length}</Col>
+                    <Col style={{marginLeft: "5px"}}>
+                        <Popover
+                                 content={
+                                     <>
+                                         <Row>
+                                             <Col><Input value={searchString} autoFocus
+                                                         onChange={handleSearchString}/></Col>
+                                         </Row>
+                                         <Row style={{marginTop: "5px", marginBottom: "10px"}}>
+                                             <Col><Button style={{marginRight: "5px"}} type="default"
+                                                          onClick={handleCloseSearch}>Close</Button></Col>
+                                             <Col><Button type="default" onClick={handleClear}>Clear</Button></Col>
+                                             {!filteredQuotes &&
+                                                 <Col><Button type="default" onClick={handleFilter}>Filter to These
+                                                     Results</Button></Col>}
+                                         </Row>
+                                         {searchResults.length > 0 &&
+                                             <Row><Col><p>{searchResults.length + " matches"}</p></Col></Row>}
+                                         {searchResults.length > 0 && searchResults.map(q => (
+                                             <div key={q.originalQuote.objectionId + "div"} style={{
+                                                 borderStyle: "solid",
+                                                 borderWidth: "1px",
+                                                 marginBottom: "5px"
+                                             }}>
+                                                 <Row key={q.originalQuote.objectionId + "quoterow"}
+                                                      style={{marginBottom: "5px"}}>
+                                                     <Col span={24} key={q.originalQuote.objectionId + "quote"}
+                                                          dangerouslySetInnerHTML={{__html: q.annotatedText}}/>
+                                                 </Row>
+                                                 <Row key={q.originalQuote.objectionId + "buttonrow"}>
+                                                     <Col span={24} key={q.originalQuote.objectionId + "buttoncol"}>
+                                                         <Button key={q.originalQuote.objectionId + "button"}
+                                                                 type="link"
+                                                                 onClick={() => goTo(q.originalQuote.objectionId)}>Go
+                                                             To</Button>
+                                                     </Col>
+                                                 </Row>
+                                             </div>
+                                         ))}
+                                     </>
+                                 }
+                                 title="Search Quotes"
+                                 trigger="click"
+                                 visible={searchVisible}
+                        >
+                            <Button icon={<SearchOutlined/>} onClick={handleSearch}/>
+                        </Popover>
+                    </Col>
+                </Row>
+                <Row justify="center">
+                    <Space>
+                        <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
+                        <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
+                        <Col span={6}><Button disabled={filteredQuotes === null} icon={<EyeInvisibleOutlined/>}
+                                              onClick={handleClearFilter}/></Col>
+                        <Col span={6}>
+                            <Dropdown placement="bottomRight" trigger={["click"]} overlay={
+                                <Menu onClick={handleMenuClick}>
+                                    <Menu.Item key="1" icon={<CopyOutlined/>}>
+                                        Copy
+                                    </Menu.Item>
+                                </Menu>
+                            }>
+                                <MoreOutlined style={{
+                                    borderStyle: "solid",
+                                    borderWidth: "thin",
+                                    borderColor: "gray",
+                                    padding: "7px",
+                                    backgroundColor: "white"
+                                }}/>
+                            </Dropdown>
+                        </Col>
+                    </Space>
+                </Row>
+                {!filteredQuotes && allQuotes && allQuotes.length > currentIndex && !StringUtils.isEmpty(allQuotes[currentIndex].answer) &&
+                    <Row>
                         <Col span={24}>
-                            <h1>Browse Quotes</h1>
+                            <p
+                                style={{marginTop: "10px"}}
+                                className="nugget-view"
+                                dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(allQuotes[currentIndex].answer)}}/>
                         </Col>
                     </Row>
-                    <Row style={{marginBottom: "10px", textAlign: "center"}} justify="center">
-                        <Col span={12}>{currentIndex + 1} of {filteredQuotes ? filteredQuotes.length : allQuotes.length}</Col>
-                        <Col span={12} style={{marginLeft: "5px"}}>
-                            <Popover style={{width: "100%"}}
-                                content={
-                                    <>
-                                        <Row>
-                                            <Col><Input value={searchString} autoFocus onChange={handleSearchString} /></Col>
-                                        </Row>
-                                        <Row style={{marginTop: "5px", marginBottom: "10px"}}>
-                                            <Col><Button style={{marginRight: "5px"}} type="default" onClick={handleCloseSearch}>Close</Button></Col>
-                                            <Col><Button type="default" onClick={handleClear}>Clear</Button></Col>
-                                            {!filteredQuotes && <Col><Button type="default" onClick={handleFilter}>Filter to These Results</Button></Col>}
-                                        </Row>
-                                        {searchResults.length > 0 && <Row><Col><p>{searchResults.length + " matches"}</p></Col></Row>}
-                                        {searchResults.length > 0 && searchResults.map(q => (
-                                            <div key={q.originalQuote.objectionId + "div"} style={{borderStyle: "solid", borderWidth: "1px", marginBottom: "5px"}}>
-                                                <Row key={q.originalQuote.objectionId + "quoterow"} style={{marginBottom: "5px"}}>
-                                                    <Col span={24} key={q.originalQuote.objectionId + "quote"} dangerouslySetInnerHTML={{__html: q.annotatedText}}/>
-                                                </Row>
-                                                <Row key={q.originalQuote.objectionId + "buttonrow"} >
-                                                    <Col span={24} key={q.originalQuote.objectionId + "buttoncol"} >
-                                                        <Button key={q.originalQuote.objectionId + "button"}  type="link" onClick={() => goTo(q.originalQuote.objectionId)}>Go To</Button>
-                                                    </Col>
-                                                </Row>
-                                            </div>
-                                        ))}
-                                    </>
-                                }
-                                title="Search Quotes"
-                                trigger="click"
-                                visible={searchVisible}
-                            >
-                                <Button icon={<SearchOutlined/>} onClick={handleSearch}/>
-                            </Popover>
+                }
+                {filteredQuotes && filteredQuotes.length > currentIndex && !StringUtils.isEmpty(filteredQuotes[currentIndex].answer) &&
+                    <Row>
+                        <Col span={24}>
+                            <p
+                                style={{marginTop: "10px"}}
+                                className="nugget-view"
+                                dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(filteredQuotes[currentIndex].answer)}}/>
                         </Col>
                     </Row>
-                    <Row justify="center">
-                        <Space>
-                            <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
-                            <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
-                            <Col span={6}><Button disabled={filteredQuotes === null} icon={<EyeInvisibleOutlined />} onClick={handleClearFilter}/></Col>
-                            <Col span={6}>
-                                <Dropdown placement="bottomRight" trigger={["click"]} overlay={
-                                    <Menu onClick={handleMenuClick}>
-                                        <Menu.Item key="1" icon={<CopyOutlined/>}>
-                                            Copy
-                                        </Menu.Item>
-                                    </Menu>
-                                }>
-                                    <MoreOutlined style={{
-                                        borderStyle: "solid",
-                                        borderWidth: "thin",
-                                        borderColor: "gray",
-                                        padding: "7px",
-                                        backgroundColor: "white"
-                                    }} />
-                                </Dropdown>
-                            </Col>
-                        </Space>
-                    </Row>
-                    {!filteredQuotes && allQuotes && allQuotes.length > currentIndex && !StringUtils.isEmpty(allQuotes[currentIndex].answer) &&
-                        <Row>
-                            <Col span={24}>
-                                <p
-                                    style={{marginTop: "10px"}}
-                                    className="nugget-view"
-                                    dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(allQuotes[currentIndex].answer)}}/>
-                            </Col>
-                        </Row>
-                    }
-                    {filteredQuotes && filteredQuotes.length > currentIndex && !StringUtils.isEmpty(filteredQuotes[currentIndex].answer) &&
-                        <Row>
-                            <Col span={24}>
-                                <p
-                                    style={{marginTop: "10px"}}
-                                    className="nugget-view"
-                                    dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(filteredQuotes[currentIndex].answer)}}/>
-                            </Col>
-                        </Row>
-                    }
-                </Swipe>
-                </Col>
-            </Row>}
+                }
+            </Swipe>
         </>
     );
 };
