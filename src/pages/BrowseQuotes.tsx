@@ -5,7 +5,14 @@ import {StringUtils} from "../helpers/string.utils";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {Button, Col, Dropdown, Input, Menu, notification, Popover, Row, Space} from "antd";
 import Swipe from "react-easy-swipe";
-import {ArrowLeftOutlined, ArrowRightOutlined, CopyOutlined, MoreOutlined, SearchOutlined} from "@ant-design/icons";
+import {
+    ArrowLeftOutlined,
+    ArrowRightOutlined,
+    CopyOutlined,
+    EyeInvisibleOutlined,
+    MoreOutlined,
+    SearchOutlined
+} from "@ant-design/icons";
 import {PassageUtils} from "../helpers/passage-utils";
 import copy from "copy-to-clipboard";
 import {QuoteMatch} from "../model/quote-match";
@@ -14,6 +21,7 @@ import {AppState} from "../model/AppState";
 
 const BrowseQuotes = () => {
     const [allQuotes, setAllQuotes] = useState<Quote[]>([]);
+    const [filteredQuotes, setFilteredQuotes] = useState<Quote[]>(null);
     const [busy, setBusy] = useState({state: false, message: ""});
     const [currentIndex, setCurrentIndex] = useState(0);
     const [searchVisible, setSearchVisible] = useState(false);
@@ -116,6 +124,17 @@ const BrowseQuotes = () => {
         setSearchString("");
     };
 
+    const handleFilter = () => {
+        setCurrentIndex(0);
+        setFilteredQuotes(searchResults.map(r => r.originalQuote));
+        handleCloseSearch();
+    };
+
+    const handleClearFilter = () => {
+        setCurrentIndex(0);
+        setFilteredQuotes(null);
+    };
+
     return (
         <>
             {busy.state && <SpinnerTimer message={busy.message} />}
@@ -123,7 +142,7 @@ const BrowseQuotes = () => {
                 <h1>Browse Quotes</h1>
                 <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
                     <Row style={{marginBottom: "10px"}} justify="center" align="middle">
-                        <Col>{currentIndex + 1} of {allQuotes.length}</Col>
+                        <Col>{currentIndex + 1} of {filteredQuotes ? filteredQuotes.length : allQuotes.length}</Col>
                         <Col style={{marginLeft: "5px"}}>
                             <Popover style={{width: "100%"}}
                                 content={
@@ -134,6 +153,8 @@ const BrowseQuotes = () => {
                                         <Row style={{marginTop: "5px", marginBottom: "10px"}}>
                                             <Col><Button style={{marginRight: "5px"}} type="default" onClick={handleCloseSearch}>Close</Button></Col>
                                             <Col><Button type="default" onClick={handleClear}>Clear</Button></Col>
+                                            {!filteredQuotes && <Col><Button type="default" onClick={handleFilter}>Filter to These Results</Button></Col>}
+                                            {/*{filteredQuotes && <Col><Button type="default" onClick={handleClearFilter}>Clear Filter</Button></Col>}*/}
                                         </Row>
                                         {searchResults.length > 0 && <Row><Col><p>{searchResults.length + " matches"}</p></Col></Row>}
                                         {searchResults.length > 0 && searchResults.map(q => (
@@ -160,9 +181,10 @@ const BrowseQuotes = () => {
                     </Row>
                     <Row justify="center">
                         <Space>
-                            <Col span={8}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
-                            <Col span={8}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
-                            <Col span={8}>
+                            <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
+                            <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
+                            <Col span={6}><Button disabled={filteredQuotes === null} icon={<EyeInvisibleOutlined />} onClick={handleClearFilter}/></Col>
+                            <Col span={6}>
                                 <Dropdown placement="bottomRight" trigger={["click"]} overlay={
                                     <Menu onClick={handleMenuClick}>
                                         <Menu.Item key="1" icon={<CopyOutlined/>}>
@@ -181,8 +203,11 @@ const BrowseQuotes = () => {
                             </Col>
                         </Space>
                     </Row>
-                    {allQuotes && allQuotes.length > currentIndex && !StringUtils.isEmpty(allQuotes[currentIndex].answer) &&
+                    {!filteredQuotes && allQuotes && allQuotes.length > currentIndex && !StringUtils.isEmpty(allQuotes[currentIndex].answer) &&
                         <p style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(allQuotes[currentIndex].answer)}}/>
+                    }
+                    {filteredQuotes && filteredQuotes.length > currentIndex && !StringUtils.isEmpty(filteredQuotes[currentIndex].answer) &&
+                        <p style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(filteredQuotes[currentIndex].answer)}}/>
                     }
                 </Swipe>
             </Row>}
