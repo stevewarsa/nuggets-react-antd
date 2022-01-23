@@ -17,6 +17,7 @@ const SearchQuotes = () => {
     const navigate = useNavigate();
     const dispatcher = useDispatch();
     const user = useSelector((state: AppState) => state.user);
+    const existingQuoteList = useSelector((state: AppState) => state.existingQuoteList);
     const [busy, setBusy] = useState({state: false, message: ""});
     const [searchString, setSearchString] = useState("");
     const [allQuotes, setAllQuotes] = useState<Quote[]>([]);
@@ -36,8 +37,18 @@ const SearchQuotes = () => {
             }));
             setBusy({state: false, message: ""});
         };
-        callServer();
-    }, [user]);
+        const processExistingQuotes = async () => {
+            setAllQuotes(existingQuoteList);
+            await setFilteredQuotes(existingQuoteList.map(q => {
+                return {originalQuote: q, annotatedText: q.answer} as QuoteMatch;
+            }));
+        };
+        if (!existingQuoteList || existingQuoteList.length === 0) {
+            callServer();
+        } else {
+            processExistingQuotes();
+        }
+    }, [user, existingQuoteList]);
 
     const handleSearch =  async (evt) => {
         setBusy({state: true, message: "Searching quotes..."});

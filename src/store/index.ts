@@ -107,6 +107,9 @@ const state = createSlice({
         },
         setFilteredQuoteIds(state, action) {
             state.filteredQuoteIds = action.payload;
+        },
+        setExistingQuoteList(state, action) {
+            state.existingQuoteList = action.payload;
         }
     }
 });

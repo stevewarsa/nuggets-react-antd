@@ -2,6 +2,7 @@ import {PracticeConfig} from "./PracticeConfig";
 import {Passage} from "./passage";
 import {VerseSelectionRequest} from "./verse-selection-request";
 import {MemUser} from "./mem-user";
+import {Quote} from "./quote";
 
 export interface AppState {
     practiceConfig: PracticeConfig;
@@ -15,4 +16,5 @@ export interface AppState {
     allUsers: MemUser[];
     startingQuote: number;
     filteredQuoteIds: number[];
+    existingQuoteList: Quote[];
 }

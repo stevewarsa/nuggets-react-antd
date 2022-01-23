@@ -3,7 +3,7 @@ import memoryService from "../services/memory-service";
 import {Quote} from "../model/quote";
 import {StringUtils} from "../helpers/string.utils";
 import SpinnerTimer from "../components/SpinnerTimer";
-import {Button, Col, Dropdown, Input, Menu, notification, Popover, Row, Space} from "antd";
+import {Button, Col, Dropdown, Menu, notification, Row, Space} from "antd";
 import Swipe from "react-easy-swipe";
 import {
     ArrowLeftOutlined,
@@ -19,16 +19,15 @@ import {QuoteMatch} from "../model/quote-match";
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import {stateActions} from "../store";
+import {useNavigate} from "react-router-dom";
 
 const BrowseQuotes = () => {
     const dispatcher = useDispatch();
+    const navigate = useNavigate();
     const [allQuotes, setAllQuotes] = useState<Quote[]>([]);
     const [filteredQuotes, setFilteredQuotes] = useState<Quote[]>(null);
     const [busy, setBusy] = useState({state: false, message: ""});
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [searchVisible, setSearchVisible] = useState(false);
-    const [searchResults, setSearchResults] = useState<QuoteMatch[]>([]);
-    const [searchString, setSearchString] = useState("");
     const user = useSelector((state: AppState) => state.user);
     const startingQuote = useSelector((state: AppState) => state.startingQuote);
     const filteredQuoteIds = useSelector((state: AppState) => state.filteredQuoteIds);
@@ -39,10 +38,11 @@ const BrowseQuotes = () => {
             const quotes: Quote[] = quoteListResponse.data.filter(({objectionId, answer}, index, a) =>
                 a.findIndex(e => objectionId === e.objectionId && answer === e.answer) === index)
                 .filter(q => StringUtils.isEmpty(q.approved) || q.approved === "Y");
-            PassageUtils.shuffleArray(quotes);
-            setAllQuotes(quotes);
+            const dedupedQuotes = PassageUtils.removeDups(quotes, "objectionId");
+            PassageUtils.shuffleArray(dedupedQuotes);
+            setAllQuotes(dedupedQuotes);
             if (filteredQuoteIds && filteredQuoteIds.length > 0) {
-                setFilteredQuotes(quotes.filter(qt => filteredQuoteIds.includes(qt.objectionId)));
+                setFilteredQuotes(dedupedQuotes.filter(qt => filteredQuoteIds.includes(qt.objectionId)));
             }
             setBusy({state: false, message: ""});
         };
@@ -101,44 +101,8 @@ const BrowseQuotes = () => {
     };
 
     const handleSearch = () => {
-        setSearchVisible(true);
-    };
-
-    const handleSearchString = (evt) => {
-        const locSearchStr = evt.target.value;
-        if (!locSearchStr || locSearchStr === "") {
-            return;
-        }
-        setSearchString(evt.target.value);
-    };
-    useEffect(() => {
-        if (searchString.length > 2) {
-            const results = doFuzzySearch(searchString, allQuotes);
-            setSearchResults(results);
-        }
-
-    }, [searchString, allQuotes]);
-
-    const handleCloseSearch = () => {
-        setSearchVisible(false);
-        setSearchResults([]);
-        setSearchString("");
-    };
-
-    const goTo = (objectionId: number) => {
-        setCurrentIndex(allQuotes.findIndex(q => q.objectionId === objectionId));
-        handleCloseSearch();
-    };
-
-    const handleClear = () => {
-        setSearchResults([]);
-        setSearchString("");
-    };
-
-    const handleFilter = () => {
-        setCurrentIndex(0);
-        setFilteredQuotes(searchResults.map(r => r.originalQuote));
-        handleCloseSearch();
+        dispatcher(stateActions.setExistingQuoteList(allQuotes));
+        navigate("/searchQuotes");
     };
 
     const handleClearFilter = () => {
@@ -156,54 +120,7 @@ const BrowseQuotes = () => {
             <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
                 <Row style={{marginBottom: "10px"}} justify="center" align="middle">
                     <Col>{currentIndex + 1} of {filteredQuotes ? filteredQuotes.length : allQuotes.length}</Col>
-                    <Col style={{marginLeft: "5px"}}>
-                        <Popover
-                                 content={
-                                     <>
-                                         <Row>
-                                             <Col><Input value={searchString} autoFocus
-                                                         onChange={handleSearchString}/></Col>
-                                         </Row>
-                                         <Row style={{marginTop: "5px", marginBottom: "10px"}}>
-                                             <Col><Button style={{marginRight: "5px"}} type="default"
-                                                          onClick={handleCloseSearch}>Close</Button></Col>
-                                             <Col><Button type="default" onClick={handleClear}>Clear</Button></Col>
-                                             {!filteredQuotes &&
-                                                 <Col><Button type="default" onClick={handleFilter}>Filter to These
-                                                     Results</Button></Col>}
-                                         </Row>
-                                         {searchResults.length > 0 &&
-                                             <Row><Col><p>{searchResults.length + " matches"}</p></Col></Row>}
-                                         {searchResults.length > 0 && searchResults.map(q => (
-                                             <div key={q.originalQuote.objectionId + "div"} style={{
-                                                 borderStyle: "solid",
-                                                 borderWidth: "1px",
-                                                 marginBottom: "5px"
-                                             }}>
-                                                 <Row key={q.originalQuote.objectionId + "quoterow"}
-                                                      style={{marginBottom: "5px"}}>
-                                                     <Col span={24} key={q.originalQuote.objectionId + "quote"}
-                                                          dangerouslySetInnerHTML={{__html: q.annotatedText}}/>
-                                                 </Row>
-                                                 <Row key={q.originalQuote.objectionId + "buttonrow"}>
-                                                     <Col span={24} key={q.originalQuote.objectionId + "buttoncol"}>
-                                                         <Button key={q.originalQuote.objectionId + "button"}
-                                                                 type="link"
-                                                                 onClick={() => goTo(q.originalQuote.objectionId)}>Go
-                                                             To</Button>
-                                                     </Col>
-                                                 </Row>
-                                             </div>
-                                         ))}
-                                     </>
-                                 }
-                                 title="Search Quotes"
-                                 trigger="click"
-                                 visible={searchVisible}
-                        >
-                            <Button icon={<SearchOutlined/>} onClick={handleSearch}/>
-                        </Popover>
-                    </Col>
+                    <Col style={{marginLeft: "5px"}}><Button icon={<SearchOutlined/>} onClick={handleSearch}/></Col>
                 </Row>
                 <Row justify="center">
                     <Space>
