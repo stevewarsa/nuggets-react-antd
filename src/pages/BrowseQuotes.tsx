@@ -43,6 +43,7 @@ const BrowseQuotes = () => {
             setAllQuotes(dedupedQuotes);
             if (filteredQuoteIds && filteredQuoteIds.length > 0) {
                 setFilteredQuotes(dedupedQuotes.filter(qt => filteredQuoteIds.includes(qt.objectionId)));
+                setCurrentIndex(0);
             }
             setBusy({state: false, message: ""});
         };
@@ -50,7 +51,7 @@ const BrowseQuotes = () => {
     }, [user]);
 
     useEffect(() => {
-        if (startingQuote > 0 && allQuotes.length > 0) {
+        if (startingQuote > 0 && allQuotes.length > 0 && !(filteredQuoteIds && filteredQuoteIds.length > 0)) {
             const currIndex = allQuotes.findIndex(qt => qt.objectionId === startingQuote);
             if (currIndex >= 0) {
                 setCurrentIndex(currIndex);

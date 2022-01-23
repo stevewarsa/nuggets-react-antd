@@ -1,17 +1,19 @@
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import memoryService from "../services/memory-service";
 import {Quote} from "../model/quote";
 import {StringUtils} from "../helpers/string.utils";
 import SpinnerTimer from "../components/SpinnerTimer";
-import {Button, Col, Input, notification, Row} from "antd";
+import {Button, Col, Input, Row} from "antd";
 import {QuoteMatch} from "../model/quote-match";
-import {doFuzzySearch} from "./BrowseQuotes";
 import {stateActions} from "../store";
 import {useNavigate} from "react-router-dom";
 import {PassageUtils} from "../helpers/passage-utils";
-import copy from "copy-to-clipboard";
+import {AgGridColumn, AgGridReact} from "ag-grid-react";
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
+import {CellClickedEvent} from "ag-grid-community";
 
 const SearchQuotes = () => {
     const navigate = useNavigate();
@@ -22,6 +24,7 @@ const SearchQuotes = () => {
     const [searchString, setSearchString] = useState("");
     const [allQuotes, setAllQuotes] = useState<Quote[]>([]);
     const [filteredQuotes, setFilteredQuotes] = useState<QuoteMatch[]>(null);
+    const gridApiRef = useRef<any>(null); // <= defined useRef for gridApi
 
     useEffect(() => {
         const callServer = async () => {
@@ -50,29 +53,48 @@ const SearchQuotes = () => {
         }
     }, [user, existingQuoteList]);
 
-    const handleSearch =  async (evt) => {
-        setBusy({state: true, message: "Searching quotes..."});
-        const locSearchStr = evt.target.value;
-        if (!locSearchStr || locSearchStr === "") {
-            setFilteredQuotes(allQuotes.map(q => {
-                return {originalQuote: q, annotatedText: q.answer} as QuoteMatch;
-            }));
-            setSearchString("");
+    const handleFilterToCurrent = () => {
+        dispatcher(stateActions.setFilteredQuoteIds(filteredQuotes.map(qt => qt.originalQuote.objectionId)));
+        navigate("/browseQuotes");
+    };
+
+    const onGridReady = (params) => {
+        params.api.resetRowHeights();
+        gridApiRef.current = params.api // assigned gridApi value on Grid ready
+    };
+
+    const handleTableFilter = (evt) => {
+        setSearchString(evt.target.value);
+        gridApiRef.current.setQuickFilter(evt.target.value); //  Used the GridApi here Yay!!!!!
+    };
+
+    const defaultColDef = {
+        editable: true,
+        sortable: true,
+        flex: 1,
+        minWidth: 300,
+        filter: true,
+        resizable: true
+    };
+    const gridOptions = {
+        pagination: true,
+        paginationPageSize: 6,
+        onCellClicked: (event: CellClickedEvent) => goTo((event.data as Quote).objectionId)
+    };
+
+    const handleFilterChanged = ev => {
+        if (ev?.api?.rowModel?.rowsToDisplay) {
+            const quotes = ev.api.rowModel.rowsToDisplay.map(row => {
+                return {originalQuote: row.data, annotatedText: row.data.answer} as QuoteMatch;
+            });
+            setFilteredQuotes(quotes);
         } else {
-            const results = doFuzzySearch(locSearchStr, allQuotes);
-            setFilteredQuotes(results);
-            setSearchString(locSearchStr);
+            console.log("handleFilterChanged - no rows ");
         }
-        setBusy({state: false, message: ""});
     };
 
     const goTo = (objectionId: number) => {
         dispatcher(stateActions.setStartingQuote(objectionId));
-        navigate("/browseQuotes");
-    };
-
-    const handleFilterToCurrent = () => {
-        dispatcher(stateActions.setFilteredQuoteIds(filteredQuotes.map(qt => qt.originalQuote.objectionId)));
         navigate("/browseQuotes");
     };
 
@@ -84,51 +106,39 @@ const SearchQuotes = () => {
                 <h1>Search Quotes</h1>
                 <Row>
                     <Col>
-                        <Input autoFocus value={searchString} placeholder="Enter Search" onChange={handleSearch} />
+                        <Input autoFocus value={searchString} placeholder="Enter Search" onChange={handleTableFilter}/>
                     </Col>
                 </Row>
-                {filteredQuotes && filteredQuotes.length > 0 &&
-                <>
-                    <Row>
-                        <Col>
-                            {filteredQuotes.length} Quotes
-                        </Col>
-                    </Row>
-                    {filteredQuotes.length < allQuotes.length && <Row>
-                        <Col>
-                            <Button type="primary" onClick={handleFilterToCurrent}>Browse Current Result</Button>
-                        </Col>
-                    </Row>}
-                </>
-                }
-                {filteredQuotes && filteredQuotes.length > 0 && filteredQuotes.map(q =>
-                    <div key={q.originalQuote.objectionId + "div"} style={{
-                        borderStyle: "solid",
-                        borderWidth: "1px",
-                        marginBottom: "5px"
-                    }}>
-                        <Row key={q.originalQuote.objectionId + "quoterow"}
-                             style={{marginBottom: "5px"}}>
-                            <Col span={24} key={q.originalQuote.objectionId + "quote"}
-                                 dangerouslySetInnerHTML={{__html: q.annotatedText}}/>
-                        </Row>
-                        <Row key={q.originalQuote.objectionId + "buttonrow"}>
-                            <Col span={12} key={q.originalQuote.objectionId + "buttoncol1"}>
-                                <Button key={q.originalQuote.objectionId + "button1"}
-                                        type="link"
-                                        onClick={() => goTo(q.originalQuote.objectionId)}>Go To</Button>
-                            </Col>
-                            <Col span={12} key={q.originalQuote.objectionId + "buttoncol2"}>
-                                <Button key={q.originalQuote.objectionId + "button2"}
-                                        type="link"
-                                        onClick={() => {
-                                            copy(q.originalQuote.answer);
-                                            notification.info({message: "Quote copied!", placement: "bottomRight"});
-                                        }}>Copy</Button>
-                            </Col>
-                        </Row>
+                <Row>
+                    <Col>
+                        <Button type="primary" onClick={handleFilterToCurrent}>Browse Current Result</Button>
+                    </Col>
+                </Row>
+                <div style={{ width: "100%", height: "350px" }}>
+                    <div
+                        id="myGrid"
+                        style={{
+                            height: "100%",
+                            width: "100%"
+                        }}
+                        className="ag-theme-alpine"
+                    >
+                        <AgGridReact
+                            reactUi={true}
+                            rowData={allQuotes}
+                            gridOptions={gridOptions}
+                            onGridReady={onGridReady}
+                            defaultColDef={defaultColDef}
+                            onFilterChanged={handleFilterChanged}
+                            ref={gridApiRef}>
+                            <AgGridColumn
+                                wrapText={true}
+                                autoHeight={true}
+                                field="answer"
+                                headerName="Quote Text"/>
+                        </AgGridReact>
                     </div>
-                )}
+                </div>
             </>
         );
     }
