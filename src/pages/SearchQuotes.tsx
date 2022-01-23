@@ -5,11 +5,13 @@ import memoryService from "../services/memory-service";
 import {Quote} from "../model/quote";
 import {StringUtils} from "../helpers/string.utils";
 import SpinnerTimer from "../components/SpinnerTimer";
-import {Button, Col, Input, Row} from "antd";
+import {Button, Col, Input, notification, Row} from "antd";
 import {QuoteMatch} from "../model/quote-match";
 import {doFuzzySearch} from "./BrowseQuotes";
 import {stateActions} from "../store";
 import {useNavigate} from "react-router-dom";
+import {PassageUtils} from "../helpers/passage-utils";
+import copy from "copy-to-clipboard";
 
 const SearchQuotes = () => {
     const navigate = useNavigate();
@@ -27,26 +29,7 @@ const SearchQuotes = () => {
             const quotes: Quote[] = quoteListResponse.data.filter(({objectionId, answer}, index, a) =>
                 a.findIndex(e => objectionId === e.objectionId && answer === e.answer) === index)
                 .filter(q => StringUtils.isEmpty(q.approved) || q.approved === "Y");
-            // Declare a new array
-            let newArray = [];
-
-            // Declare an empty object
-            let uniqueObject = {};
-
-            // Loop for the array elements
-            for (let i in quotes) {
-
-                // Extract the title
-                let objectionId = quotes[i]['objectionId'];
-
-                // Use the title as the index
-                uniqueObject[objectionId] = quotes[i];
-            }
-
-            // Loop to push unique object into array
-            for (let i in uniqueObject) {
-                newArray.push(uniqueObject[i]);
-            }
+            const newArray = PassageUtils.removeDups(quotes, "objectionId");
             setAllQuotes(newArray);
             setFilteredQuotes(newArray.map(q => {
                 return {originalQuote: q, annotatedText: q.answer} as QuoteMatch;
@@ -77,6 +60,11 @@ const SearchQuotes = () => {
         navigate("/browseQuotes");
     };
 
+    const handleFilterToCurrent = () => {
+        dispatcher(stateActions.setFilteredQuoteIds(filteredQuotes.map(qt => qt.originalQuote.objectionId)));
+        navigate("/browseQuotes");
+    };
+
     if (busy.state) {
         return <SpinnerTimer message={busy.message}/>;
     } else {
@@ -88,11 +76,20 @@ const SearchQuotes = () => {
                         <Input autoFocus value={searchString} placeholder="Enter Search" onChange={handleSearch} />
                     </Col>
                 </Row>
-                {filteredQuotes && filteredQuotes.length > 0 && <Row>
-                    <Col>
-                        {filteredQuotes.length} Quotes
-                    </Col>
-                </Row>}
+                {filteredQuotes && filteredQuotes.length > 0 &&
+                <>
+                    <Row>
+                        <Col>
+                            {filteredQuotes.length} Quotes
+                        </Col>
+                    </Row>
+                    {filteredQuotes.length < allQuotes.length && <Row>
+                        <Col>
+                            <Button type="primary" onClick={handleFilterToCurrent}>Browse Current Result</Button>
+                        </Col>
+                    </Row>}
+                </>
+                }
                 {filteredQuotes && filteredQuotes.length > 0 && filteredQuotes.map(q =>
                     <div key={q.originalQuote.objectionId + "div"} style={{
                         borderStyle: "solid",
@@ -105,11 +102,18 @@ const SearchQuotes = () => {
                                  dangerouslySetInnerHTML={{__html: q.annotatedText}}/>
                         </Row>
                         <Row key={q.originalQuote.objectionId + "buttonrow"}>
-                            <Col span={24} key={q.originalQuote.objectionId + "buttoncol"}>
-                                <Button key={q.originalQuote.objectionId + "button"}
+                            <Col span={12} key={q.originalQuote.objectionId + "buttoncol1"}>
+                                <Button key={q.originalQuote.objectionId + "button1"}
                                         type="link"
-                                        onClick={() => goTo(q.originalQuote.objectionId)}>Go
-                                    To</Button>
+                                        onClick={() => goTo(q.originalQuote.objectionId)}>Go To</Button>
+                            </Col>
+                            <Col span={12} key={q.originalQuote.objectionId + "buttoncol2"}>
+                                <Button key={q.originalQuote.objectionId + "button2"}
+                                        type="link"
+                                        onClick={() => {
+                                            copy(q.originalQuote.answer);
+                                            notification.info({message: "Quote copied!", placement: "bottomRight"});
+                                        }}>Copy</Button>
                             </Col>
                         </Row>
                     </div>

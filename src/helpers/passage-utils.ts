@@ -52,6 +52,25 @@ export class PassageUtils {
   //   return JSON.parse(JSON.stringify(passage));
   // }
 
+  public static removeDups(list: any[], uniqueField: string): any[] {
+    // Declare a new array
+    let newArray = [];
+    // Declare an empty object
+    let uniqueObject = {};
+    // Loop for the array elements
+    for (let i in list) {
+      // Extract the val
+      let uniqueFieldVal = list[i][uniqueField];
+      // Use the val as the index
+      uniqueObject[uniqueFieldVal] = list[i];
+    }
+    // Loop to push unique object into array
+    for (let i in uniqueObject) {
+      newArray.push(uniqueObject[i]);
+    }
+    return newArray;
+  }
+
   public static copyPassageToClipboard(passage: Passage, noTransl: boolean): string {
     let clipboardContent = PassageUtils.getPassageForClipboard(passage, noTransl);
     copy(clipboardContent);

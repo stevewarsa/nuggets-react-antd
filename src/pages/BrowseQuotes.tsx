@@ -16,10 +16,12 @@ import {
 import {PassageUtils} from "../helpers/passage-utils";
 import copy from "copy-to-clipboard";
 import {QuoteMatch} from "../model/quote-match";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
+import {stateActions} from "../store";
 
 const BrowseQuotes = () => {
+    const dispatcher = useDispatch();
     const [allQuotes, setAllQuotes] = useState<Quote[]>([]);
     const [filteredQuotes, setFilteredQuotes] = useState<Quote[]>(null);
     const [busy, setBusy] = useState({state: false, message: ""});
@@ -29,6 +31,7 @@ const BrowseQuotes = () => {
     const [searchString, setSearchString] = useState("");
     const user = useSelector((state: AppState) => state.user);
     const startingQuote = useSelector((state: AppState) => state.startingQuote);
+    const filteredQuoteIds = useSelector((state: AppState) => state.filteredQuoteIds);
     useEffect(() => {
         const callServer = async () => {
             setBusy({state: true, message: "Retrieving quotes from server..."});
@@ -38,6 +41,9 @@ const BrowseQuotes = () => {
                 .filter(q => StringUtils.isEmpty(q.approved) || q.approved === "Y");
             PassageUtils.shuffleArray(quotes);
             setAllQuotes(quotes);
+            if (filteredQuoteIds && filteredQuoteIds.length > 0) {
+                setFilteredQuotes(quotes.filter(qt => filteredQuoteIds.includes(qt.objectionId)));
+            }
             setBusy({state: false, message: ""});
         };
         callServer();
@@ -136,6 +142,7 @@ const BrowseQuotes = () => {
     };
 
     const handleClearFilter = () => {
+        dispatcher(stateActions.setFilteredQuoteIds([]));
         setCurrentIndex(0);
         setFilteredQuotes(null);
     };

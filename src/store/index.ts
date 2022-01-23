@@ -15,7 +15,8 @@ const initialState: AppState = {
     maxChaptersByBook: [],
     user: null,
     allUsers: [],
-    startingQuote: -1
+    startingQuote: -1,
+    filteredQuoteIds: []
 } as AppState;
 
 const state = createSlice({
@@ -103,6 +104,9 @@ const state = createSlice({
         },
         setStartingQuote(state, action) {
             state.startingQuote = action.payload;
+        },
+        setFilteredQuoteIds(state, action) {
+            state.filteredQuoteIds = action.payload;
         }
     }
 });
