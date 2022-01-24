@@ -94,7 +94,7 @@ const App = () => {
 
     return (
         <Layout className="layout">
-            <Header>
+            <Header style={{paddingLeft: "0px", paddingRight: "0px"}}>
                 <Menu theme="light" mode="horizontal" selectedKeys={[selectedMenu.toString()]} defaultSelectedKeys={['1']}>
                     {menuItems.map(item => <Menu.Item key={item.key} onClick={() => handleMenuItem(item)}>{item.label}</Menu.Item>)}
                 </Menu>
