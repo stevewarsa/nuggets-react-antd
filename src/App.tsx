@@ -99,7 +99,7 @@ const App = () => {
                     {menuItems.map(item => <Menu.Item key={item.key} onClick={() => handleMenuItem(item)}>{item.label}</Menu.Item>)}
                 </Menu>
             </Header>
-            <Content style={{ padding: '0 50px', marginTop: '20px' }}>
+            <Content style={{ paddingLeft: "5px", paddingRight: "5px", marginTop: "20px" }}>
                 <div className="site-layout-content">
                     <Routes>
                         <Route path="/" element={<Login/>} />
