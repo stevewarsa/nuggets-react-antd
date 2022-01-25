@@ -328,7 +328,7 @@ export class PassageUtils {
       if (stringToHighlight === "") {
         continue;
       }
-      let regex: RegExp = new RegExp(stringToHighlight, 'i');
+      let regex: RegExp = new RegExp(stringToHighlight, "ig");
       locString = locString.replace(regex, "<span class='search_result'>$&</span>");
     }
     return locString;
