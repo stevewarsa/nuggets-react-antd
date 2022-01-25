@@ -11,14 +11,16 @@ const SelectVerses = () => {
     const navigate = useNavigate();
     const dispatcher = useDispatch();
     const verseSelectionRequest = useSelector((appState: AppState) => appState.verseSelectionRequest);
-    const [locVerses, setLocVerses] = useState(verseSelectionRequest ? [...verseSelectionRequest.versesForSelection] : []);
+    const [locVerses, setLocVerses] = useState([]);
     useEffect(() => {
-        const v = [...locVerses];
-        for (let i = 0; i < v.length; i++) {
-            v[i].selected = i === 0 || i === (v.length - 1);
+        if (verseSelectionRequest) {
+            const selectedVerses = [...verseSelectionRequest.versesForSelection];
+            for (let i = 0; i < selectedVerses.length; i++) {
+                selectedVerses[i].selected = i === 0 || i === (selectedVerses.length - 1);
+            }
+            setLocVerses(selectedVerses);
         }
-        setLocVerses(v);
-    }, [verseSelectionRequest.versesForSelection, locVerses]);
+    }, [verseSelectionRequest]);
 
     const handleSubmit = () => {
         // console.log("Handle submit - selected verses:");
