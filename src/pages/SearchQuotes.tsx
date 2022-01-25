@@ -70,7 +70,7 @@ const SearchQuotes = () => {
     const handleTableFilter = (evt) => {
         setSearchString(evt.target.value);
         if (gridApiRef.current) {
-            gridApiRef.current.setQuickFilter(evt.target.value); //  Used the GridApi here Yay!!!!!
+            gridApiRef.current.setQuickFilter(evt.target.value);
         }
     };
 
@@ -134,8 +134,8 @@ const SearchQuotes = () => {
                 <Row justify="center">
                     <h1>Search Quotes</h1>
                 </Row>
-                <Row justify="center">
-                    <Col>
+                <Row justify="center" align="middle">
+                    <Col style={{marginRight: "5px"}}>
                         <Input autoFocus value={searchString} placeholder="Enter Search" onChange={handleTableFilter}/>
                     </Col>
                 </Row>

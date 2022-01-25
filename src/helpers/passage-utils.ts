@@ -320,13 +320,18 @@ export class PassageUtils {
     if (StringUtils.isEmpty(find) || StringUtils.isEmpty(str)) {
       return str;
     }
-    let stringToHighlight = find.replace("*", "(.*?)");
-    //console.log("PassageUtils.updateAllMatches - Here is the regex wildcard: '" + stringToHighlight + "'");
-    if (stringToHighlight === "") {
-      return str;
+    const findWords = find.split(" ");
+    let locString = str;
+    for (let findWord of findWords) {
+      let stringToHighlight = findWord.replace("*", "(.*?)");
+      //console.log("PassageUtils.updateAllMatches - Here is the regex wildcard: '" + stringToHighlight + "'");
+      if (stringToHighlight === "") {
+        continue;
+      }
+      let regex: RegExp = new RegExp(stringToHighlight, 'i');
+      locString = locString.replace(regex, "<span class='search_result'>$&</span>");
     }
-    let regex: RegExp = new RegExp(stringToHighlight, 'i');
-    return str.replace(regex, "<span class='search_result'>$&</span>");
+    return locString;
   }
 
   public static updateLineFeedsWithBr(stringToModify: string): string {
