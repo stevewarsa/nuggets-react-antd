@@ -2,6 +2,7 @@ import {Passage} from "../model/passage";
 import {Constants} from "../model/constants";
 import copy from "copy-to-clipboard";
 import {VerseNumAndText} from "../model/versenum-and-text";
+import {StringUtils} from "./string.utils";
 
 export class PassageUtils {
   public static readonly RAND: string = "rand";
@@ -316,6 +317,9 @@ export class PassageUtils {
   // }
 
   public static updateAllMatches(find: string, str: string) {
+    if (StringUtils.isEmpty(find) || StringUtils.isEmpty(str)) {
+      return str;
+    }
     let stringToHighlight = find.replace("*", "(.*?)");
     //console.log("PassageUtils.updateAllMatches - Here is the regex wildcard: '" + stringToHighlight + "'");
     if (stringToHighlight === "") {

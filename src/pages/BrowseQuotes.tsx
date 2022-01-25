@@ -31,6 +31,7 @@ const BrowseQuotes = () => {
     const user = useSelector((state: AppState) => state.user);
     const startingQuote = useSelector((state: AppState) => state.startingQuote);
     const filteredQuoteIds = useSelector((state: AppState) => state.filteredQuoteIds);
+    const searchString = useSelector((state: AppState) => state.currentSearchString);
     useEffect(() => {
         const callServer = async () => {
             setBusy({state: true, message: "Retrieving quotes from server..."});
@@ -107,6 +108,7 @@ const BrowseQuotes = () => {
     };
 
     const handleClearFilter = () => {
+        dispatcher(stateActions.setCurrentSearchString(null));
         dispatcher(stateActions.setFilteredQuoteIds([]));
         setCurrentIndex(0);
         setFilteredQuotes(null);
@@ -164,7 +166,7 @@ const BrowseQuotes = () => {
                             <p
                                 style={{marginTop: "10px"}}
                                 className="nugget-view"
-                                dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(filteredQuotes[currentIndex].answer)}}/>
+                                dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(StringUtils.isEmpty(searchString) ? filteredQuotes[currentIndex].answer : PassageUtils.updateAllMatches(searchString, filteredQuotes[currentIndex].answer))}}/>
                         </Col>
                     </Row>
                 }

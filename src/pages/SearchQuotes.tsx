@@ -15,6 +15,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {CellClickedEvent} from "ag-grid-community";
 import {DoubleLeftOutlined, DoubleRightOutlined, LeftOutlined, RightOutlined} from "@ant-design/icons";
+import QuoteCellRenderer from "../renderers/QuoteCellRenderer";
 
 const SearchQuotes = () => {
     const navigate = useNavigate();
@@ -56,6 +57,7 @@ const SearchQuotes = () => {
     }, [user, existingQuoteList]);
 
     const handleFilterToCurrent = () => {
+        dispatcher(stateActions.setCurrentSearchString(searchString));
         dispatcher(stateActions.setFilteredQuoteIds(filteredQuotes.map(qt => qt.originalQuote.objectionId)));
         navigate("/browseQuotes");
     };
@@ -88,7 +90,6 @@ const SearchQuotes = () => {
         navigate("/browseQuotes");
     };
     const onPaginationChanged = (evt) => {
-        console.log('onPaginationPageLoaded');
         if (evt && evt.api) {
             const pgInfo = {
                 currentPage: evt.api.paginationGetCurrentPage() + 1,
@@ -164,9 +165,15 @@ const SearchQuotes = () => {
                         <AgGridReact
                             reactUi={true}
                             rowData={allQuotes}
+                            frameworkComponents={{
+                                quoteCellRenderer: QuoteCellRenderer
+                            }}
                             gridOptions={{
                                 pagination: true,
                                 paginationPageSize: 6,
+                                getRowStyle: () => {
+                                    return {borderWidth: "thick"};
+                                },
                                 onCellClicked: (event: CellClickedEvent) => goTo((event.data as Quote).objectionId)
                             }}
                             onGridReady={onGridReady}
@@ -185,6 +192,8 @@ const SearchQuotes = () => {
                             <AgGridColumn
                                 wrapText={true}
                                 autoHeight={true}
+                                cellRenderer="quoteCellRenderer"
+                                cellRendererParams={{"searchString": searchString}}
                                 field="answer"
                                 headerName="Quote Text"/>
                         </AgGridReact>

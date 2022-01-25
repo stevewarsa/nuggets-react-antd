@@ -17,4 +17,5 @@ export interface AppState {
     startingQuote: number;
     filteredQuoteIds: number[];
     existingQuoteList: Quote[];
+    currentSearchString: string;
 }

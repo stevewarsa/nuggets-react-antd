@@ -16,7 +16,8 @@ const initialState: AppState = {
     user: null,
     allUsers: [],
     startingQuote: -1,
-    filteredQuoteIds: []
+    filteredQuoteIds: [],
+    currentSearchString: null
 } as AppState;
 
 const state = createSlice({
@@ -110,6 +111,9 @@ const state = createSlice({
         },
         setExistingQuoteList(state, action) {
             state.existingQuoteList = action.payload;
+        },
+        setCurrentSearchString(state, action) {
+            state.currentSearchString = action.payload;
         }
     }
 });
