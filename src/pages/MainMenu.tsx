@@ -52,8 +52,8 @@ const MainMenu = () => {
             children: [
                 {
                     key: "2.1",
-                    label: "Search Full Bible",
-                    action: "/searchFullBible"
+                    label: "Bible Search",
+                    action: "/bibleSearch"
                 }
             ]
         },

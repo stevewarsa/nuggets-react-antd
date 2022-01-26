@@ -22,6 +22,7 @@ const BibleReadingPlan = () => {
     const dispatcher = useDispatch();
     const navigate = useNavigate();
     const maxChaptersByBook = useSelector((state: AppState) => state.maxChaptersByBook);
+    const prefs = useSelector((state: AppState) => state.userPreferences);
     const currentDayOfWeek = DateUtils.getDayOfWeek();
     const [allReadingPlanProgress, setAllReadingPlanProgress] = useState<ReadingHistoryEntry[]>([]);
     const [todaysReading, setTodaysReading] = useState<ReadingHistoryEntry>(null);
@@ -76,8 +77,7 @@ const BibleReadingPlan = () => {
                 nextReadingEntry.dateRead = DateUtils.formatDate(new Date(), "yyyy-MM-dd");
             }
             setTodaysReading(nextReadingEntry);
-            const preferencesResponse = await memoryService.getPreferences(user);
-            setTranslation(PassageUtils.getPreferredTranslationFromPrefs(preferencesResponse.data, "niv"));
+            setTranslation(PassageUtils.getPreferredTranslationFromPrefs(prefs, "niv"));
             setBusy({state: false, message: ""});
         };
         callServer();

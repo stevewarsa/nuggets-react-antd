@@ -20,6 +20,8 @@ import Login from "./pages/Login";
 import { useNavigate } from 'react-router-dom';
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import SearchQuotes from "./pages/SearchQuotes";
+import BibleSearch from "./pages/BibleSearch";
+import {PassageUtils} from "./helpers/passage-utils";
 
 const App = () => {
     const navigate = useNavigate();
@@ -34,6 +36,7 @@ const App = () => {
             dispatcher(stateActions.setMaxChaptersByBook(locMaxChaptersByBook.data));
             const allUsers = await memoryService.getAllUsers();
             dispatcher(stateActions.setAllUsers(allUsers.data));
+
         };
         callServer();
 
@@ -115,6 +118,7 @@ const App = () => {
                             <Route path="/selectVerses" element={<SelectVerses/>}/>
                             <Route path="/browseQuotes" element={<BrowseQuotes/>}/>
                             <Route path="/searchQuotes" element={<SearchQuotes/>}/>
+                            <Route path="/bibleSearch" element={<BibleSearch/>}/>
                             <Route path="/addQuote" element={<AddQuote/>}/>
                         </Route>
                     </Routes>
