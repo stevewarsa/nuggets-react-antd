@@ -103,9 +103,13 @@ const BibleReadingPlan = () => {
             <>
                 {todaysReading &&
                     <>
-                        <h1>Today's Reading</h1>
-                        <h3>{Constants.bookAbbrev[todaysReading.bookName][1] + " " + todaysReading.chapter}</h3>
-                        <Row>
+                        <Row justify="center">
+                            <h1>Today's Reading</h1>
+                        </Row>
+                        <Row justify="center">
+                            <h3>{Constants.bookAbbrev[todaysReading.bookName][1] + " " + todaysReading.chapter}</h3>
+                        </Row>
+                        <Row justify="center">
                             <Col><Button type="primary" onClick={handleRead}>Read</Button></Col>
                         </Row>
                     </>
