@@ -311,10 +311,10 @@ export class PassageUtils {
     return verseText;
   }
 
-  // public static getFormattedPassageTextHighlight(passage: Passage, textToHighlight: string, showVerseNumbers: boolean) {
-  //   var formattedText = this.getFormattedPassageText(passage, showVerseNumbers);
-  //   return this.updateAllMatches(textToHighlight, formattedText);
-  // }
+  public static getFormattedPassageTextHighlight(passage: Passage, textToHighlight: string, showVerseNumbers: boolean) {
+    var formattedText = this.getFormattedPassageText(passage, showVerseNumbers);
+    return this.updateAllMatches(textToHighlight, formattedText);
+  }
 
   public static updateAllMatches(find: string, str: string) {
     if (StringUtils.isEmpty(find) || StringUtils.isEmpty(str)) {

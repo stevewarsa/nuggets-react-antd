@@ -66,5 +66,9 @@ class MemoryService {
     public doLogin(userName: string) {
         return axios.get<string>("/bible-app/server/nuggets_login.php?user=" + userName);
     }
+
+    public searchBible(searchParam: any) {
+        return axios.post<Passage[]>("/bible-app/server/bible_search.php", searchParam);
+    }
 }
 export default new MemoryService();
