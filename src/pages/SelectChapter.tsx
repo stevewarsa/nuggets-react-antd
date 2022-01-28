@@ -1,22 +1,30 @@
 import {Button, Col, Row, Select} from "antd";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Constants} from "../model/constants";
 import {ReadFilled} from "@ant-design/icons";
 import {useDispatch, useSelector} from "react-redux";
 import {stateActions} from "../store";
 import {useNavigate} from "react-router-dom";
 import {AppState} from "../model/AppState";
+import {PassageUtils} from "../helpers/passage-utils";
 
 const SelectChapter = () => {
     const dispatcher = useDispatch();
     const maxChaptersByBook = useSelector((state: AppState) => state.maxChaptersByBook);
     const chapterConfig = useSelector((state: AppState) => state.chapterSelection);
+    const prefs = useSelector((state: AppState) => state.userPreferences);
     const navigate = useNavigate();
     const {Option} = Select;
     const [book, setBook] = useState(chapterConfig ? chapterConfig.book : "N/A");
     const [chapter, setChapter] = useState(chapterConfig ? chapterConfig.chapter : "N/A");
     const [translation, setTranslation] = useState(chapterConfig ? chapterConfig.translation : "N/A");
     const [bookChapters, setBookChapters] = useState([]);
+
+    useEffect(() => {
+        if (prefs) {
+            setTranslation(PassageUtils.getPreferredTranslationFromPrefs(prefs, "niv"));
+        }
+    }, [prefs]);
 
     const handleBookChange = (value) => {
         // console.log(`selected book ${value}`);
@@ -25,6 +33,7 @@ const SelectChapter = () => {
         if (maxChapter > 0) {
             let chapters = Array.from({length: maxChapter}, (e, i) => i + 1);
             setBookChapters(chapters);
+            setChapter(1);
         }
     };
 
