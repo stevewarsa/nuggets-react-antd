@@ -63,6 +63,14 @@ class MemoryService {
         return axios.get<MemUser[]>("/bible-app/server/get_all_users.php");
     }
 
+    public addEmailMapping(param: any) {
+        return axios.post<string>("/bible-app/serveadd_email_mapping.php", param);
+    }
+
+    public getEmailMappings(param: any) {
+        return axios.post<any[]>("/bible-app/server/get_email_mappings.php", param);
+    }
+
     public doLogin(userName: string) {
         return axios.get<string>("/bible-app/server/nuggets_login.php?user=" + userName);
     }

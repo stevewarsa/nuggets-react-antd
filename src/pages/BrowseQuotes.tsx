@@ -3,13 +3,26 @@ import memoryService from "../services/memory-service";
 import {Quote} from "../model/quote";
 import {StringUtils} from "../helpers/string.utils";
 import SpinnerTimer from "../components/SpinnerTimer";
-import {Button, Col, Dropdown, Menu, notification, Row, Space} from "antd";
+import {
+    Button,
+    Col,
+    Dropdown,
+    Form,
+    Input,
+    Menu,
+    Modal,
+    notification,
+    Row,
+    Select,
+    Space,
+    TreeSelect
+} from "antd";
 import Swipe from "react-easy-swipe";
 import {
     ArrowLeftOutlined,
     ArrowRightOutlined,
     CopyOutlined,
-    EyeInvisibleOutlined,
+    EyeInvisibleOutlined, MailOutlined,
     MoreOutlined,
     SearchOutlined
 } from "@ant-design/icons";
@@ -20,6 +33,9 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import {stateActions} from "../store";
 import {useNavigate} from "react-router-dom";
+import {MemUser} from "../model/mem-user";
+
+type SizeType = Parameters<typeof Form>[0]['size'];
 
 const BrowseQuotes = () => {
     const dispatcher = useDispatch();
@@ -28,10 +44,25 @@ const BrowseQuotes = () => {
     const [filteredQuotes, setFilteredQuotes] = useState<Quote[]>(null);
     const [busy, setBusy] = useState({state: false, message: ""});
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [modalVisible, setModalVisible] = useState(false);
     const user = useSelector((state: AppState) => state.user);
+    const allUsers = useSelector((appState: AppState) => appState.allUsers);
     const startingQuote = useSelector((state: AppState) => state.startingQuote);
     const filteredQuoteIds = useSelector((state: AppState) => state.filteredQuoteIds);
     const searchString = useSelector((state: AppState) => state.currentSearchString);
+    const [componentSize, setComponentSize] = useState<SizeType | 'default'>('small');
+    const [comments, setComments] = useState("");
+    const [quoteForSend, setQuoteForSend] = useState("");
+    const [emailSubject, setEmailSubject] = useState("");
+    const [userToSendTo, setUserToSendTo] = useState("");
+    const [usersWithEmail, setUsersWithEmail] = useState<{[user: string]: {user: MemUser, email: string}}>({});
+    const [emailAddress, setEmailAddress] = useState("");
+    const { TextArea } = Input;
+
+    const onFormLayoutChange = ({ size }: { size: SizeType }) => {
+        setComponentSize(size);
+    };
+
     useEffect(() => {
         const callServer = async () => {
             setBusy({state: true, message: "Retrieving quotes from server..."});
@@ -46,10 +77,29 @@ const BrowseQuotes = () => {
                 setFilteredQuotes(dedupedQuotes.filter(qt => filteredQuoteIds.includes(qt.objectionId)));
                 setCurrentIndex(0);
             }
+            if (user) {
+                setEmailSubject("Quote sent to you from " + user);
+            }
             setBusy({state: false, message: ""});
         };
         callServer();
     }, [user]);
+
+    useEffect(() => {
+        const callServer = async () => {
+            const emailMappingsResponse = await memoryService.getEmailMappings({user: user});
+            const mappings = emailMappingsResponse.data;
+            if (mappings && mappings.length > 0) {
+                const emailMappingsMap: { [user: string]: { user: MemUser, email: string } } = {};
+                mappings.forEach(mp => emailMappingsMap[mp.userName] = {user: allUsers.find(usr => usr.userName === mp.userName), email: mp.emailAddress});
+                console.log("Setting usersWithEmail to: ", emailMappingsMap);
+                setUsersWithEmail(emailMappingsMap);
+            }
+        }
+        if (!StringUtils.isEmpty(user) && allUsers && allUsers.length > 0) {
+            callServer();
+        }
+    }, [allUsers, user]);
 
     useEffect(() => {
         if (startingQuote > 0 && allQuotes.length > 0 && !(filteredQuoteIds && filteredQuoteIds.length > 0)) {
@@ -99,6 +149,13 @@ const BrowseQuotes = () => {
             } else {
                 notification.warning({message: "Quote is empty - not copied!", placement: "bottomRight"});
             }
+        } else if (key === "2") {
+            let quoteText = filteredQuotes && filteredQuotes.length > currentIndex ? filteredQuotes[currentIndex].answer : "";
+            if (StringUtils.isEmpty(quoteText)) {
+                quoteText = allQuotes && allQuotes.length > currentIndex ? allQuotes[currentIndex].answer : "";
+            }
+            setQuoteForSend(quoteText);
+            setModalVisible(true);
         }
     };
 
@@ -112,6 +169,28 @@ const BrowseQuotes = () => {
         dispatcher(stateActions.setFilteredQuoteIds([]));
         setCurrentIndex(0);
         setFilteredQuotes(null);
+    };
+
+    const handleOk = () => {
+        setModalVisible(false);
+        console.log("Here is the chosen user: " + userToSendTo + ", emailSubject: " + emailSubject + ", comments: " + comments + ", quoteForSend: " + quoteForSend);
+    };
+
+    const handleCancel = () => {
+        setModalVisible(false);
+    };
+
+    const handleComments = (evt) => {
+        setComments(evt.target.value);
+    };
+
+    const handleSelectUser = (value) => {
+        setUserToSendTo(value);
+        if (usersWithEmail[value] && !StringUtils.isEmpty(usersWithEmail[value].email)) {
+            setEmailAddress(usersWithEmail[value].email)
+        } else {
+            setEmailAddress("");
+        }
     };
 
     return (
@@ -136,6 +215,9 @@ const BrowseQuotes = () => {
                                 <Menu onClick={handleMenuClick}>
                                     <Menu.Item key="1" icon={<CopyOutlined/>}>
                                         Copy
+                                    </Menu.Item>
+                                    <Menu.Item key="2" icon={<MailOutlined />}>
+                                        Send Quote...
                                     </Menu.Item>
                                 </Menu>
                             }>
@@ -171,6 +253,44 @@ const BrowseQuotes = () => {
                     </Row>
                 }
             </Swipe>
+            <Modal title="Send Quote" visible={modalVisible} onOk={handleOk} onCancel={handleCancel}>
+                <Form
+                    labelCol={{ span: 4 }}
+                    wrapperCol={{ span: 14 }}
+                    layout="horizontal"
+                    initialValues={{ size: componentSize }}
+                    onValuesChange={onFormLayoutChange}
+                    size={componentSize as SizeType}
+                >
+                    {allUsers && allUsers.length > 0 &&
+                        <Form.Item label="To" colon={true}>
+                            <Select onChange={handleSelectUser}>
+                                <Select.Option key="n/a" value={userToSendTo}>--Select User--</Select.Option>
+                                {allUsers.filter(usr => !["Guest", user].includes(usr.userName)).map(usr =>
+                                    <Select.Option key={usr.userName} value={usr.userName}>{usr.userName}</Select.Option>
+                                )}
+                            </Select>
+                        </Form.Item>
+                    }
+                    <Form.Item label="Email Address" colon={true}>
+                        <Input value={emailAddress} autoFocus onChange={(evt) => setEmailAddress(evt.target.value)} />
+                    </Form.Item>
+                    <Form.Item label="Email Subject" colon={true}>
+                        <Input value={emailSubject} autoFocus onChange={(evt) => setEmailSubject(evt.target.value)} />
+                    </Form.Item>
+                    <Form.Item label="Comments" colon={true}>
+                        <TextArea
+                            style={{marginLeft: "5px", marginRight: "5px"}}
+                            autoSize
+                            placeholder="Enter comments to send with quote"
+                            value={comments}
+                            onChange={handleComments}/>
+                    </Form.Item>
+                    <Form.Item label="Quote Text" colon={true}>
+                        {quoteForSend}
+                    </Form.Item>
+                </Form>
+            </Modal>
         </>
     );
 };
