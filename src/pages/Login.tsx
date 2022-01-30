@@ -25,8 +25,6 @@ const Login = () => {
         // @ts-ignore
         if (location.state?.from?.pathname && !["/readChapter", "/selectVerses", "/practice"].includes(location.state.from.pathname)) {
             // @ts-ignore
-            console.log("location.state.from is populated with: ", location.state.from.pathname);
-            // @ts-ignore
             navigate(location.state.from.pathname);
         } else {
             console.log("location.state.from is NOT populated");

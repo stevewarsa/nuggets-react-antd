@@ -20,6 +20,7 @@ import {Constants} from "../model/constants";
 import Swipe from "react-easy-swipe";
 import {StringUtils} from "../helpers/string.utils";
 import {stateActions} from "../store";
+import {DateUtils} from "../helpers/date.utils";
 
 const Practice = () => {
     const dispatcher = useDispatch();
@@ -99,6 +100,11 @@ const Practice = () => {
                 await populateVerses(currPassage, false);
             }
         }
+        const dt = new Date();
+        let dtNum = dt.getTime();
+        const formattedDateTime = DateUtils.formatDateTime(dt, "MM-dd-yy KK:mm:ss");
+        // fire and forget - don't need to wait for the result
+        memoryService.updateLastViewed(user, currPassage.passageId, dtNum, formattedDateTime);
     }, [dispatcher, memTextOverrides, populateVerses, practiceState.currentIndex, practiceState.memPassageList, practiceState.showPsgRef]);
 
     // grab the memory verses from the server based on the practice config...

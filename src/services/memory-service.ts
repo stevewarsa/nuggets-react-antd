@@ -17,6 +17,15 @@ class MemoryService {
         return axios.get("/bible-app/server/get_mempsg_text_overrides.php?user=" + user);
     }
 
+    public updateLastViewed(userName: string, passageId: number, lastViewedNum: number, lastViewedString: string) {
+        var encodedLastViewedString = encodeURIComponent(lastViewedString);
+        return axios.get<string>("/bible-app/server/update_last_viewed.php?user=" + userName + "&passageId=" + passageId + "&lastViewedNum=" + lastViewedNum + "&lastViewedStr=" + encodedLastViewedString);
+    }
+
+    public getMemoryPracticeHistory(userName: string) {
+        return axios.get("/bible-app/server/get_mem_practice_history.php?user=" + userName);
+    }
+
     public getMaxChaptersByBook() {
         return axios.get("/bible-app/server/get_max_chapter_by_book.php");
     }

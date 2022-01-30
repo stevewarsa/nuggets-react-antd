@@ -154,6 +154,11 @@ const MainMenu = () => {
                     label: "Practice",
                     action: "/practiceSetup"
                 },
+                {
+                    key: "5.2",
+                    label: "Practice History",
+                    action: "/practiceHist"
+                },
                 // {
                 //     key: "5.2",
                 //     label: "Search / Add New Verse",

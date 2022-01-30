@@ -94,7 +94,7 @@ export class DateUtils {
    *
    * Formats a date as per the given format
    * @param {Date} date or string or milliseconds from epoch
-   * @param {string} [formatStr] defaults to "MM/DD/YYYY"
+   * @param {string} [formatStr] defaults to "MM/dd/yyyy"
    * @returns {string} formatted date
    */
   static formatDate(date: Date | string | number, formatStr?: string): string {
@@ -113,7 +113,7 @@ export class DateUtils {
    *
    * Parses a string as per the given format
    * @param {string} value
-   * @param {string} [formatStr] defaults to "MM/DD/YYYY"
+   * @param {string} [formatStr] defaults to "MM/dd/yyyy"
    * @returns {Date}
    */
   static parseDate(value: string, formatStr = DateUtils.DATE_FORMAT): Date | undefined {
@@ -144,5 +144,9 @@ export class DateUtils {
       return typeof dt === "undefined" ? undefined : endOfDay(dt);
     }
     return endOfDay(toDate(date));
+  }
+
+  public static formatDateTime(date: Date, formatStr: string): string {
+    return format(date, formatStr);
   }
 }

@@ -22,6 +22,7 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import SearchQuotes from "./pages/SearchQuotes";
 import BibleSearch from "./pages/BibleSearch";
 import {PassageUtils} from "./helpers/passage-utils";
+import ViewMemoryPracticeHistory from "./pages/ViewMemoryPracticeHistory";
 
 const App = () => {
     const navigate = useNavigate();
@@ -111,6 +112,7 @@ const App = () => {
                             <Route path="/mainMenu" element={<MainMenu/>}/>
                             <Route path="/about" element={<About/>}/>
                             <Route path="/practiceSetup" element={<PracticeSetup/>}/>
+                            <Route path="/practiceHist" element={<ViewMemoryPracticeHistory/>}/>
                             <Route path="/practice" element={<Practice/>}/>
                             <Route path="/selectChapter" element={<SelectChapter/>}/>
                             <Route path="/readChapter" element={<ReadChapter/>}/>

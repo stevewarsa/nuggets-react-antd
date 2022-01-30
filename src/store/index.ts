@@ -98,7 +98,7 @@ const state = createSlice({
             state.verseSelectionRequest = action.payload;
         },
         setUser(state, action) {
-            console.log("setUser (reducer) - action.payload: " + action.payload);
+            // console.log("setUser (reducer) - action.payload: " + action.payload);
             state.user = action.payload;
         },
         setAllUsers(state, action) {
