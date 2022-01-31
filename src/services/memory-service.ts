@@ -1,59 +1,60 @@
-import axios from "axios";
+import axios, {AxiosInstance, AxiosRequestConfig} from "axios";
 import {Passage} from "../model/passage";
 import {Constants} from "../model/constants";
 import {Quote} from "../model/quote";
 import {MemUser} from "../model/mem-user";
+import axiosRetry from "axios-retry";
 
 class MemoryService {
     public getMemoryPsgList(user: string) {
-        return axios.get("/bible-app/server/get_mempsg_list.php?user=" + user);
+        return MemoryService.buildAxios().get("/bible-app/server/get_mempsg_list.php?user=" + user);
     }
 
     public getPassage(passage: Passage, user: string) {
-        return axios.get("/bible-app/server/get_passage_text.php?user=" + user + "&translation=" + passage.translationName + "&book=" + passage.bookName + "&chapter=" + passage.chapter + "&start=" + passage.startVerse + "&end=" + passage.endVerse);
+        return MemoryService.buildAxios().get("/bible-app/server/get_passage_text.php?user=" + user + "&translation=" + passage.translationName + "&book=" + passage.bookName + "&chapter=" + passage.chapter + "&start=" + passage.startVerse + "&end=" + passage.endVerse);
     }
 
     public getMemoryPassageTextOverrides(user: string) {
-        return axios.get("/bible-app/server/get_mempsg_text_overrides.php?user=" + user);
+        return MemoryService.buildAxios().get("/bible-app/server/get_mempsg_text_overrides.php?user=" + user);
     }
 
     public updateLastViewed(userName: string, passageId: number, lastViewedNum: number, lastViewedString: string) {
         var encodedLastViewedString = encodeURIComponent(lastViewedString);
-        return axios.get<string>("/bible-app/server/update_last_viewed.php?user=" + userName + "&passageId=" + passageId + "&lastViewedNum=" + lastViewedNum + "&lastViewedStr=" + encodedLastViewedString);
+        return MemoryService.buildAxios().get<string>("/bible-app/server/update_last_viewed.php?user=" + userName + "&passageId=" + passageId + "&lastViewedNum=" + lastViewedNum + "&lastViewedStr=" + encodedLastViewedString);
     }
 
     public getMemoryPracticeHistory(userName: string) {
-        return axios.get("/bible-app/server/get_mem_practice_history.php?user=" + userName);
+        return MemoryService.buildAxios().get("/bible-app/server/get_mem_practice_history.php?user=" + userName);
     }
 
     public getMaxChaptersByBook() {
-        return axios.get("/bible-app/server/get_max_chapter_by_book.php");
+        return MemoryService.buildAxios().get("/bible-app/server/get_max_chapter_by_book.php");
     }
     public getChapter(book: string, chapter: number, translation: string) {
         let bookId: number = this.getBookId(book);
-        return axios.get("/bible-app/server/get_chapter.php?bookId=" + bookId + "&chapter=" + chapter + "&translation=" + translation);
+        return MemoryService.buildAxios().get("/bible-app/server/get_chapter.php?bookId=" + bookId + "&chapter=" + chapter + "&translation=" + translation);
     }
 
     public getAllReadingPlanProgress(user: string) {
-        return axios.get("/bible-app/server/get_all_reading_plan_progress.php?user=" + user);
+        return MemoryService.buildAxios().get("/bible-app/server/get_all_reading_plan_progress.php?user=" + user);
     }
 
     public updateReadingPlan(user: string, dayOfWeek: string, book: string, bookId: number, chapter: number) {
-        return axios.get("/bible-app/server/update_reading_plan.php?user=" + user + "&dayOfWeek=" + dayOfWeek + "&book=" + book + "&bookId=" + bookId + "&chapter=" + chapter);
+        return MemoryService.buildAxios().get("/bible-app/server/update_reading_plan.php?user=" + user + "&dayOfWeek=" + dayOfWeek + "&book=" + book + "&bookId=" + bookId + "&chapter=" + chapter);
     }
 
     public getPreferences(user: string) {
-        return axios.get("/bible-app/server/get_preferences.php?user=" + user);
+        return MemoryService.buildAxios().get("/bible-app/server/get_preferences.php?user=" + user);
     }
 
     public getQuoteList(userName: string) {
-        return axios.get<Quote[]>("/bible-app/server/get_quote_list.php?user=" + userName);
+        return MemoryService.buildAxios().get<Quote[]>("/bible-app/server/get_quote_list.php?user=" + userName);
     }
 
     public addNonBibleQuote(quote: any, user: string) {
         quote.user = user;
         quote.category = 'quote';
-        return axios.post("/bible-app/server/add_nonbible_memory_fact.php", quote);
+        return MemoryService.buildAxios().post("/bible-app/server/add_nonbible_memory_fact.php", quote);
     }
 
     public getBookId(bookName: string): number {
@@ -69,23 +70,37 @@ class MemoryService {
     }
 
     public getAllUsers() {
-        return axios.get<MemUser[]>("/bible-app/server/get_all_users.php");
+        return MemoryService.buildAxios().get<MemUser[]>("/bible-app/server/get_all_users.php");
     }
 
     public addEmailMapping(param: any) {
-        return axios.post<string>("/bible-app/serveadd_email_mapping.php", param);
+        return MemoryService.buildAxios().post<string>("/bible-app/serveadd_email_mapping.php", param);
     }
 
     public getEmailMappings(param: any) {
-        return axios.post<any[]>("/bible-app/server/get_email_mappings.php", param);
+        return MemoryService.buildAxios().post<any[]>("/bible-app/server/get_email_mappings.php", param);
     }
 
     public doLogin(userName: string) {
-        return axios.get<string>("/bible-app/server/nuggets_login.php?user=" + userName);
+        return MemoryService.buildAxios().get<string>("/bible-app/server/nuggets_login.php?user=" + userName);
     }
 
     public searchBible(searchParam: any) {
-        return axios.post<Passage[]>("/bible-app/server/bible_search.php", searchParam);
+        return MemoryService.buildAxios().post<Passage[]>("/bible-app/server/bible_search.php", searchParam);
+    }
+
+    private static buildAxios(): AxiosInstance {
+        // implement 15 second timeout
+        const config: AxiosRequestConfig = {
+            timeout: 15000
+        } as AxiosRequestConfig;
+        let axiosInstance = axios.create(config);
+        axiosRetry(axiosInstance, {
+            retries: 3,
+            shouldResetTimeout: true,
+            retryCondition: (_error) => true // retry no matter what
+        });
+        return axiosInstance;
     }
 }
 export default new MemoryService();
