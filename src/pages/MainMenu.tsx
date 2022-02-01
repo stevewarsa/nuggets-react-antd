@@ -300,10 +300,10 @@ const MainMenu = () => {
     const handleSelect = (item: {key: string, label: string, action: string}) => {
         // console.log("handleSelect - item:");
         // console.log(item);
-        if (item.key === "5.1") {
-            // this is practice setup
-            dispatcher(stateActions.setSelectedMenuToPracticeSetup());
-        }
+        // if (item.key === "5.1") {
+        //     // this is practice setup
+        //     dispatcher(stateActions.setSelectedMenuToPracticeSetup());
+        // }
         navigate(item.action);
     };
     return (

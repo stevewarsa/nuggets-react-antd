@@ -1,7 +1,7 @@
 import {Route, Routes} from "react-router-dom";
 import 'antd/dist/antd.css';
 import MainMenu from "./pages/MainMenu";
-import {Layout, Menu} from "antd";
+import {Layout, Menu, Image} from "antd";
 import About from "./pages/About";
 import PracticeSetup from "./pages/PracticeSetup";
 import Practice from "./pages/Practice";
@@ -21,8 +21,8 @@ import { useNavigate } from 'react-router-dom';
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import SearchQuotes from "./pages/SearchQuotes";
 import BibleSearch from "./pages/BibleSearch";
-import {PassageUtils} from "./helpers/passage-utils";
 import ViewMemoryPracticeHistory from "./pages/ViewMemoryPracticeHistory";
+import {MenuOutlined} from "@ant-design/icons";
 
 const App = () => {
     const navigate = useNavigate();
@@ -99,7 +99,13 @@ const App = () => {
     return (
         <Layout className="layout">
             <Header style={{paddingLeft: "0px", paddingRight: "0px"}}>
-                <Menu theme="light" mode="horizontal" selectedKeys={[selectedMenu.toString()]} defaultSelectedKeys={['1']}>
+                <div style={{
+                    float: 'left',
+                    backgroundColor: "white"
+                }} >
+                    <Image src="goldnuggeticon.png" width={65} height={65} alt="logo" />
+                </div>
+                <Menu theme="light" mode="horizontal" selectedKeys={[selectedMenu.toString()]} defaultSelectedKeys={['1']}  overflowedIndicator={<MenuOutlined />}>
                     {menuItems.map(item => <Menu.Item key={item.key} onClick={() => handleMenuItem(item)}>{item.label}</Menu.Item>)}
                 </Menu>
             </Header>

@@ -36,7 +36,6 @@ code {
 
 .button {
   font-size: 48px !important;
-  font-weight: bold !important;
   width: fit-content !important;
   height: fit-content !important;
 }
@@ -47,5 +46,4 @@ code {
 }
 .icon-dropdown {
   font-size: 52px !important;
-  padding: 7px;
 }
