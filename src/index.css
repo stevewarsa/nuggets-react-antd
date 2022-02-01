@@ -33,3 +33,19 @@ code {
   height: 100%;
   text-align: center;
 }
+
+.button {
+  font-size: 48px !important;
+  font-weight: bold !important;
+  width: fit-content !important;
+  height: fit-content !important;
+}
+
+.icon {
+  font-size: inherit !important;
+  padding: 7px;
+}
+.icon-dropdown {
+  font-size: 52px !important;
+  padding: 7px;
+}

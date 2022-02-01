@@ -131,13 +131,15 @@ const Practice = () => {
     }, [dispatcher, practiceConfig, memTextOverrides, user]);
 
     const handlePrev = () => {
+        setShowingQuestion(true);
+        setShowPsgRef(practiceConfig.practiceMode === PassageUtils.BY_REF);
         setCurrentIndex(prev => prev === 0 ? memPassageList.length - 1 : prev - 1);
-        //displayPassageOnScreen();
     };
     const handleNext = () => {
         // console.log("handleNext - incrementing current index (currently " + currentIndex + ")");
+        setShowingQuestion(true);
+        setShowPsgRef(practiceConfig.practiceMode === PassageUtils.BY_REF);
         setCurrentIndex(prev => prev === (memPassageList.length - 1) ? 0 : prev + 1);
-        //displayPassageOnScreen();
     };
 
     const handleToggleAnswer = () => {
@@ -231,13 +233,13 @@ const Practice = () => {
                         </Popover>
                     </Col>
                 </Row>
-                <Row justify="center">
+                <Row justify="center" style={{marginBottom: "10px"}}>
                     <Space>
-                        <Col span={6}><Button icon={showingQuestion ? <QuestionCircleOutlined /> : <CheckSquareOutlined />} onClick={handleToggleAnswer}/></Col>
-                        <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
-                        <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
+                        <Col span={6}><Button className="button" icon={showingQuestion ? <QuestionCircleOutlined className="icon" /> : <CheckSquareOutlined className="icon" />} onClick={handleToggleAnswer}/></Col>
+                        <Col span={6}><Button className="button" icon={<ArrowLeftOutlined className="icon"/>} onClick={handlePrev}/></Col>
+                        <Col span={6}><Button className="button" icon={<ArrowRightOutlined className="icon"/>} onClick={handleNext}/></Col>
                         <Col span={6}>
-                            <Dropdown placement="bottomRight" trigger={["click"]} overlay={
+                            <Dropdown className="button" placement="bottomRight" trigger={["click"]} overlay={
                                 <Menu onClick={handleMenuClick}>
                                     <Menu.Item key="1" icon={<CopyOutlined/>}>
                                         Copy
@@ -247,7 +249,7 @@ const Practice = () => {
                                     </Menu.Item>
                                 </Menu>
                             }>
-                                <MoreOutlined style={{
+                                <MoreOutlined className="icon-dropdown" style={{
                                     borderStyle: "solid",
                                     borderWidth: "thin",
                                     borderColor: "gray",
