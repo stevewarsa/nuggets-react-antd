@@ -26,6 +26,20 @@ code {
   color: forestgreen;
   font-weight: bold;
 }
+/*Large devices - desktops*/
+@media (min-width: 992px) {
+  .nugget-view {
+    margin-left: 30%;
+    margin-right: 30%;
+  }
+}
+@media (max-width: 991px) {
+  .nugget-view {
+    margin-left: 3%;
+    margin-right: 3%;
+  }
+}
+
 .nugget-view {
   font-weight: bold;
   line-height: 1.25em;
