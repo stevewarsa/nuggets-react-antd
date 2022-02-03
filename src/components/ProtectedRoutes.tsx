@@ -7,9 +7,13 @@ import memoryService from "../services/memory-service";
 import {stateActions} from "../store";
 import {useEffect, useState} from "react";
 import SpinnerTimer from "./SpinnerTimer";
+import {useSearchParams} from "react-router-dom";
+import {Constants} from "../model/constants";
+import {CookieUtils} from "../helpers/cookie-utils";
 
 const ProtectedRoutes = () => {
     const location = useLocation();
+    const [searchParams] = useSearchParams();
     const dispatcher = useDispatch();
     const [busy, setBusy] = useState({state: false, message: ""});
     const user = useSelector((state: AppState) => state.user);
@@ -27,15 +31,21 @@ const ProtectedRoutes = () => {
             callServer();
         }
     }, [user, prefs]);
+    const bypass = "true" === searchParams.get("bypass");
     if (StringUtils.isEmpty(user)) {
-        // not logged in
-        return <Navigate to="/login" replace state={{from: location}}/>;
+        if (bypass && StringUtils.isEmpty(CookieUtils.getCookie("user.name"))) {
+            dispatcher(stateActions.setUser(Constants.GUEST_USER));
+            return <Outlet/>;
+        } else {
+            // not logged in
+            return <Navigate to="/login" replace state={{from: location}}/>;
+        }
     } else {
         // logged in
         if (busy.state) {
-            return <SpinnerTimer message={busy.message} />;
+            return <SpinnerTimer message={busy.message}/>;
         } else {
-            return <Outlet/>
+            return <Outlet/>;
         }
     }
 };

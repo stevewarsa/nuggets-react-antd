@@ -1,7 +1,7 @@
 import {Route, Routes} from "react-router-dom";
 import 'antd/dist/antd.css';
 import MainMenu from "./pages/MainMenu";
-import {Layout, Menu, Image} from "antd";
+import {Layout, Menu, Image, Row, Col} from "antd";
 import About from "./pages/About";
 import PracticeSetup from "./pages/PracticeSetup";
 import Practice from "./pages/Practice";
@@ -23,13 +23,14 @@ import SearchQuotes from "./pages/SearchQuotes";
 import BibleSearch from "./pages/BibleSearch";
 import ViewMemoryPracticeHistory from "./pages/ViewMemoryPracticeHistory";
 import {MenuOutlined} from "@ant-design/icons";
+import {StringUtils} from "./helpers/string.utils";
 
 const App = () => {
     const navigate = useNavigate();
     //console.log("Here is the location:", location);
     const dispatcher = useDispatch();
-    const selectedMenu = useSelector((state: AppState) => state.selectedMenuKey);
     // console.log("App - selectedMenu from store is " + selectedMenu);
+    const user = useSelector((state: AppState) => state.user);
     const { Header, Content, Footer } = Layout;
     useEffect(() => {
         const callServer = async () => {
@@ -37,10 +38,8 @@ const App = () => {
             dispatcher(stateActions.setMaxChaptersByBook(locMaxChaptersByBook.data));
             const allUsers = await memoryService.getAllUsers();
             dispatcher(stateActions.setAllUsers(allUsers.data));
-
         };
         callServer();
-
     }, [dispatcher]);
     const menuItems = [
         {
@@ -105,7 +104,7 @@ const App = () => {
                 }} >
                     <Image src="goldnuggeticon.png" width={65} height={65} alt="logo" />
                 </div>
-                <Menu theme="light" mode="horizontal" selectedKeys={[selectedMenu.toString()]} defaultSelectedKeys={['1']}  overflowedIndicator={<MenuOutlined />}>
+                <Menu theme="light" mode="horizontal" defaultSelectedKeys={['1']}  overflowedIndicator={<MenuOutlined />}>
                     {menuItems.map(item => <Menu.Item key={item.key} onClick={() => handleMenuItem(item)}>{item.label}</Menu.Item>)}
                 </Menu>
             </Header>
@@ -132,7 +131,18 @@ const App = () => {
                     </Routes>
                 </div>
             </Content>
-            <Footer style={{ textAlign: 'center' }}>Bible Nuggets ©{new Date().getFullYear()} Created by Steve Warsa</Footer>
+            <Footer style={{ textAlign: 'center' }}>
+                {!StringUtils.isEmpty(user) &&
+                    <Row justify="center">
+                        <h3>Current User: {user}</h3>
+                    </Row>
+                }
+                <Row justify="center">
+                    <Col>
+                        Bible Nuggets ©{new Date().getFullYear()} Created by Steve Warsa
+                    </Col>
+                </Row>
+            </Footer>
         </Layout>
     );
 }
