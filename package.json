@@ -31,8 +31,8 @@
     }
   },
   "scripts": {
-    "start": "env-cmd -f .env.dev react-scripts start",
-    "build": "react-scripts build",
+    "start": "node index.js .env.dev && env-cmd -f .env.dev react-scripts start",
+    "build": "node index.js .env && react-scripts build",
     "test": "jest",
     "eject": "react-scripts eject"
   },
