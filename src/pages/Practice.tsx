@@ -159,11 +159,13 @@ const Practice = () => {
             null;
         if (currPassage) {
             displayPassageOnScreen();
-            const dt = new Date();
-            let dtNum = dt.getTime();
-            const formattedDateTime = DateUtils.formatDateTime(dt, "MM-dd-yy KK:mm:ss");
-            // fire and forget - don't need to wait for the result
-            memoryService.updateLastViewed(user, currPassage.passageId, dtNum, formattedDateTime);
+            if (user !== Constants.GUEST_USER) {
+                const dt = new Date();
+                let dtNum = dt.getTime();
+                const formattedDateTime = DateUtils.formatDateTime(dt, "MM-dd-yy KK:mm:ss");
+                // fire and forget - don't need to wait for the result
+                memoryService.updateLastViewed(user, currPassage.passageId, dtNum, formattedDateTime);
+            }
         }
         setShowPsgRef(practiceConfig.practiceMode === PassageUtils.BY_REF);
     }, [currentIndex]);

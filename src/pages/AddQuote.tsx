@@ -7,6 +7,7 @@ import {useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import {stateActions} from "../store";
+import {Constants} from "../model/constants";
 
 const AddQuote = () => {
     const navigate = useNavigate();
@@ -46,11 +47,11 @@ const AddQuote = () => {
                 <h2><PlusCircleOutlined/> Add Quote</h2>
                 <Row style={{marginBottom: "5px"}}>
                     <Col span={24}>
-                        <TextArea autoSize={{ minRows: 5, maxRows: 10 }} style={{width: "100%"}} autoFocus value={quote} onChange={handleInput}/>
+                        <TextArea disabled={user === Constants.GUEST_USER} autoSize={{ minRows: 5, maxRows: 10 }} style={{width: "100%"}} autoFocus value={quote} onChange={handleInput}/>
                     </Col>
                 </Row>
                 <Row>
-                    <Col><Button disabled={!quote || quote.trim().length === 0} type="primary" onClick={handleAddQuote}>Add Quote</Button></Col>
+                    <Col><Button disabled={user === Constants.GUEST_USER || !quote || quote.trim().length === 0} type="primary" onClick={handleAddQuote}>Add Quote</Button></Col>
                 </Row>
             </>
         );

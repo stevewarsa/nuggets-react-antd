@@ -110,7 +110,7 @@ const BibleReadingPlan = () => {
                             <h3>{Constants.bookAbbrev[todaysReading.bookName][1] + " " + todaysReading.chapter}</h3>
                         </Row>
                         <Row justify="center">
-                            <Col><Button type="primary" onClick={handleRead}>Read</Button></Col>
+                            <Col><Button disabled={user === Constants.GUEST_USER} type="primary" onClick={handleRead}>Read</Button></Col>
                         </Row>
                     </>
                 }
