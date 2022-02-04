@@ -24,6 +24,7 @@ import BibleSearch from "./pages/BibleSearch";
 import ViewMemoryPracticeHistory from "./pages/ViewMemoryPracticeHistory";
 import {MenuOutlined} from "@ant-design/icons";
 import {StringUtils} from "./helpers/string.utils";
+import {CookieUtils} from "./helpers/cookie-utils";
 
 const App = () => {
     const navigate = useNavigate();
@@ -91,8 +92,15 @@ const App = () => {
 
     const handleMenuItem = (item: {key: number, label: string, path: string}) => {
         // console.log(item.label);
-        navigate(item.path);
-        dispatcher(stateActions.setSelectedMenuItem(item.key));
+        if (item.key === 9) {
+            // logout
+            CookieUtils.deleteCookie('user.name');
+            dispatcher(stateActions.setUser(null));
+            navigate("/")
+        } else {
+            navigate(item.path);
+            dispatcher(stateActions.setSelectedMenuItem(item.key));
+        }
     }
 
     return (

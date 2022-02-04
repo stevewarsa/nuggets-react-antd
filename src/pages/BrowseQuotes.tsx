@@ -14,8 +14,7 @@ import {
     notification,
     Row,
     Select,
-    Space,
-    TreeSelect
+    Space
 } from "antd";
 import Swipe from "react-easy-swipe";
 import {

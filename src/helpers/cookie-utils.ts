@@ -25,10 +25,6 @@ export class CookieUtils {
      * @param key name of the cookie
      */
     public static deleteCookie(key: string) {
-        // Delete a cookie by setting the date of expiry to yesterday
-        let date = new Date();
-        date.setDate(date.getDate() - 1);
-        document.cookie = escape(key) + '=;expires=' + date;
+        document.cookie = key + '=; Max-Age=-99999999;';
     }
-
 }

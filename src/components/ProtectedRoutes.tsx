@@ -30,7 +30,7 @@ const ProtectedRoutes = () => {
             };
             callServer();
         }
-    }, [user, prefs]);
+    }, [user, prefs, dispatcher]);
     const bypass = "true" === searchParams.get("bypass");
     if (StringUtils.isEmpty(user)) {
         if (bypass && StringUtils.isEmpty(CookieUtils.getCookie("user.name"))) {

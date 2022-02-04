@@ -3,12 +3,12 @@ import {AimOutlined, ReadOutlined, SearchOutlined, SketchOutlined} from "@ant-de
 import {Collapse, List, Space} from "antd";
 import 'antd/dist/antd.css';
 import {useNavigate} from "react-router-dom";
-import {useDispatch} from "react-redux";
-import {stateActions} from "../store";
+//import {useDispatch} from "react-redux";
+//import {stateActions} from "../store";
 
 const MainMenu = () => {
     const navigate = useNavigate();
-    const dispatcher = useDispatch();
+    //const dispatcher = useDispatch();
     const { Panel } = Collapse;
     const menuItems = [
         {
