@@ -89,10 +89,14 @@ class MemoryService {
         return MemoryService.buildAxios().post<Passage[]>("/bible-app/server/bible_search.php", searchParam);
     }
 
+    public copyDbToGuestDb() {
+        return MemoryService.buildAxios().get<string>("/bible-app/server/copy_db_to_another.php?dbSource=SteveWarsa&dbDest=Guest");
+    }
+
     private static buildAxios(): AxiosInstance {
         // implement 15 second timeout
         const config: AxiosRequestConfig = {
-            timeout: 15000
+            timeout: 7000
         } as AxiosRequestConfig;
         let axiosInstance = axios.create(config);
         axiosRetry(axiosInstance, {

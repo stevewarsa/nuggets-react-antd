@@ -7,10 +7,11 @@ import {PassageUtils} from "../helpers/passage-utils";
 import {SearchOutlined} from "@ant-design/icons";
 import memoryService from "../services/memory-service";
 import SpinnerTimer from "../components/SpinnerTimer";
+import React from "react";
 
 const BibleSearch = () => {
     const {Option} = Select;
-    const { TextArea } = Input;
+    const {TextArea} = Input;
     const [searchScope, setSearchScope] = useState("both");
     const [book, setBook] = useState("All");
     const [translation, setTranslation] = useState("all");
@@ -61,7 +62,7 @@ const BibleSearch = () => {
     }
 
     if (searching.state) {
-        return <SpinnerTimer message={searching.message} />;
+        return <SpinnerTimer message={searching.message}/>;
     } else {
         return (
             <>
@@ -131,16 +132,22 @@ const BibleSearch = () => {
                     <>
                         <Divider/>
                         {(!searchResults.results || searchResults.results.length === 0) && <Row><p>No matches</p></Row>}
-                        {searchResults.results && searchResults.results.length > 0 && <Row><p style={{fontWeight: "bold"}}>({searchResults.results.length} matches)</p></Row>}
-                        {searchResults.results && searchResults.results.length > 0 && searchResults.results.map(psg => (
-                            <>
-                                <Row key={PassageUtils.getPassageStringNoIndex(psg, psg.translationId, false)}>
-                                    <Col style={{marginRight: "3px"}} dangerouslySetInnerHTML={{__html: PassageUtils.getPassageStringNoIndex(psg, psg.translationId, false)}}/>
-                                    <Col dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageTextHighlight(psg, searchPhrase, false)}}/>
-                                </Row>
-                                <Divider/>
-                            </>
-                        ))}
+                        {searchResults.results && searchResults.results.length > 0 &&
+                            <Row><p style={{fontWeight: "bold"}}>({searchResults.results.length} matches)</p></Row>}
+                        {searchResults.results && searchResults.results.length > 0 && searchResults.results.map(psg => {
+                                const psgString = PassageUtils.getPassageStringNoIndex(psg, psg.translationId, false);
+                                const formattedPsgText = PassageUtils.getFormattedPassageTextHighlight(psg, searchPhrase, false);
+                                return (
+                                    <React.Fragment key={psgString}>
+                                        <Row>
+                                            <Col style={{marginRight: "3px"}} dangerouslySetInnerHTML={{__html: psgString}}/>
+                                            <Col dangerouslySetInnerHTML={{__html: formattedPsgText}}/>
+                                        </Row>
+                                        <Divider/>
+                                    </React.Fragment>
+                                );
+                            }
+                        )}
                     </>
                 }
             </>

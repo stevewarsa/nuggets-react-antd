@@ -1,13 +1,18 @@
 import React from 'react';
-import {AimOutlined, ReadOutlined, SearchOutlined, SketchOutlined} from "@ant-design/icons";
-import {Collapse, List, Space} from "antd";
+import {AimOutlined, CheckCircleOutlined, ReadOutlined, SearchOutlined, SketchOutlined} from "@ant-design/icons";
+import {Collapse, List, notification, Space} from "antd";
 import 'antd/dist/antd.css';
 import {useNavigate} from "react-router-dom";
+import memoryService from "../services/memory-service";
+import {Constants} from "../model/constants";
+import {useSelector} from "react-redux";
+import {AppState} from "../model/AppState";
 //import {useDispatch} from "react-redux";
 //import {stateActions} from "../store";
 
 const MainMenu = () => {
     const navigate = useNavigate();
+    const user = useSelector((state: AppState) => state.user);
     //const dispatcher = useDispatch();
     const { Panel } = Collapse;
     const menuItems = [
@@ -270,19 +275,19 @@ const MainMenu = () => {
         //         }
         //     ]
         // },
-        // {
-        //     key: "9",
-        //     title: "Steve's Tasks",
-        //     icon: (<CheckCircleOutlined />),
-        //     desc: "This section is used for tasks that only the creator of this program (Steve) can do",
-        //     children: [
-        //         {
-        //             key: "9.1",
-        //             label: "Copy This DB to Guest",
-        //             action: "/browseSearchTopics"
-        //         }
-        //     ]
-        // },
+        {
+            key: "9",
+            title: "Steve's Tasks",
+            icon: (<CheckCircleOutlined />),
+            desc: "This section is used for tasks that only the creator of this program (Steve) can do",
+            children: [
+                {
+                    key: "9.1",
+                    label: "Copy This DB to Guest",
+                    action: "/mainMenu"
+                }
+            ]
+        },
         // {
         //     key: "10",
         //     title: "Settings",
@@ -297,18 +302,24 @@ const MainMenu = () => {
         //     ]
         // }
     ];
-    const handleSelect = (item: {key: string, label: string, action: string}) => {
+    const handleSelect = async (item: {key: string, label: string, action: string}) => {
         // console.log("handleSelect - item:");
         // console.log(item);
-        // if (item.key === "5.1") {
-        //     // this is practice setup
-        //     dispatcher(stateActions.setSelectedMenuToPracticeSetup());
-        // }
-        navigate(item.action);
+        if (item.key === "9.1") {
+            // this is copy db to guest
+            const copyResponse = await memoryService.copyDbToGuestDb();
+            if (copyResponse.data === "success") {
+                notification.info({message: "DB copied!", placement: "bottomRight"});
+            } else {
+                notification.warning({message: "DB NOT copied! Error message: " + copyResponse.data, placement: "bottomRight"});
+            }
+        } else {
+            navigate(item.action);
+        }
     };
     return (
         <Collapse accordion>
-            {menuItems.map(menuItem => (
+            {menuItems.filter(item => item.key !== "9" || (item.key === "9" && user === "SteveWarsa")).map(menuItem => (
                     <Panel header={(
                         <Space size="small">
                             {menuItem.icon}
