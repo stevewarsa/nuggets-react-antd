@@ -1,7 +1,8 @@
 import {VerseNumAndText} from "./versenum-and-text";
+import {Passage} from "./passage";
 
 export class VerseSelectionRequest {
-    versesForSelection: VerseNumAndText[];
+    passage: Passage;
     backToPath: string;
     actionToPerform: string;
 }

@@ -71,7 +71,7 @@ const MainMenu = () => {
                 {
                     key: "3.1",
                     label: "Browse Bible",
-                    action: "/browseBibleNuggets"
+                    action: "/browseNuggets"
                 },
                 {
                     key: "3.2",

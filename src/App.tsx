@@ -25,6 +25,7 @@ import ViewMemoryPracticeHistory from "./pages/ViewMemoryPracticeHistory";
 import {MenuOutlined} from "@ant-design/icons";
 import {StringUtils} from "./helpers/string.utils";
 import {CookieUtils} from "./helpers/cookie-utils";
+import BrowseNuggets from "./pages/BrowseNuggets";
 
 const App = () => {
     const navigate = useNavigate();
@@ -132,6 +133,7 @@ const App = () => {
                             <Route path="/bibleReadingPlan" element={<BibleReadingPlan/>}/>
                             <Route path="/selectVerses" element={<SelectVerses/>}/>
                             <Route path="/browseQuotes" element={<BrowseQuotes/>}/>
+                            <Route path="/browseNuggets" element={<BrowseNuggets/>}/>
                             <Route path="/searchQuotes" element={<SearchQuotes/>}/>
                             <Route path="/bibleSearch" element={<BibleSearch/>}/>
                             <Route path="/addQuote" element={<AddQuote/>}/>

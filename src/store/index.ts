@@ -16,6 +16,7 @@ const initialState: AppState = {
     user: null,
     allUsers: [],
     startingQuote: -1,
+    startingPassageId: -1,
     filteredQuoteIds: [],
     currentSearchString: null,
     userPreferences: null
@@ -106,6 +107,9 @@ const state = createSlice({
         },
         setStartingQuote(state, action) {
             state.startingQuote = action.payload;
+        },
+        setStartingPassageId(state, action) {
+            state.startingPassageId = parseInt(action.payload);
         },
         setFilteredQuoteIds(state, action) {
             state.filteredQuoteIds = action.payload;

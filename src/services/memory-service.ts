@@ -93,6 +93,14 @@ class MemoryService {
         return MemoryService.buildAxios().get<string>("/bible-app/server/copy_db_to_another.php?dbSource=SteveWarsa&dbDest=Guest");
     }
 
+    public getNuggetIdList(currentUser: string) {
+        return MemoryService.buildAxios().get<any[]>("/bible-app/server/get_nugget_id_list.php?user=" + currentUser);
+    }
+
+    public getPassageById(passageId: number, selectedTranslation: string, currentUser: string) {
+        return MemoryService.buildAxios().get<Passage>("/bible-app/server/get_nugget_by_id.php?user=" + currentUser + "&nugget_id=" + passageId + "&translation=" + selectedTranslation);
+    }
+
     private static buildAxios(): AxiosInstance {
         // implement 15 second timeout
         const config: AxiosRequestConfig = {
