@@ -16,6 +16,7 @@ $user = $input->user->userName;
 $fromUser = $input->fromUser;
 $emailTo = $input->emailTo;
 $quote = $input->quote;
+$comments = $input->comments;
 $prompt = $quote->prompt;
 $answer = $quote->answer;
 $category = $quote->category;
@@ -68,6 +69,7 @@ if ($objectionId != -1) {
 
 	error_log('Emailing ' . $emailTo . ' regarding the quote...');
 	// now email user to notify them that quote has been sent and requires approval
+    $commentsToSend = $comments === "" ? "Here is a quote being sent to you by " . $fromUser : "Comments from " . $fromUser . ": " . $comments;
 	$msg = "
 		<html>
 		<head>
@@ -75,7 +77,7 @@ if ($objectionId != -1) {
 		</head>
 		<body>
 		<p>Hello " . $user . ",</p>
-		<p>Here is a quote being sent to you by " . $fromUser . ":</p><br>
+		<p>" . $commentsToSend . ":</p><br>
 		<p>" . $quote->answer . "</p><br>
 		<p>Please click <a href='http://ps11911.com/bible-app/server/approve_quote.php?quote_id=" . $objectionId . "&user=" . $user . "'>this link</a> to add it to your quote list</p><br>
 		<p>Thanks,</p>

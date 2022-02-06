@@ -101,6 +101,10 @@ class MemoryService {
         return MemoryService.buildAxios().get<Passage>("/bible-app/server/get_nugget_by_id.php?user=" + currentUser + "&nugget_id=" + passageId + "&translation=" + selectedTranslation);
     }
 
+    public sendQuoteToUser(param: any) {
+        return MemoryService.buildAxios().post<string>("/bible-app/server/send_quote_to_user.php", param);
+    }
+
     private static buildAxios(): AxiosInstance {
         // implement 15 second timeout
         const config: AxiosRequestConfig = {

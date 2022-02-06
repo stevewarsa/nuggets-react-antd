@@ -1,4 +1,3 @@
-import {VerseNumAndText} from "./versenum-and-text";
 import {Passage} from "./passage";
 
 export class VerseSelectionRequest {

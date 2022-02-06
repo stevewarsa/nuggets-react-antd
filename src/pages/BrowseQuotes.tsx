@@ -42,6 +42,7 @@ const BrowseQuotes = () => {
     const [allQuotes, setAllQuotes] = useState<Quote[]>([]);
     const [filteredQuotes, setFilteredQuotes] = useState<Quote[]>(null);
     const [busy, setBusy] = useState({state: false, message: ""});
+    const [modalBusy, setModalBusy] = useState({state: false, message: ""});
     const [currentIndex, setCurrentIndex] = useState(0);
     const [modalVisible, setModalVisible] = useState(false);
     const user = useSelector((state: AppState) => state.user);
@@ -56,6 +57,7 @@ const BrowseQuotes = () => {
     const [userToSendTo, setUserToSendTo] = useState("");
     const [usersWithEmail, setUsersWithEmail] = useState<{[user: string]: {user: MemUser, email: string}}>({});
     const [emailAddress, setEmailAddress] = useState("");
+    const [modalErrorMessage, setModalErrorMessage] = useState(null);
     const { TextArea } = Input;
 
     const onFormLayoutChange = ({ size }: { size: SizeType }) => {
@@ -91,7 +93,6 @@ const BrowseQuotes = () => {
             if (mappings && mappings.length > 0) {
                 const emailMappingsMap: { [user: string]: { user: MemUser, email: string } } = {};
                 mappings.forEach(mp => emailMappingsMap[mp.userName] = {user: allUsers.find(usr => usr.userName === mp.userName), email: mp.emailAddress});
-                console.log("Setting usersWithEmail to: ", emailMappingsMap);
                 setUsersWithEmail(emailMappingsMap);
             }
         }
@@ -170,9 +171,38 @@ const BrowseQuotes = () => {
         setFilteredQuotes(null);
     };
 
-    const handleOk = () => {
-        setModalVisible(false);
-        console.log("Here is the chosen user: " + userToSendTo + ", emailSubject: " + emailSubject + ", comments: " + comments + ", quoteForSend: " + quoteForSend);
+    const handleOk = async () => {
+        if (StringUtils.isEmpty(userToSendTo)) {
+            setModalErrorMessage("Select user to send to");
+            return;
+        }
+        if (StringUtils.isEmpty(emailAddress)) {
+            setModalErrorMessage("Enter email address to send to");
+            return;
+        }
+        if (StringUtils.isEmpty(emailSubject)) {
+            setModalErrorMessage("Enter email subject");
+            return;
+        }
+        setModalBusy({state: true, message: "Sending quote to selected user..."});
+        console.log("Here is the chosen user: " + userToSendTo + " emailAddress: " + emailAddress + ", emailSubject: " + emailSubject + ", comments: " + comments + ", quoteForSend: " + quoteForSend);
+        let param: any = {
+            user: userToSendTo,
+            fromUser: user,
+            quote: allQuotes[currentIndex],
+            emailTo: emailAddress,
+            comment: comments
+        };
+        const sendQuoteResponse = await memoryService.sendQuoteToUser(param);
+        if (sendQuoteResponse.data === "error") {
+            console.log('Unable to send quote to ' + user + '...');
+            setModalBusy({state: false, message: ""});
+        } else {
+            console.log('Here is the quote sent to ' + user + ':');
+            console.log(sendQuoteResponse.data);
+            setModalBusy({state: false, message: ""});
+            setModalVisible(false);
+        }
     };
 
     const handleCancel = () => {
@@ -253,6 +283,7 @@ const BrowseQuotes = () => {
                 }
             </Swipe>
             <Modal title="Send Quote" visible={modalVisible} onOk={handleOk} onCancel={handleCancel}>
+                {modalBusy.state && <Row justify="center"><SpinnerTimer message={modalBusy.message}/></Row>}
                 <Form
                     labelCol={{ span: 4 }}
                     wrapperCol={{ span: 14 }}
@@ -261,6 +292,11 @@ const BrowseQuotes = () => {
                     onValuesChange={onFormLayoutChange}
                     size={componentSize as SizeType}
                 >
+                    {modalErrorMessage &&
+                        <Form.Item label="Error" colon={true}>
+                            <span style={{color: "red", fontWeight: "bold"}}>{modalErrorMessage}</span>
+                        </Form.Item>
+                    }
                     {allUsers && allUsers.length > 0 &&
                         <Form.Item label="To" colon={true}>
                             <Select onChange={handleSelectUser}>
@@ -272,10 +308,10 @@ const BrowseQuotes = () => {
                         </Form.Item>
                     }
                     <Form.Item label="Email Address" colon={true}>
-                        <Input value={emailAddress} autoFocus onChange={(evt) => setEmailAddress(evt.target.value)} />
+                        <Input autoComplete="off" value={emailAddress} autoFocus onChange={(evt) => setEmailAddress(evt.target.value)} />
                     </Form.Item>
                     <Form.Item label="Email Subject" colon={true}>
-                        <Input value={emailSubject} autoFocus onChange={(evt) => setEmailSubject(evt.target.value)} />
+                        <Input autoComplete="off" value={emailSubject} autoFocus onChange={(evt) => setEmailSubject(evt.target.value)} />
                     </Form.Item>
                     <Form.Item label="Comments" colon={true}>
                         <TextArea

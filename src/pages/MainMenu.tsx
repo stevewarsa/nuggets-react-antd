@@ -4,7 +4,6 @@ import {Collapse, List, notification, Space} from "antd";
 import 'antd/dist/antd.css';
 import {useNavigate} from "react-router-dom";
 import memoryService from "../services/memory-service";
-import {Constants} from "../model/constants";
 import {useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 //import {useDispatch} from "react-redux";
