@@ -12,7 +12,7 @@ error_log("Here is the incoming request: ");
 error_log($request);
 $input = json_decode($request);
 
-$user = $input->user->userName;
+$user = $input->user;
 $fromUser = $input->fromUser;
 $emailTo = $input->emailTo;
 $quote = $input->quote;
