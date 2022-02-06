@@ -8,7 +8,9 @@ import Swipe from "react-easy-swipe";
 import {
     ArrowLeftOutlined,
     ArrowRightOutlined,
-    CopyOutlined, LinkOutlined, MoreOutlined
+    CopyOutlined,
+    LinkOutlined,
+    MoreOutlined
 } from "@ant-design/icons";
 import {PassageUtils} from "../helpers/passage-utils";
 import {Constants} from "../model/constants";

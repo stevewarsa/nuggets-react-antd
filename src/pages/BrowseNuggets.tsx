@@ -9,7 +9,7 @@ import Swipe from "react-easy-swipe";
 import {
     ArrowLeftOutlined,
     ArrowRightOutlined,
-    CopyOutlined,
+    CopyOutlined, LinkOutlined,
     MoreOutlined
 } from "@ant-design/icons";
 import {Constants} from "../model/constants";
@@ -85,6 +85,9 @@ const BrowseNuggets = () => {
             // console.log(formattedVersesAsArray);
             dispatcher(stateActions.setVerseSelectionRequest({passage: currentPassage, actionToPerform: "copy", backToPath: "/browseNuggets"} as VerseSelectionRequest));
             navigate("/selectVerses");
+        } else if (key === "2") {
+            // interlinear link
+            PassageUtils.openInterlinearLink(currentPassage);
         }
     };
 
@@ -132,6 +135,9 @@ const BrowseNuggets = () => {
                                 <Menu onClick={handleMenuClick}>
                                     <Menu.Item key="1" icon={<CopyOutlined/>}>
                                         Copy
+                                    </Menu.Item>
+                                    <Menu.Item key="2" icon={<LinkOutlined />}>
+                                        Interlinear View
                                     </Menu.Item>
                                 </Menu>
                             }>
