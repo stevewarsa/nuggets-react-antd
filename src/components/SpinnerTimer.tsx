@@ -17,7 +17,7 @@ const SpinnerTimer = ({message}: {message:string}) => {
     }, 1000);
     return (
         <>
-            <Spin indicator={antIcon}  /> {message + " (" + seconds + " seconds)"}
+            <Spin indicator={antIcon} style={{marginRight: "3px"}}  /> {message + " (" + seconds + " seconds)"}
         </>
     );
 };

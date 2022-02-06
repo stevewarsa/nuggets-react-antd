@@ -23,34 +23,6 @@ const ReadChapter = () => {
     const chapterConfig = useSelector((state: AppState) => state.chapterSelection);
     const {Option} = Select;
     const [currPassage, setCurrPassage] = useState<Passage>(null);
-    // const [verseSelectionRequestSent, setVerseSelectionRequestSent] = useState(false);
-    // console.log("ReadChapter component - here is the chapter config:");
-    // console.log(chapterConfig);
-
-    // useEffect(() => {
-    //     if (verseSelectionRequest) {
-    //         // console.log("useEffect - here's the verseSelectionRequest sent back to me, and following that will be the current passage:");
-    //         // console.log(verseSelectionRequest);
-    //         const selectedVerses = verseSelectionRequest.versesForSelection.filter(v => v.selected);
-    //         if (selectedVerses.length === 1 || selectedVerses.length === 2) {
-    //             const passage = new Passage();
-    //             passage.startVerse = selectedVerses[0].verseNum;
-    //             passage.endVerse = selectedVerses.length === 1 ? passage.startVerse : selectedVerses[1].verseNum;
-    //             passage.bookName = chapterConfig.book;
-    //             passage.translationName = chapterConfig.translation;
-    //             passage.chapter = chapterConfig.chapter;
-    //             const psgRef = PassageUtils.getPassageStringNoIndex(passage, true, true);
-    //             let clipboardString = psgRef + "\n\n";
-    //             for (let verse of verseSelectionRequest.versesForSelection) {
-    //                 if (verse.verseNum >= passage.startVerse && verse.verseNum <= passage.endVerse) {
-    //                     clipboardString += verse.plainText;
-    //                 }
-    //             }
-    //             copy(clipboardString);
-    //             notification.info({message: psgRef + " copied!", placement: "bottomRight"});
-    //         }
-    //     }
-    // }, [verseSelectionRequest, chapterConfig.book, chapterConfig.chapter, chapterConfig.translation]);
 
     useEffect(() => {
         const callServer = async () => {
@@ -64,6 +36,13 @@ const ReadChapter = () => {
             callServer();
         }
     }, [chapterConfig]);
+
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }, [currPassage]);
 
     const handleNext = () => {
         dispatcher(stateActions.nextChapter())

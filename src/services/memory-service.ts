@@ -104,7 +104,7 @@ class MemoryService {
     private static buildAxios(): AxiosInstance {
         // implement 15 second timeout
         const config: AxiosRequestConfig = {
-            timeout: 7000
+            timeout: 12000
         } as AxiosRequestConfig;
         let axiosInstance = axios.create(config);
         axiosRetry(axiosInstance, {

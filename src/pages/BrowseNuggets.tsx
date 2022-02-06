@@ -43,7 +43,6 @@ const BrowseNuggets = () => {
             const nuggetIdList = nuggetIdListResponse.data;
             PassageUtils.shuffleArray(nuggetIdList);
             setNuggetIdList(nuggetIdList);
-            // setCurrentIndex(0);
             setBusy({state: false, message: ""});
         };
         callServer();
@@ -69,7 +68,6 @@ const BrowseNuggets = () => {
         setBusy({state: true, message: "Retrieving passage text..."});
         const passageResponse = await memoryService.getPassageById(passageId, selectedTranslation, user);
         setCurrentPassage(passageResponse.data);
-        //this.memoryService.setCurrentPassage(this.currentPassage, this.currUser);
         setBusy({state: false, message: ""});
     }, [nuggetIdList, currentIndex, selectedTranslation, user]);
 
@@ -83,7 +81,6 @@ const BrowseNuggets = () => {
 
     const handleMenuClick = ({key}) => {
         if (key === "1") {
-            const formattedVersesAsArray = PassageUtils.getFormattedVersesAsArray(currentPassage, []);
             // console.log("handleMenuClick - Here are the verses for selection:");
             // console.log(formattedVersesAsArray);
             dispatcher(stateActions.setVerseSelectionRequest({passage: currentPassage, actionToPerform: "copy", backToPath: "/browseNuggets"} as VerseSelectionRequest));
@@ -97,64 +94,68 @@ const BrowseNuggets = () => {
 
     useEffect(() => {
         retrievePassage();
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     }, [selectedTranslation, retrievePassage, currentIndex, nuggetIdList]);
 
-    if (busy.state) {
-        return <SpinnerTimer message={busy.message} />;
-    } else {
-        return (
-            <>
+    return (
+        <>
+            <Row justify="center">
+                <h1>Browse Bible</h1>
+            </Row>
+            {busy.state &&
                 <Row justify="center">
-                    <h1>Browse Bible Nuggets</h1>
+                    <SpinnerTimer message={busy.message}/>;
                 </Row>
-                <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
-                    {nuggetIdList && nuggetIdList.length > 0 &&
-                        <Row style={{marginBottom: "10px"}} justify="center" align="middle">
-                            <Col>{currentIndex + 1} of {nuggetIdList.length}</Col>
-                        </Row>
-                    }
-                    <Row justify="center">
-                        <Space>
-                            <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
-                            <Select style={{width: "100%"}} size="large" value={selectedTranslation} onChange={handleTranslationChange}>
-                                <Option value="N/A">{"--Select Translation--"}</Option>
-                                {Constants.translationsShortNms.map(trans => (
-                                        <Option key={trans.code} value={trans.code}>{trans.translationName}</Option>
-                                    )
-                                )}
-                            </Select>
-                            <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
-                            <Col span={6}>
-                                <Dropdown placement="bottomRight" trigger={["click"]} overlay={
-                                    <Menu onClick={handleMenuClick}>
-                                        <Menu.Item key="1" icon={<CopyOutlined/>}>
-                                            Copy
-                                        </Menu.Item>
-                                    </Menu>
-                                }>
-                                    <MoreOutlined style={{
-                                        borderStyle: "solid",
-                                        borderWidth: "thin",
-                                        borderColor: "gray",
-                                        padding: "7px",
-                                        backgroundColor: "white"
-                                    }}/>
-                                </Dropdown>
-                            </Col>
-                        </Space>
+            }
+            <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
+                {nuggetIdList && nuggetIdList.length > 0 &&
+                    <Row style={{marginBottom: "10px"}} justify="center" align="middle">
+                        <Col>{currentIndex + 1} of {nuggetIdList.length}</Col>
                     </Row>
-                    {currentPassage && (
-                        <>
-                            <p className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(currentPassage, currentIndex + 1, nuggetIdList.length, Constants.translationsShortNms.filter(t => t.code === currentPassage.bookName).map(t => t.translationName)[0], true, true, null)}}/>
-                            <p style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(currentPassage, true)}}/>
-                        </>
-                    )
-                    }
+                }
+                <Row justify="center" style={{marginBottom: "8px"}}>
+                    <Space>
+                        <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
+                        <Select style={{width: "100%"}} size="large" value={selectedTranslation} onChange={handleTranslationChange}>
+                            <Option value="N/A">{"--Select Translation--"}</Option>
+                            {Constants.translationsShortNms.map(trans => (
+                                    <Option key={trans.code} value={trans.code}>{trans.translationName}</Option>
+                                )
+                            )}
+                        </Select>
+                        <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
+                        <Col span={6}>
+                            <Dropdown placement="bottomRight" trigger={["click"]} overlay={
+                                <Menu onClick={handleMenuClick}>
+                                    <Menu.Item key="1" icon={<CopyOutlined/>}>
+                                        Copy
+                                    </Menu.Item>
+                                </Menu>
+                            }>
+                                <MoreOutlined style={{
+                                    borderStyle: "solid",
+                                    borderWidth: "thin",
+                                    borderColor: "gray",
+                                    padding: "7px",
+                                    backgroundColor: "white"
+                                }}/>
+                            </Dropdown>
+                        </Col>
+                    </Space>
+                </Row>
+                {currentPassage && (
+                    <>
+                        <p className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(currentPassage, currentIndex + 1, nuggetIdList.length, Constants.translationsShortNms.filter(t => t.code === currentPassage.bookName).map(t => t.translationName)[0], true, false, null)}}/>
+                        <p style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(currentPassage, true)}}/>
+                    </>
+                )}
 
-                </Swipe>
-            </>
-        );
-    }
+            </Swipe>
+        </>
+    );
 };
 
 export default BrowseNuggets;
