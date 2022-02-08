@@ -1,15 +1,20 @@
 import {Button, Col, Divider, Input, Radio, Row, Select} from "antd";
 import {useEffect, useState} from "react";
 import {Constants} from "../model/constants";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import {PassageUtils} from "../helpers/passage-utils";
 import {SearchOutlined} from "@ant-design/icons";
 import memoryService from "../services/memory-service";
 import SpinnerTimer from "../components/SpinnerTimer";
 import React from "react";
+import {Passage} from "../model/passage";
+import {stateActions} from "../store";
+import {useNavigate} from "react-router-dom";
 
 const BibleSearch = () => {
+    const dispatcher = useDispatch();
+    const navigate = useNavigate();
     const {Option} = Select;
     const {TextArea} = Input;
     const [searchScope, setSearchScope] = useState("both");
@@ -17,7 +22,7 @@ const BibleSearch = () => {
     const [translation, setTranslation] = useState("all");
     const [searchPhrase, setSearchPhrase] = useState("");
     const [searching, setSearching] = useState({state: false, message: ""});
-    const [searchResults, setSearchResults] = useState({visible: false, results: []});
+    const [searchResults, setSearchResults] = useState<{visible: boolean, results: Passage[]}>({visible: false, results: []});
     const prefs = useSelector((state: AppState) => state.userPreferences);
     const user = useSelector((state: AppState) => state.user);
 
@@ -60,6 +65,11 @@ const BibleSearch = () => {
             setSearchScope(e.target.value)
         }
     }
+
+    const handleGoToPassage = (psg: Passage) => {
+        dispatcher(stateActions.setChapterSelection({book: psg.bookName, chapter: psg.chapter, translation: psg.translationId, verse: psg.startVerse}));
+        navigate("/readChapter");
+    };
 
     if (searching.state) {
         return <SpinnerTimer message={searching.message}/>;
@@ -134,13 +144,16 @@ const BibleSearch = () => {
                         {(!searchResults.results || searchResults.results.length === 0) && <Row><p>No matches</p></Row>}
                         {searchResults.results && searchResults.results.length > 0 &&
                             <Row><p style={{fontWeight: "bold"}}>({searchResults.results.length} matches)</p></Row>}
-                        {searchResults.results && searchResults.results.length > 0 && searchResults.results.map(psg => {
-                                const psgString = PassageUtils.getPassageStringNoIndex(psg, psg.translationId, false);
+                        {searchResults.results && searchResults.results.length > 0 && searchResults.results.map((psg: Passage) => {
+                                const psgString = PassageUtils.getPassageStringNoIndex(psg,true, false);
                                 const formattedPsgText = PassageUtils.getFormattedPassageTextHighlight(psg, searchPhrase, false);
+
                                 return (
                                     <React.Fragment key={psgString}>
                                         <Row>
-                                            <Col style={{marginRight: "3px"}} dangerouslySetInnerHTML={{__html: psgString}}/>
+                                            <Col style={{marginRight: "3px"}}>
+                                                <a style={{cursor: "pointer"}} onClick={() => handleGoToPassage(psg)}>{psgString}</a>
+                                            </Col>
                                             <Col dangerouslySetInnerHTML={{__html: formattedPsgText}}/>
                                         </Row>
                                         <Divider/>

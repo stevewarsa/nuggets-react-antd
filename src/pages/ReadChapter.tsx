@@ -18,6 +18,7 @@ import {stateActions} from "../store";
 import {useNavigate} from "react-router-dom";
 import {VerseSelectionRequest} from "../model/verse-selection-request";
 import copy from "copy-to-clipboard";
+import {StringUtils} from "../helpers/string.utils";
 
 const ReadChapter = () => {
     const dispatcher = useDispatch();
@@ -25,6 +26,7 @@ const ReadChapter = () => {
     const chapterConfig = useSelector((state: AppState) => state.chapterSelection);
     const {Option} = Select;
     const [currPassage, setCurrPassage] = useState<Passage>(null);
+    const [currFormattedPassageText, setCurrFormattedPassageText] = useState(null);
 
     useEffect(() => {
         const callServer = async () => {
@@ -33,6 +35,7 @@ const ReadChapter = () => {
             // console.log("Here is the chapter received back:");
             // console.log(chapterResponse.data);
             setCurrPassage(chapterResponse.data as Passage);
+            setCurrFormattedPassageText(PassageUtils.getFormattedPassageText(chapterResponse.data, true));
         };
         if (chapterConfig) {
             callServer();
@@ -40,11 +43,27 @@ const ReadChapter = () => {
     }, [chapterConfig]);
 
     useEffect(() => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
+        if (!chapterConfig.hasOwnProperty("verse") && !chapterConfig.verse) {
+            // scroll to top
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        }
     }, [currPassage]);
+
+    useEffect(() => {
+        if (!StringUtils.isEmpty(currFormattedPassageText) && chapterConfig.hasOwnProperty("verse") && chapterConfig.verse) {
+            // scroll to verse
+            const element = document.getElementById("" + chapterConfig.verse)
+            const topPos = element.getBoundingClientRect().top + window.pageYOffset
+
+            window.scrollTo({
+                top: topPos, // scroll so that the element is at the top of the view
+                behavior: 'smooth' // smooth scroll
+            })
+        }
+    }, [currFormattedPassageText, chapterConfig]);
 
     const handleNext = () => {
         dispatcher(stateActions.nextChapter())
@@ -108,10 +127,10 @@ const ReadChapter = () => {
                         </Col>
                     </Space>
                 </Row>
-                {currPassage && (
+                {currPassage && !StringUtils.isEmpty(currFormattedPassageText) && (
                     <>
                     <p className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(currPassage, -1, 0, Constants.translationsShortNms.filter(t => t.code === currPassage.bookName).map(t => t.translationName)[0], false, false, null)}}/>
-                    <p style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(currPassage, true)}}/>
+                    <p style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: currFormattedPassageText}}/>
                     </>
                     )
                 }

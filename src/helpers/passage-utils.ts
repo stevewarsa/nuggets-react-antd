@@ -144,9 +144,9 @@ export class PassageUtils {
       let versePartLen: number = passage.verses[i].verseParts.length;
       for (let j = 0; j < versePartLen; j++) {
         if (j === 0 && showVerseNumbers) {
-          verseText += "<span class='verse_num'>"
+          verseText += "<span class='verse_num'><a style='color: black; cursor: default' id='" + passage.verses[i].verseParts[j].verseNumber + "'>"
             + passage.verses[i].verseParts[j].verseNumber
-            + "</span> ";
+            + "</a></span> ";
         }
         if (passage.verses[i].verseParts[j].wordsOfChrist) {
           verseText += "<span class='wordsOfChrist'>";
@@ -159,6 +159,9 @@ export class PassageUtils {
         }
       }
     }
+    // if (showVerseNumbers) {
+    //   console.log("PassageUtils.getFormattedPassageText - here is the verse text: ", verseText);
+    // }
     return verseText;
   }
 
