@@ -105,6 +105,11 @@ class MemoryService {
         return MemoryService.buildAxios().post<string>("/bible-app/server/send_quote_to_user.php", param);
     }
 
+    public updateQuote(quote: Quote, currentUser: string) {
+        let param = {user: currentUser, quote: quote};
+        return MemoryService.buildAxios().post<string>("/bible-app/server/update_quote.php", param);
+    }
+
     private static buildAxios(): AxiosInstance {
         // implement 15 second timeout
         const config: AxiosRequestConfig = {

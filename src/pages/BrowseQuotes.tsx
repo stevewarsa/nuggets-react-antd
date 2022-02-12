@@ -20,7 +20,7 @@ import Swipe from "react-easy-swipe";
 import {
     ArrowLeftOutlined,
     ArrowRightOutlined,
-    CopyOutlined,
+    CopyOutlined, EditOutlined,
     EyeInvisibleOutlined, MailOutlined,
     MoreOutlined,
     SearchOutlined
@@ -44,7 +44,8 @@ const BrowseQuotes = () => {
     const [busy, setBusy] = useState({state: false, message: ""});
     const [modalBusy, setModalBusy] = useState({state: false, message: ""});
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [modalVisible, setModalVisible] = useState(false);
+    const [sendQuoteVisible, setSendQuoteVisible] = useState(false);
+    const [editQuoteVisible, setEditQuoteVisible] = useState(false);
     const user = useSelector((state: AppState) => state.user);
     const allUsers = useSelector((appState: AppState) => appState.allUsers);
     const startingQuote = useSelector((state: AppState) => state.startingQuote);
@@ -53,6 +54,8 @@ const BrowseQuotes = () => {
     const [componentSize, setComponentSize] = useState<SizeType | 'default'>('small');
     const [comments, setComments] = useState("");
     const [quoteForSend, setQuoteForSend] = useState("");
+    const [quoteForEdit, setQuoteForEdit] = useState("");
+    const [currentlyEditingQuoteObj, setCurrentlyEditingQuoteObj] = useState(undefined);
     const [emailSubject, setEmailSubject] = useState("");
     const [userToSendTo, setUserToSendTo] = useState("");
     const [usersWithEmail, setUsersWithEmail] = useState<{[user: string]: {user: MemUser, email: string}}>({});
@@ -155,7 +158,17 @@ const BrowseQuotes = () => {
                 quoteText = allQuotes && allQuotes.length > currentIndex ? allQuotes[currentIndex].answer : "";
             }
             setQuoteForSend(quoteText);
-            setModalVisible(true);
+            setSendQuoteVisible(true);
+        } else if (key === "3") {
+            let quoteText = filteredQuotes && filteredQuotes.length > currentIndex ? filteredQuotes[currentIndex].answer : "";
+            if (StringUtils.isEmpty(quoteText)) {
+                quoteText = allQuotes && allQuotes.length > currentIndex ? allQuotes[currentIndex].answer : "";
+                setCurrentlyEditingQuoteObj(allQuotes[currentIndex]);
+            } else {
+                setCurrentlyEditingQuoteObj(filteredQuotes[currentIndex]);
+            }
+            setQuoteForEdit(quoteText);
+            setEditQuoteVisible(true);
         }
     };
 
@@ -201,12 +214,12 @@ const BrowseQuotes = () => {
             console.log('Here is the quote sent to ' + user + ':');
             console.log(sendQuoteResponse.data);
             setModalBusy({state: false, message: ""});
-            setModalVisible(false);
+            setSendQuoteVisible(false);
         }
     };
 
     const handleCancel = () => {
-        setModalVisible(false);
+        setSendQuoteVisible(false);
     };
 
     const handleComments = (evt) => {
@@ -220,6 +233,50 @@ const BrowseQuotes = () => {
         } else {
             setEmailAddress("");
         }
+    };
+
+    const handleUpdateQuote = async () => {
+        setBusy({state: true, message: "Updating quote..."});
+        const locQuote = {...currentlyEditingQuoteObj, answer: quoteForEdit};
+        console.log("Here is the updated quote:", locQuote);
+        const updateQuoteResponse = await memoryService.updateQuote(locQuote, user);
+        if (updateQuoteResponse.data === "success") {
+            setAllQuotes(prevState => {
+                const locAllQuotes = [...prevState];
+                const editedQuote = locAllQuotes.find(qt => qt.objectionId === locQuote.objectionId);
+                editedQuote.answer = locQuote.answer;
+                return locAllQuotes;
+            });
+            setFilteredQuotes(prevState => {
+                const locFilteredQuotes = [...prevState];
+                const editedQuote = locFilteredQuotes.find(qt => qt.objectionId === locQuote.objectionId);
+                editedQuote.answer = locQuote.answer;
+                return locFilteredQuotes;
+            });
+        } else {
+            Modal.error({
+                title: "Error",
+                content: "Error updating quote!",
+            });
+        }
+        setEditQuoteVisible(false);
+        setCurrentlyEditingQuoteObj(undefined);
+        setQuoteForEdit("");
+        setBusy({state: false, message: ""});
+    };
+
+    const handleUpdateQuoteCancel = () => {
+        setEditQuoteVisible(false);
+        setCurrentlyEditingQuoteObj(undefined);
+        setQuoteForEdit("");
+    };
+
+    const handleQuoteForEdit = (evt) => {
+        setQuoteForEdit(evt.target.value);
+    };
+
+    const handleRemoveLineFeedsAndExtraSpaces = () => {
+        setQuoteForEdit(prevState => prevState.replace(/(\r\n|\n|\r)/gm, "").replace(/\s{2,}/g, ' ').trim());
     };
 
     return (
@@ -247,6 +304,9 @@ const BrowseQuotes = () => {
                                     </Menu.Item>
                                     <Menu.Item key="2" icon={<MailOutlined />}>
                                         Send Quote...
+                                    </Menu.Item>
+                                    <Menu.Item key="3" icon={<EditOutlined />}>
+                                        Edit Quote...
                                     </Menu.Item>
                                 </Menu>
                             }>
@@ -282,7 +342,23 @@ const BrowseQuotes = () => {
                     </Row>
                 }
             </Swipe>
-            <Modal title="Send Quote" visible={modalVisible} onOk={handleOk} onCancel={handleCancel}>
+            <Modal title="Edit Quote" visible={editQuoteVisible} onOk={handleUpdateQuote} onCancel={handleUpdateQuoteCancel}>
+                <Row style={{marginBottom: "5px"}}>
+                    <Col style={{width: "100%"}}>
+                        <TextArea
+                            style={{marginLeft: "5px", marginRight: "5px"}}
+                            autoSize
+                            value={quoteForEdit}
+                            onChange={handleQuoteForEdit}/>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col style={{width: "100%", marginLeft: "5px", marginRight: "5px"}}>
+                        <Button type="primary" onClick={handleRemoveLineFeedsAndExtraSpaces}>Remove Line Feeds</Button>
+                    </Col>
+                </Row>
+            </Modal>
+            <Modal title="Send Quote" visible={sendQuoteVisible} onOk={handleOk} onCancel={handleCancel}>
                 {modalBusy.state && <Row justify="center"><SpinnerTimer message={modalBusy.message}/></Row>}
                 <Form
                     labelCol={{ span: 4 }}
