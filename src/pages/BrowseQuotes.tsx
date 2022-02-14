@@ -33,6 +33,7 @@ import {AppState} from "../model/AppState";
 import {stateActions} from "../store";
 import {useNavigate} from "react-router-dom";
 import {MemUser} from "../model/mem-user";
+import QueueAnim from "rc-queue-anim";
 
 type SizeType = Parameters<typeof Form>[0]['size'];
 
@@ -322,24 +323,32 @@ const BrowseQuotes = () => {
                     </Space>
                 </Row>
                 {!filteredQuotes && allQuotes && allQuotes.length > currentIndex && !StringUtils.isEmpty(allQuotes[currentIndex].answer) &&
-                    <Row>
-                        <Col span={24}>
-                            <p
-                                style={{marginTop: "10px"}}
-                                className="nugget-view"
-                                dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(allQuotes[currentIndex].answer)}}/>
-                        </Col>
-                    </Row>
+                    <QueueAnim key="psg-ref"
+                               type={['right', 'left']}
+                               ease={['easeOutQuart', 'easeInOutQuart']}>
+                        <Row key={"all-quotes-" + currentIndex}>
+                            <Col span={24}>
+                                <p
+                                    style={{marginTop: "10px"}}
+                                    className="nugget-view"
+                                    dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(allQuotes[currentIndex].answer)}}/>
+                            </Col>
+                        </Row>
+                    </QueueAnim>
                 }
                 {filteredQuotes && filteredQuotes.length > currentIndex && !StringUtils.isEmpty(filteredQuotes[currentIndex].answer) &&
-                    <Row>
-                        <Col span={24}>
-                            <p
-                                style={{marginTop: "10px"}}
-                                className="nugget-view"
-                                dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(StringUtils.isEmpty(searchString) ? filteredQuotes[currentIndex].answer : PassageUtils.updateAllMatches(searchString, filteredQuotes[currentIndex].answer))}}/>
-                        </Col>
-                    </Row>
+                    <QueueAnim key="psg-ref"
+                               type={['right', 'left']}
+                               ease={['easeOutQuart', 'easeInOutQuart']}>
+                        <Row key={"filtered-quotes-" + currentIndex}>
+                            <Col span={24}>
+                                <p
+                                    style={{marginTop: "10px"}}
+                                    className="nugget-view"
+                                    dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(StringUtils.isEmpty(searchString) ? filteredQuotes[currentIndex].answer : PassageUtils.updateAllMatches(searchString, filteredQuotes[currentIndex].answer))}}/>
+                            </Col>
+                        </Row>
+                    </QueueAnim>
                 }
             </Swipe>
             <Modal title="Edit Quote" visible={editQuoteVisible} onOk={handleUpdateQuote} onCancel={handleUpdateQuoteCancel}>

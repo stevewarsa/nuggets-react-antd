@@ -21,6 +21,7 @@ import Swipe from "react-easy-swipe";
 import {StringUtils} from "../helpers/string.utils";
 import {stateActions} from "../store";
 import {DateUtils} from "../helpers/date.utils";
+import QueueAnim from 'rc-queue-anim';
 
 const Practice = () => {
     const dispatcher = useDispatch();
@@ -262,12 +263,22 @@ const Practice = () => {
                         </Col>
                     </Space>
                 </Row>
+
                 {showPsgRef && memPassageList && memPassageList.length > currentIndex && memPassageList[currentIndex] &&
-                    <p className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(memPassageList[currentIndex], currentIndex, memPassageList.length, Constants.translationsShortNms.filter(t => t.code === memPassageList[currentIndex].translationName).map(t => t.translationName)[0], false, false, memPassageList[currentIndex].passageRefAppendLetter)}}/>
+                    <QueueAnim key="psg-ref"
+                               type={['right', 'left']}
+                               ease={['easeOutQuart', 'easeInOutQuart']}>
+                    <p key={currentIndex + "-psg-ref"} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(memPassageList[currentIndex], currentIndex, memPassageList.length, Constants.translationsShortNms.filter(t => t.code === memPassageList[currentIndex].translationName).map(t => t.translationName)[0], false, false, memPassageList[currentIndex].passageRefAppendLetter)}}/>
+                    </QueueAnim>
                 }
                 {!showPsgRef && memPassageList && memPassageList.length > currentIndex && memPassageList[currentIndex] && memPassageList[currentIndex].verses && memPassageList[currentIndex].verses.length &&
-                    <p style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(memPassageList[currentIndex], false)}}/>
+                    <QueueAnim key="psg-text"
+                               type={['right', 'left']}
+                               ease={['easeOutQuart', 'easeInOutQuart']}>
+                    <p key={currentIndex + "-psg-text"} style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(memPassageList[currentIndex], false)}}/>
+                    </QueueAnim>
                 }
+
             </Swipe>
         </>
     );
