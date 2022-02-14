@@ -248,12 +248,14 @@ const BrowseQuotes = () => {
                 editedQuote.answer = locQuote.answer;
                 return locAllQuotes;
             });
-            setFilteredQuotes(prevState => {
-                const locFilteredQuotes = [...prevState];
-                const editedQuote = locFilteredQuotes.find(qt => qt.objectionId === locQuote.objectionId);
-                editedQuote.answer = locQuote.answer;
-                return locFilteredQuotes;
-            });
+            if (filteredQuotes && filteredQuotes.length > 0) {
+                setFilteredQuotes(prevState => {
+                    const locFilteredQuotes = [...prevState];
+                    const editedQuote = locFilteredQuotes.find(qt => qt.objectionId === locQuote.objectionId);
+                    editedQuote.answer = locQuote.answer;
+                    return locFilteredQuotes;
+                });
+            }
         } else {
             Modal.error({
                 title: "Error",
