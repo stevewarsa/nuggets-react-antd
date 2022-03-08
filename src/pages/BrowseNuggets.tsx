@@ -4,12 +4,12 @@ import {useCallback, useEffect, useState} from "react";
 import memoryService from "../services/memory-service";
 import {PassageUtils} from "../helpers/passage-utils";
 import SpinnerTimer from "../components/SpinnerTimer";
-import {Button, Col, Dropdown, Menu, Row, Select, Space} from "antd";
+import {Button, Col, Dropdown, Menu, Modal, Row, Select, Space} from "antd";
 import Swipe from "react-easy-swipe";
 import {
     ArrowLeftOutlined,
-    ArrowRightOutlined,
-    CopyOutlined, LinkOutlined,
+    ArrowRightOutlined, CloseOutlined,
+    CopyOutlined, FilterOutlined, LinkOutlined,
     MoreOutlined
 } from "@ant-design/icons";
 import {Constants} from "../model/constants";
@@ -26,9 +26,13 @@ const BrowseNuggets = () => {
     const startingPassageId = useSelector((state: AppState) => state.startingPassageId);
     const [busy, setBusy] = useState({state: false, message: ""});
     const [nuggetIdList, setNuggetIdList] = useState([]);
+    const [originalNuggetIdList, setOriginalNuggetIdList] = useState([]);
+    const [topicList, setTopicList] = useState<{id: number, name: string}[]>([]);
+    const [filterVisible, setFilterVisible] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [currentPassage, setCurrentPassage] = useState(undefined);
     const [selectedTranslation, setSelectedTranslation] = useState("niv");
+    const [selectedTopic, setSelectedTopic] = useState<number>(-1);
     const {Option} = Select;
 
     useEffect(() => {
@@ -44,6 +48,10 @@ const BrowseNuggets = () => {
             const nuggetIdList = nuggetIdListResponse.data;
             PassageUtils.shuffleArray(nuggetIdList);
             setNuggetIdList(nuggetIdList);
+            setOriginalNuggetIdList(nuggetIdList);
+            setBusy({state: true, message: "Retrieving topic list from server..."});
+            const topicListResponse = await memoryService.getTopicList(user);
+            setTopicList(topicListResponse.data);
             setBusy({state: false, message: ""});
         };
         callServer();
@@ -89,6 +97,13 @@ const BrowseNuggets = () => {
         } else if (key === "2") {
             // interlinear link
             PassageUtils.openInterlinearLink(currentPassage);
+        } else if (key === "3") {
+            // filter
+            setFilterVisible(true);
+        } else if (key === "4") {
+            // filter
+            setSelectedTopic(-1);
+            setNuggetIdList(originalNuggetIdList);
         }
     };
 
@@ -103,6 +118,23 @@ const BrowseNuggets = () => {
             behavior: "smooth"
         });
     }, [selectedTranslation, retrievePassage, currentIndex, nuggetIdList]);
+
+    const handleOk = () => {
+        console.log("handleOk on filter dialog");
+        setFilterVisible(false);
+        const callServer = async () => {
+            setBusy({state: true, message: "Retrieving passages for topic..."});
+            const passagesByTopicResponse = await memoryService.getPassagesForTopic(selectedTopic, user);
+            const passagesByTopic = passagesByTopicResponse.data;
+            console.log("passages by topic:", passagesByTopic);
+            console.log("nugget id list:", nuggetIdList);
+            const filteredNuggetIdList = nuggetIdList.filter(nugget => passagesByTopic.find(tpcPsg => tpcPsg.passageId === nugget.nuggetId));
+            console.log("filtered passage list is:", filteredNuggetIdList);
+            setNuggetIdList(filteredNuggetIdList);
+            setBusy({state: false, message: ""});
+        };
+        callServer();
+    };
 
     return (
         <>
@@ -140,6 +172,14 @@ const BrowseNuggets = () => {
                                     <Menu.Item key="2" icon={<LinkOutlined />}>
                                         Interlinear View
                                     </Menu.Item>
+                                    <Menu.Item key="3" icon={<FilterOutlined />}>
+                                        Filter...
+                                    </Menu.Item>
+                                    {selectedTopic && selectedTopic !== -1 &&
+                                        <Menu.Item key="4" icon={<CloseOutlined/>}>
+                                            Clear Filter
+                                        </Menu.Item>
+                                    }
                                 </Menu>
                             }>
                                 <MoreOutlined style={{
@@ -153,6 +193,11 @@ const BrowseNuggets = () => {
                         </Col>
                     </Space>
                 </Row>
+                {selectedTopic && selectedTopic !== -1 &&
+                    <Row>
+                        <Col><span style={{fontWeight: "bold"}}>Filtered Topic:</span> {topicList.find(tpc => tpc.id === selectedTopic).name}</Col>
+                    </Row>
+                }
                 {currentPassage && (
                     <QueueAnim key="psg-ref"
                                type={['right', 'left']}
@@ -163,6 +208,22 @@ const BrowseNuggets = () => {
                 )}
 
             </Swipe>
+            <Modal title="Filter Dialog" visible={filterVisible} onOk={handleOk} onCancel={() => setFilterVisible(false)}>
+                <>
+                <Row><Col>Filter By Topic:</Col></Row>
+                <Row>
+                    <Col span={24}>
+                        <Select style={{width: "100%"}} size="large" value={selectedTopic} onChange={value => setSelectedTopic(value)}>
+                            <Option value={-1}>--Select Topic--</Option>
+                            {topicList.map(topic => (
+                                    <Option key={topic.id} value={topic.id}>{topic.name}</Option>
+                                )
+                            )}
+                        </Select>
+                    </Col>
+                </Row>
+                </>
+            </Modal>
         </>
     );
 };

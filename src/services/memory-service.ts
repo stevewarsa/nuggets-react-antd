@@ -110,6 +110,14 @@ class MemoryService {
         return MemoryService.buildAxios().post<string>("/bible-app/server/update_quote.php", param);
     }
 
+    public getTopicList(currentUser: string) {
+        return MemoryService.buildAxios().get<{id: number, name: string}[]>("/bible-app/server/get_tag_list.php?user=" + currentUser);
+    }
+
+    public getPassagesForTopic(topicId: number, currentUser: string) {
+        return MemoryService.buildAxios().get<Passage[]>("/bible-app/server/get_tag_list.php?tagId=" + topicId + '&user=' + currentUser);
+    }
+
     private static buildAxios(): AxiosInstance {
         // implement 15 second timeout
         const config: AxiosRequestConfig = {
