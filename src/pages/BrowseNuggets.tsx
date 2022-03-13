@@ -16,6 +16,7 @@ import {Constants} from "../model/constants";
 import {stateActions} from "../store";
 import {VerseSelectionRequest} from "../model/verse-selection-request";
 import {useNavigate} from "react-router-dom";
+import { CSSTransition, SwitchTransition } from "react-transition-group";
 
 const BrowseNuggets = () => {
     const dispatcher = useDispatch();
@@ -198,12 +199,21 @@ const BrowseNuggets = () => {
                     </Row>
                 }
                 {currentPassage && (
-                    <>
-                        <p key={"psg-ref-" + currentPassage.passageId} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(currentPassage, currentIndex + 1, nuggetIdList.length, Constants.translationsShortNms.filter(t => t.code === currentPassage.bookName).map(t => t.translationName)[0], true, false, null)}}/>
-                        <p key={"psg-text-" + currentPassage.passageId} style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(currentPassage, true)}}/>
-                    </>
+                    <SwitchTransition mode="out-in">
+                        <CSSTransition
+                            classNames="fade"
+                            addEndListener={(node, done) => {
+                                node.addEventListener("transitionend", done, false);
+                            }}
+                            key={currentPassage.passageId}
+                        >
+                            <>
+                            <p key={"psg-ref-" + currentPassage.passageId} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(currentPassage, currentIndex + 1, nuggetIdList.length, Constants.translationsShortNms.filter(t => t.code === currentPassage.bookName).map(t => t.translationName)[0], true, false, null)}}/>
+                            <p key={"psg-text-" + currentPassage.passageId} style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(currentPassage, true)}}/>
+                            </>
+                        </CSSTransition>
+                    </SwitchTransition>
                 )}
-
             </Swipe>
             <Modal title="Filter Dialog" visible={filterVisible} onOk={handleOk} onCancel={() => setFilterVisible(false)}>
                 <>

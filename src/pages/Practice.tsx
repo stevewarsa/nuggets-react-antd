@@ -21,6 +21,7 @@ import Swipe from "react-easy-swipe";
 import {StringUtils} from "../helpers/string.utils";
 import {stateActions} from "../store";
 import {DateUtils} from "../helpers/date.utils";
+import { CSSTransition, SwitchTransition } from "react-transition-group";
 
 const Practice = () => {
     const dispatcher = useDispatch();
@@ -262,14 +263,36 @@ const Practice = () => {
                         </Col>
                     </Space>
                 </Row>
-
                 {showPsgRef && memPassageList && memPassageList.length > currentIndex && memPassageList[currentIndex] &&
-                    <p key={currentIndex + "-psg-ref"} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(memPassageList[currentIndex], currentIndex, memPassageList.length, Constants.translationsShortNms.filter(t => t.code === memPassageList[currentIndex].translationName).map(t => t.translationName)[0], false, false, memPassageList[currentIndex].passageRefAppendLetter)}}/>
+                    <SwitchTransition mode="out-in">
+                        <CSSTransition
+                            classNames="fade"
+                            addEndListener={(node, done) => {
+                                node.addEventListener("transitionend", done, false);
+                            }}
+                            key={currentIndex + "-psg-ref"}
+                        >
+                            <p key={currentIndex + "-psg-ref"} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(memPassageList[currentIndex], currentIndex, memPassageList.length, Constants.translationsShortNms.filter(t => t.code === memPassageList[currentIndex].translationName).map(t => t.translationName)[0], false, false, memPassageList[currentIndex].passageRefAppendLetter)}}/>
+                        </CSSTransition>
+                    </SwitchTransition>
                 }
                 {!showPsgRef && memPassageList && memPassageList.length > currentIndex && memPassageList[currentIndex] && memPassageList[currentIndex].verses && memPassageList[currentIndex].verses.length &&
-                    <p key={currentIndex + "-psg-text"} style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(memPassageList[currentIndex], false)}}/>
+                    <SwitchTransition mode="out-in">
+                        <CSSTransition
+                            classNames="fade"
+                            addEndListener={(node, done) => {
+                                node.addEventListener("transitionend", done, false);
+                            }}
+                            key={currentIndex + "-psg-text"}
+                        >
+                            <p
+                                key={currentIndex + "-psg-text"}
+                                style={{marginTop: "10px"}}
+                                className="nugget-view"
+                                dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(memPassageList[currentIndex], false)}}/>
+                        </CSSTransition>
+                    </SwitchTransition>
                 }
-
             </Swipe>
         </>
     );
