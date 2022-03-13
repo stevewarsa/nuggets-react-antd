@@ -18,7 +18,6 @@ import {stateActions} from "../store";
 import {useNavigate} from "react-router-dom";
 import {VerseSelectionRequest} from "../model/verse-selection-request";
 import {StringUtils} from "../helpers/string.utils";
-import QueueAnim from "rc-queue-anim";
 
 const ReadChapter = () => {
     const dispatcher = useDispatch();
@@ -131,12 +130,10 @@ const ReadChapter = () => {
                     </Space>
                 </Row>
                 {currPassage && !StringUtils.isEmpty(currFormattedPassageText) && (
-                    <QueueAnim key="psg-ref"
-                               type={['right', 'left']}
-                               ease={['easeOutQuart', 'easeInOutQuart']}>
+                    <>
                         <p key={"psg-ref-" + chapterIdString} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(currPassage, -1, 0, Constants.translationsShortNms.filter(t => t.code === currPassage.bookName).map(t => t.translationName)[0], false, false, null)}}/>
                         <p key={"psg-text-" + chapterIdString} style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: currFormattedPassageText}}/>
-                    </QueueAnim>
+                    </>
                     )
                 }
             </Swipe>

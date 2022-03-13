@@ -16,7 +16,6 @@ import {Constants} from "../model/constants";
 import {stateActions} from "../store";
 import {VerseSelectionRequest} from "../model/verse-selection-request";
 import {useNavigate} from "react-router-dom";
-import QueueAnim from "rc-queue-anim";
 
 const BrowseNuggets = () => {
     const dispatcher = useDispatch();
@@ -199,12 +198,10 @@ const BrowseNuggets = () => {
                     </Row>
                 }
                 {currentPassage && (
-                    <QueueAnim key="psg-ref"
-                               type={['right', 'left']}
-                               ease={['easeOutQuart', 'easeInOutQuart']}>
+                    <>
                         <p key={"psg-ref-" + currentPassage.passageId} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(currentPassage, currentIndex + 1, nuggetIdList.length, Constants.translationsShortNms.filter(t => t.code === currentPassage.bookName).map(t => t.translationName)[0], true, false, null)}}/>
                         <p key={"psg-text-" + currentPassage.passageId} style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getFormattedPassageText(currentPassage, true)}}/>
-                    </QueueAnim>
+                    </>
                 )}
 
             </Swipe>
