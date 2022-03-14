@@ -96,6 +96,11 @@ const BibleReadingPlan = () => {
         }
     };
 
+    const goToChapter = (entry: ReadingHistoryEntry) => {
+        dispatcher(stateActions.setChapterSelection({book: entry.bookName, chapter: entry.chapter, translation: translation}));
+        navigate("/readChapter");
+    };
+
     if (busy.state) {
         return <SpinnerTimer message={busy.message} />;
     } else {
@@ -119,7 +124,7 @@ const BibleReadingPlan = () => {
                         <Divider/>
                         <h3>Reading History</h3>
                         {allReadingPlanProgress.map(p =>
-                            <Card key={p.dateRead + "row" + p.chapter} size="small"
+                            <Card style={{cursor: "pointer"}} onClick={() => goToChapter(p)} key={p.dateRead + "row" + p.chapter} size="small"
                                   title={p.dayOfWeek + " " + p.dateRead}>
                                 <p key={p.dateRead + "col1" + p.chapter}>{Constants.bookAbbrev[p.bookName][1] + " " + p.chapter}</p>
                             </Card>

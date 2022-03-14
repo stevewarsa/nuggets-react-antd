@@ -1,18 +1,22 @@
 import React from 'react';
-import {AimOutlined, CheckCircleOutlined, ReadOutlined, SearchOutlined, SketchOutlined} from "@ant-design/icons";
+import {
+    AimOutlined,
+    CheckCircleOutlined,
+    LinkOutlined,
+    ReadOutlined,
+    SearchOutlined,
+    SketchOutlined
+} from "@ant-design/icons";
 import {Collapse, List, notification, Space} from "antd";
 import 'antd/dist/antd.css';
 import {useNavigate} from "react-router-dom";
 import memoryService from "../services/memory-service";
 import {useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
-//import {useDispatch} from "react-redux";
-//import {stateActions} from "../store";
 
 const MainMenu = () => {
     const navigate = useNavigate();
     const user = useSelector((state: AppState) => state.user);
-    //const dispatcher = useDispatch();
     const { Panel } = Collapse;
     const menuItems = [
         {
@@ -104,49 +108,49 @@ const MainMenu = () => {
                 // }
             ]
         },
-        // {
-        //     key: "4",
-        //     title: "Devotionals & Links",
-        //     icon: (<LinkOutlined />),
-        //     desc: "Here are some links that are good spiritual resources for the Christian",
-        //     children: [
-        //         {
-        //             key: "4.1",
-        //             label: "Valley of Vision",
-        //             action: "/todo"
-        //         },
-        //         {
-        //             key: "4.2",
-        //             label: "Spurgeon Morning & Evening",
-        //             action: "/todo"
-        //         },
-        //         {
-        //             key: "4.3",
-        //             label: "Grace Gems",
-        //             action: "/todo"
-        //         },
-        //         {
-        //             key: "4.4",
-        //             label: "Got Questions",
-        //             action: "/todo"
-        //         },
-        //         {
-        //             key: "4.5",
-        //             label: "J.C. Ryle",
-        //             action: "/todo"
-        //         },
-        //         {
-        //             key: "4.6",
-        //             label: "Our Daily Bread",
-        //             action: "/todo"
-        //         },
-        //         {
-        //             key: "4.7",
-        //             label: "Plugged In Movie Reviews",
-        //             action: "/todo"
-        //         }
-        //     ]
-        // },
+        {
+            key: "4",
+            title: "Devotionals & Links",
+            icon: (<LinkOutlined />),
+            desc: "Here are some links that are good spiritual resources for the Christian",
+            children: [
+                {
+                    key: "4.1",
+                    label: "Valley of Vision",
+                    action: "https://banneroftruth.org/us/valley/"
+                },
+                {
+                    key: "4.2",
+                    label: "Spurgeon Morning & Evening",
+                    action: "http://biblegateway.com/devotionals/morning-and-evening/today"
+                },
+                {
+                    key: "4.3",
+                    label: "Grace Gems",
+                    action: "http://gracegems.org/"
+                },
+                {
+                    key: "4.4",
+                    label: "Got Questions",
+                    action: "http://www.gotquestions.net/getrandompage.asp?websiteid=1"
+                },
+                {
+                    key: "4.5",
+                    label: "J.C. Ryle",
+                    action: "http://gracegems.org/Ryle"
+                },
+                {
+                    key: "4.6",
+                    label: "Our Daily Bread",
+                    action: "http://odb.org"
+                },
+                {
+                    key: "4.7",
+                    label: "Plugged In Movie Reviews",
+                    action: "http://www.pluggedin.com"
+                }
+            ]
+        },
         {
             key: "5",
             title: "Memorize",
@@ -310,8 +314,13 @@ const MainMenu = () => {
             if (copyResponse.data === "success") {
                 notification.info({message: "DB copied!", placement: "bottomRight"});
             } else {
-                notification.warning({message: "DB NOT copied! Error message: " + copyResponse.data, placement: "bottomRight"});
+                notification.warning({
+                    message: "DB NOT copied! Error message: " + copyResponse.data,
+                    placement: "bottomRight"
+                });
             }
+        } else if (item.key.startsWith("4.")) {
+            window.open(item.action, "_blank");
         } else {
             navigate(item.action);
         }
@@ -330,7 +339,7 @@ const MainMenu = () => {
                             bordered
                             dataSource={menuItem.children}
                             renderItem={item => (
-                                <List.Item key={item.key} onClick={() => handleSelect(item)}>
+                                <List.Item key={item.key} style={{cursor: "pointer"}} onClick={() => handleSelect(item)}>
                                     {item.label}
                                 </List.Item>
                             )}
