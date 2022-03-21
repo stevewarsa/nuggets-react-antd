@@ -172,11 +172,11 @@ const MainMenu = () => {
                 //     label: "Search / Add New Verse",
                 //     action: "/addMemoryVerse"
                 // },
-                // {
-                //     key: "5.3",
-                //     label: "My Verses",
-                //     action: "/myVerses"
-                // },
+                {
+                    key: "5.3",
+                    label: "My Mem Passages",
+                    action: "/myMemPsgList"
+                }
                 // {
                 //     key: "5.4",
                 //     label: "Memory Stats",

@@ -22,9 +22,11 @@ import {StringUtils} from "../helpers/string.utils";
 import {stateActions} from "../store";
 import {DateUtils} from "../helpers/date.utils";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
+import useMemoryPassages from "../hooks/use-memory-passages";
 
 const Practice = () => {
     const dispatcher = useDispatch();
+    const {getMemPassages} = useMemoryPassages();
     const practiceConfig = useSelector((state: AppState) => state.practiceConfig);
     const memTextOverrides = useSelector((state: AppState) => state.memTextOverrides);
     const user = useSelector((state: AppState) => state.user);
@@ -102,34 +104,16 @@ const Practice = () => {
 
     // grab the memory verses from the server based on the practice config...
     useEffect(() => {
-        const callServer = async () => {
+        (async () => {
             setBusy({state: true, message: "Loading memory passages from DB..."});
-            // console.log("Inside call server - calling memoryService.getMemoryPsgList()...");
-            const locMemoryPassagesData: any = await memoryService.getMemoryPsgList(user);
-            // console.log("Inside call server - BACK FROM calling memoryService.getMemoryPsgList()...");
-            // update the "append letter" if there is one
-            if (memTextOverrides && memTextOverrides.length > 0) {
-                locMemoryPassagesData.data.forEach(psg => {
-                    const foundOverride = memTextOverrides.find(o => o.passageId === psg.passageId);
-                    if (foundOverride) {
-                        psg.passageRefAppendLetter = foundOverride.passageRefAppendLetter;
-                    }
-                });
-            }
-            let tempPassages: Passage[] = PassageUtils.sortAccordingToPracticeConfig(practiceConfig.passageDisplayOrder, locMemoryPassagesData.data);
-            // if user is practicing by frequency, make it more challenging by randomizing
-            // the passages within each frequency group
-            if (practiceConfig.passageDisplayOrder === PassageUtils.BY_FREQ) {
-                tempPassages = PassageUtils.sortWithinFrequencyGroups(tempPassages, PassageUtils.BY_LAST_PRACTICED);
-            }
+            // console.log("Inside anonymous async function - calling memoryService.getMemoryPsgList()...");
             // console.log("Inside call server - setting memPassageList - there are " + tempPassages.length + " passages returned...");
-            setMemPassageList(tempPassages);
+            setMemPassageList(await getMemPassages(user, true));
             setShowPsgRef(practiceConfig.practiceMode === PassageUtils.BY_REF);
             handleNext();
             setBusy({state: false, message: ""});
-        };
-        callServer();
-    }, [dispatcher, practiceConfig, memTextOverrides, user]);
+        })();
+    }, [practiceConfig, memTextOverrides, user]);
 
     const handlePrev = () => {
         setShowingQuestion(true);

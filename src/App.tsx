@@ -26,6 +26,7 @@ import {MenuOutlined} from "@ant-design/icons";
 import {StringUtils} from "./helpers/string.utils";
 import {CookieUtils} from "./helpers/cookie-utils";
 import BrowseNuggets from "./pages/BrowseNuggets";
+import MyMemPsgList from "./pages/MyMemPsgList";
 
 const App = () => {
     const navigate = useNavigate();
@@ -62,7 +63,7 @@ const App = () => {
         {
             key: 4,
             label: "My Mem Psg List",
-            path: "/myPassageList"
+            path: "/myMemPsgList"
         },
         {
             key: 5,
@@ -137,6 +138,7 @@ const App = () => {
                             <Route path="/searchQuotes" element={<SearchQuotes/>}/>
                             <Route path="/bibleSearch" element={<BibleSearch/>}/>
                             <Route path="/addQuote" element={<AddQuote/>}/>
+                            <Route path="/myMemPsgList" element={<MyMemPsgList/>} />
                         </Route>
                     </Routes>
                 </div>
