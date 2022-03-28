@@ -19,7 +19,8 @@ const initialState: AppState = {
     startingPassageId: -1,
     filteredQuoteIds: [],
     currentSearchString: null,
-    userPreferences: null
+    userPreferences: null,
+    maxVerseByBookChapter: {}
 } as AppState;
 
 const state = createSlice({
@@ -28,6 +29,10 @@ const state = createSlice({
     reducers: {
         setMaxChaptersByBook(state, action) {
             state.maxChaptersByBook = action.payload;
+        },
+        setMaxVerseByBookChapter(state, action) {
+            console.log("reducer.setMaxVerseByBookChapter - action:", action);
+            state.maxVerseByBookChapter[action.payload.translation] = action.payload.maxVerseByBookChapter;
         },
         setPracticeConfig(state, action) {
             // console.log("setPracticeConfig (reducer).  Incoming action is:");

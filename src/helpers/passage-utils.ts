@@ -125,17 +125,17 @@ export class PassageUtils {
     return -1;
   }
 
-  // public static getUnformattedPassageTextNoVerseNumbers(passage: Passage): string {
-  //   let verseLen = passage.verses.length;
-  //   let verseText = "";
-  //   for (let i = 0; i < verseLen; i++) {
-  //     let versePartLen = passage.verses[i].verseParts.length;
-  //     for (let j = 0; j < versePartLen; j++) {
-  //       verseText += passage.verses[i].verseParts[j].verseText + " ";
-  //     }
-  //   }
-  //   return verseText;
-  // }
+  public static getUnformattedPassageTextNoVerseNumbers(passage: Passage): string {
+    let verseLen = passage.verses.length;
+    let verseText = "";
+    for (let i = 0; i < verseLen; i++) {
+      let versePartLen = passage.verses[i].verseParts.length;
+      for (let j = 0; j < versePartLen; j++) {
+        verseText += passage.verses[i].verseParts[j].verseText + " ";
+      }
+    }
+    return verseText;
+  }
 
   public static getFormattedPassageText(passage: Passage, showVerseNumbers: boolean): string {
     let verseLen: number = passage.verses.length;

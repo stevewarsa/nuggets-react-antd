@@ -10,7 +10,7 @@ import {
     ArrowLeftOutlined,
     ArrowRightOutlined,
     CheckSquareOutlined,
-    CopyOutlined,
+    CopyOutlined, EditOutlined,
     InfoCircleOutlined,
     LinkOutlined,
     MoreOutlined,
@@ -23,6 +23,7 @@ import {stateActions} from "../store";
 import {DateUtils} from "../helpers/date.utils";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import useMemoryPassages from "../hooks/use-memory-passages";
+import EditPassage from "../components/EditPassage";
 
 const Practice = () => {
     const dispatcher = useDispatch();
@@ -36,6 +37,7 @@ const Practice = () => {
     const [showingQuestion, setShowingQuestion] = useState(true);
     const [showPsgRef, setShowPsgRef] = useState(practiceConfig.practiceMode === PassageUtils.BY_REF);
     const [infoVisible, setInfoVisible] = useState(false);
+    const [editing, setEditing] = useState(false);
 
     const updatePassageInList = useCallback((passage: Passage) => {
         setMemPassageList(prev => {
@@ -119,12 +121,14 @@ const Practice = () => {
         setShowingQuestion(true);
         setShowPsgRef(practiceConfig.practiceMode === PassageUtils.BY_REF);
         setCurrentIndex(prev => prev === 0 ? memPassageList.length - 1 : prev - 1);
+        setEditing(false);
     };
     const handleNext = () => {
         // console.log("handleNext - incrementing current index (currently " + currentIndex + ")");
         setShowingQuestion(true);
         setShowPsgRef(practiceConfig.practiceMode === PassageUtils.BY_REF);
         setCurrentIndex(prev => prev === (memPassageList.length - 1) ? 0 : prev + 1);
+        setEditing(false);
     };
 
     const handleToggleAnswer = () => {
@@ -155,14 +159,6 @@ const Practice = () => {
         setShowPsgRef(practiceConfig.practiceMode === PassageUtils.BY_REF);
     }, [currentIndex]);
 
-    const handleInfo = () => {
-        setInfoVisible(true);
-    };
-
-    const handleHideInfo = () => {
-        setInfoVisible(false);
-    };
-
     const getFrequency = (psg: Passage) => {
         if (!psg) {
             return "N/A";
@@ -189,6 +185,12 @@ const Practice = () => {
         } else if (key === "2") {
             // interlinear link
             PassageUtils.openInterlinearLink(currPassage);
+        } else if (key === "3") {
+            // Edit
+            setBusy({state: true, message: "Populating passage text..."});
+            await populateVerses(currPassage, false);
+            setBusy({state: false, message: ""});
+            setEditing(true);
         }
     };
 
@@ -198,6 +200,7 @@ const Practice = () => {
             <Row justify="center">
                 <h1>Memory Verses</h1>
             </Row>
+            {editing && <EditPassage passage={memPassageList[currentIndex]} />}
             <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
                 <Row style={{marginBottom: "10px"}} justify="center" align="middle">
                     <Col>{currentIndex + 1} of {memPassageList.length}</Col>
@@ -209,14 +212,14 @@ const Practice = () => {
                                         <li>Frequency: {getFrequency(memPassageList[currentIndex])}</li>
                                         <li>Last Practiced: {memPassageList[currentIndex]?.last_viewed_str}</li>
                                     </ul>
-                                    <Button type="link" onClick={handleHideInfo}>Close</Button>
+                                    <Button type="link" onClick={() => setInfoVisible(false)}>Close</Button>
                                 </>
                             }
                             title="Additional Info"
                             trigger="click"
                             visible={infoVisible}
                         >
-                            <Button icon={<InfoCircleOutlined />} onClick={handleInfo}/>
+                            <Button icon={<InfoCircleOutlined />} onClick={() => setInfoVisible(true)}/>
                         </Popover>
                     </Col>
                 </Row>
@@ -233,6 +236,9 @@ const Practice = () => {
                                     </Menu.Item>
                                     <Menu.Item key="2" icon={<LinkOutlined />}>
                                         Interlinear View
+                                    </Menu.Item>
+                                    <Menu.Item key="3" icon={<EditOutlined />}>
+                                        Edit...
                                     </Menu.Item>
                                 </Menu>
                             }>

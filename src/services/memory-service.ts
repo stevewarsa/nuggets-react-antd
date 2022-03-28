@@ -4,6 +4,7 @@ import {Constants} from "../model/constants";
 import {Quote} from "../model/quote";
 import {MemUser} from "../model/mem-user";
 import axiosRetry from "axios-retry";
+import {UpdatePassageParam} from "../model/update-passage-param";
 
 class MemoryService {
     public getMemoryPsgList(user: string) {
@@ -30,6 +31,11 @@ class MemoryService {
     public getMaxChaptersByBook() {
         return MemoryService.buildAxios().get("/bible-app/server/get_max_chapter_by_book.php");
     }
+
+    public getMaxVerseByBookChapter(translation: string) {
+        return MemoryService.buildAxios().get<any[]>("/bible-app/server/get_max_verse_by_book_chapter.php?translation=" + translation);
+    }
+
     public getChapter(book: string, chapter: number, translation: string) {
         let bookId: number = this.getBookId(book);
         return MemoryService.buildAxios().get("/bible-app/server/get_chapter.php?bookId=" + bookId + "&chapter=" + chapter + "&translation=" + translation);
@@ -116,6 +122,10 @@ class MemoryService {
 
     public getPassagesForTopic(topicId: number, currentUser: string) {
         return MemoryService.buildAxios().get<Passage[]>("/bible-app/server/get_tag_list.php?tagId=" + topicId + '&user=' + currentUser);
+    }
+
+    public updatePassage(updatePassageParam: UpdatePassageParam) {
+        return MemoryService.buildAxios().post<string>("/bible-app/server/update_passage.php", updatePassageParam);
     }
 
     private static buildAxios(): AxiosInstance {

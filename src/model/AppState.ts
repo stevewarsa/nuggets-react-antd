@@ -20,4 +20,5 @@ export interface AppState {
     existingQuoteList: Quote[];
     currentSearchString: string;
     userPreferences: any[];
+    maxVerseByBookChapter: {[translation: string]: []};
 }
