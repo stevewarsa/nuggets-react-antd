@@ -10,7 +10,7 @@ import {
     ArrowRightOutlined,
     CopyOutlined,
     LinkOutlined,
-    MoreOutlined
+    MoreOutlined, SubnodeOutlined
 } from "@ant-design/icons";
 import {PassageUtils} from "../helpers/passage-utils";
 import {Constants} from "../model/constants";
@@ -84,6 +84,9 @@ const ReadChapter = () => {
         } else if (key === "2") {
             // interlinear link
             PassageUtils.openInterlinearLink(currPassage);
+        } else if (key === "3") {
+            dispatcher(stateActions.setVerseSelectionRequest({passage: currPassage, actionToPerform: "add-to-memory", backToPath: "/practiceSetup"} as VerseSelectionRequest));
+            navigate("/selectVerses");
         }
     };
 
@@ -112,10 +115,13 @@ const ReadChapter = () => {
                             <Dropdown placement="bottomRight" trigger={["click"]} overlay={
                                 <Menu onClick={handleMenuClick}>
                                     <Menu.Item key="1" icon={<CopyOutlined/>}>
-                                        Copy
+                                        Copy...
+                                    </Menu.Item>
+                                    <Menu.Item key="3" icon={<SubnodeOutlined />}>
+                                        Add To Memory Verses...
                                     </Menu.Item>
                                     <Menu.Item key="2" icon={<LinkOutlined />}>
-                                        Interlinear View
+                                        Interlinear View...
                                     </Menu.Item>
                                 </Menu>
                             }>

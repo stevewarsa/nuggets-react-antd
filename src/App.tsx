@@ -27,7 +27,7 @@ import {StringUtils} from "./helpers/string.utils";
 import {CookieUtils} from "./helpers/cookie-utils";
 import BrowseNuggets from "./pages/BrowseNuggets";
 import MyMemPsgList from "./pages/MyMemPsgList";
-import {Constants} from "./model/constants";
+//import {Constants} from "./model/constants";
 import SpinnerTimer from "./components/SpinnerTimer";
 
 const App = () => {
@@ -46,11 +46,11 @@ const App = () => {
             dispatcher(stateActions.setMaxChaptersByBook(locMaxChaptersByBook.data));
             const allUsers = await memoryService.getAllUsers();
             dispatcher(stateActions.setAllUsers(allUsers.data));
-            for (let key of Object.keys(Constants.translationLongNames)) {
-                console.log("Loading max verse by book and chapter for translation: " + key);
-                const maxVerseByBookChapter = await memoryService.getMaxVerseByBookChapter(key);
-                dispatcher(stateActions.setMaxVerseByBookChapter({translation: key, maxVerseByBookChapter: maxVerseByBookChapter.data}));
-            }
+            // for (let key of Object.keys(Constants.translationLongNames)) {
+            //     console.log("Loading max verse by book and chapter for translation: " + key);
+            //     const maxVerseByBookChapter = await memoryService.getMaxVerseByBookChapter(key);
+            //     dispatcher(stateActions.setMaxVerseByBookChapter({translation: key, maxVerseByBookChapter: maxVerseByBookChapter.data}));
+            // }
             setBusy({state: false, message: ""});
         };
         callServer();

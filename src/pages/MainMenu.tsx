@@ -24,7 +24,7 @@ const MainMenu = () => {
             title: "Read",
             icon: (<ReadOutlined />),
             desc: "In this section, you can search read the full Bible, or you can just read selected passages from the Bible",
-            children: [
+            items: [
                 {
                     key: "1.1",
                     label: "Read a Chapter",
@@ -57,7 +57,7 @@ const MainMenu = () => {
             title: "Search",
             icon: (<SearchOutlined />),
             desc: "In this section, you can search the full bible for any word or phrase, including wildcards. The search can be performed in the Old Testament, New Testament or the Full Bible, or you can limit the search to a particular book of the Bible. Additionally, you can search any of the supported translations of the Bible.",
-            children: [
+            items: [
                 {
                     key: "2.1",
                     label: "Bible Search",
@@ -70,7 +70,7 @@ const MainMenu = () => {
             title: "Nuggets",
             icon: (<SketchOutlined />),
             desc: "Nuggets are passages from the Bible consisting of 1 or more verses and up to a whole chapter.  These are passages you can just randomly browse if you're looking to get a quick bit of Bible reading in and don't know where to start.",
-            children: [
+            items: [
                 {
                     key: "3.1",
                     label: "Browse Bible",
@@ -113,7 +113,7 @@ const MainMenu = () => {
             title: "Devotionals & Links",
             icon: (<LinkOutlined />),
             desc: "Here are some links that are good spiritual resources for the Christian",
-            children: [
+            items: [
                 {
                     key: "4.1",
                     label: "Valley of Vision",
@@ -156,7 +156,7 @@ const MainMenu = () => {
             title: "Memorize",
             icon: (<AimOutlined />),
             desc: "This section is used for various tasks related to Bible or other memorization",
-            children: [
+            items: [
                 {
                     key: "5.1",
                     label: "Practice",
@@ -167,16 +167,16 @@ const MainMenu = () => {
                     label: "Practice History",
                     action: "/practiceHist"
                 },
-                // {
-                //     key: "5.2",
-                //     label: "Search / Add New Verse",
-                //     action: "/addMemoryVerse"
-                // },
                 {
                     key: "5.3",
                     label: "My Mem Passages",
                     action: "/myMemPsgList"
                 }
+                // {
+                //     key: "5.4",
+                //     label: "Search / Add New Verse",
+                //     action: "/addMemoryVerse"
+                // },
                 // {
                 //     key: "5.4",
                 //     label: "Memory Stats",
@@ -199,7 +199,7 @@ const MainMenu = () => {
         //     title: "Full Bible",
         //     icon: (<BookOutlined />),
         //     desc: "This section is used for searching and reading the full bible",
-        //     children: [
+        //     items: [
         //         {
         //             key: "6.1",
         //             label: "Search Full Bible",
@@ -227,7 +227,7 @@ const MainMenu = () => {
         //     title: "Topics",
         //     icon: (<BarsOutlined />),
         //     desc: "This section is used for browsing the Bible by topic",
-        //     children: [
+        //     items: [
         //         {
         //             key: "7.1",
         //             label: "Browse/Search Topics",
@@ -245,7 +245,7 @@ const MainMenu = () => {
         //     title: "Facts & Quotes",
         //     icon: (<IdcardOutlined />),
         //     desc: "This section is used for browsing and managing extra-biblical content such as facts and quotes",
-        //     children: [
+        //     items: [
         //         {
         //             key: "8.1",
         //             label: "Browse Quotes",
@@ -283,7 +283,7 @@ const MainMenu = () => {
             title: "Steve's Tasks",
             icon: (<CheckCircleOutlined />),
             desc: "This section is used for tasks that only the creator of this program (Steve) can do",
-            children: [
+            items: [
                 {
                     key: "9.1",
                     label: "Copy This DB to Guest",
@@ -296,7 +296,7 @@ const MainMenu = () => {
         //     title: "Settings",
         //     icon: (<SettingOutlined />),
         //     desc: "Manage your settings for this site",
-        //     children: [
+        //     items: [
         //         {
         //             key: "10.1",
         //             label: "Manage Email Associations",
@@ -337,7 +337,7 @@ const MainMenu = () => {
                         <p style={{fontWeight: "bold"}}>{menuItem.desc}</p>
                         <List
                             bordered
-                            dataSource={menuItem.children}
+                            dataSource={menuItem.items}
                             renderItem={item => (
                                 <List.Item key={item.key} style={{cursor: "pointer"}} onClick={() => handleSelect(item)}>
                                     {item.label}

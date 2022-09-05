@@ -394,7 +394,87 @@ export class PassageUtils {
     } else {
       return bookName + " " + passage.chapter + ":" + verseNumbers + translString;
     }
+  }
 
+  static EXACT_BOOK_MATCH = 1;
+  static PARTIAL_BOOK_MATCH = 2;
+  static BOOK_MATCH_PLUS = 3;
+
+  public static getPassageFromPassageRef(passageRef: string): Passage[] {
+    passageRef = passageRef.trim().toLowerCase();
+    const matchingPassages: Passage[] = [];
+    for (let bookNm in Constants.bookAbbrev) {
+      const fullBookNm: string = Constants.bookAbbrev[bookNm][1];
+
+      // Exactly equal
+      if (passageRef === fullBookNm.toLowerCase()) {
+        matchingPassages.push(this.handleMatch(bookNm, PassageUtils.EXACT_BOOK_MATCH, passageRef, fullBookNm));
+        continue;
+      }
+      // Passage reference contains one of the book names
+      if (passageRef.startsWith(fullBookNm.toLowerCase())) {
+        matchingPassages.push(this.handleMatch(bookNm, PassageUtils.BOOK_MATCH_PLUS, passageRef, fullBookNm));
+        continue;
+      }
+      // the Passage reference passed in is a partial match to one of the book names
+      if (fullBookNm.toLowerCase().includes(passageRef)) {
+        matchingPassages.push(this.handleMatch(bookNm, PassageUtils.PARTIAL_BOOK_MATCH, passageRef, fullBookNm));
+        continue;
+      }
+    }
+    return matchingPassages;
+  }
+
+  private static handleMatch(bookNm: string, matchType: number, passageRef: string, fullBookNm: string): Passage {
+    let passage = new Passage();
+    passage.chapter = 1;
+    passage.startVerse = 1;
+    passage.endVerse = 1;
+    passage.bookName = bookNm;
+    passage.bookId = PassageUtils.getBookId(bookNm);
+    if (matchType === PassageUtils.BOOK_MATCH_PLUS) {
+      this.handleBookMatchPlus(passageRef, fullBookNm, passage);
+    }
+    return passage;
+  }
+
+  private static handleBookMatchPlus(passageRef: string, fullBookNm: string, passage: Passage) {
+    // assume that what is after the book is a chapter and possibly more
+    let chapter = passageRef.substring(fullBookNm.length + 1, passageRef.length);
+    if (chapter.includes(":")) {
+      // assume that they're trying to specify a verse or a verse range
+      let chapterParts = chapter.split(":");
+      if (!isNaN(Number(chapterParts[0]))) {
+        // assume that what is after the book name is a chapter
+        passage.chapter = parseInt(chapterParts[0]);
+      }
+      if (chapter.includes("-")) {
+        // this is a verse range
+        let verseRange = chapterParts[1].split("-");
+        if (!isNaN(Number(verseRange[0]))) {
+          passage.startVerse = parseInt(verseRange[0]);
+        }
+        if (!isNaN(Number(verseRange[1])) && verseRange[1] !== "") {
+          passage.endVerse = parseInt(verseRange[1]);
+        } else {
+          passage.endVerse = passage.startVerse;
+        }
+      } else {
+        // this is only 1 verse
+        if (!isNaN(Number(chapterParts[1])) && chapterParts[1] !== "") {
+          passage.startVerse = parseInt(chapterParts[1]);
+          passage.endVerse = passage.startVerse;
+        } else {
+          passage.startVerse = 1;
+          passage.endVerse = 1;
+        }
+      }
+    } else {
+      if (!isNaN(Number(chapter))) {
+        // assume that what is after the book name is a chapter
+        passage.chapter = parseInt(chapter);
+      }
+    }
   }
 
   public static getRegularBook(bookId: number) {

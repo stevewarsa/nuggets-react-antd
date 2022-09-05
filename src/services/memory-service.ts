@@ -79,6 +79,11 @@ class MemoryService {
         return MemoryService.buildAxios().get<MemUser[]>("/bible-app/server/get_all_users.php");
     }
 
+    // Note - the return value of this method is the new passage id (-1 if not successful, otherwise a positive integer)
+    public addMemoryPassage(passage: Passage, userName: string) {
+        return MemoryService.buildAxios().get<number>("/bible-app/server/add_memory_passage.php?user=" + userName + "&translation=" + passage.translationId + "&book=" + passage.bookName + "&chapter=" + passage.chapter + "&start=" + passage.startVerse + "&end=" + passage.endVerse + "&queue=N");
+    }
+
     public addEmailMapping(param: any) {
         return MemoryService.buildAxios().post<string>("/bible-app/serveadd_email_mapping.php", param);
     }

@@ -29,11 +29,23 @@ const useMemoryPassages = () => {
         } else {
             return locMemoryPassagesData.data;
         }
+    };
 
+    const addMemoryPassage = async (passage: Passage, user: string) => {
+        const addMemPsgResponse: any = await memoryService.addMemoryPassage(passage, user);
+        const passageId: number = addMemPsgResponse.data as number;
+        if (passageId === -1) {
+            // it errored out...
+        } else {
+            // it was successful
+            passage.passageId = passageId;
+        }
+        return passageId;
     };
 
     return {
-        getMemPassages: getMemPassages
+        getMemPassages: getMemPassages,
+        addMemoryPassage: addMemoryPassage
     };
 };
 
