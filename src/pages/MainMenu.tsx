@@ -90,6 +90,11 @@ const MainMenu = () => {
                     key: "3.4",
                     label: "Search Quotes",
                     action: "/searchQuotes"
+                },
+                {
+                    key: "3.5",
+                    label: "Browse By Topic",
+                    action: "/topicList"
                 }
                 // {
                 //     key: "3.4",

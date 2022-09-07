@@ -1,7 +1,7 @@
-import {Route, Routes} from "react-router-dom";
+import {Route, Routes, useNavigate} from "react-router-dom";
 import 'antd/dist/antd.css';
 import MainMenu from "./pages/MainMenu";
-import {Layout, Menu, Image, Row, Col} from "antd";
+import {Col, Image, Layout, Menu, MenuProps, Row} from "antd";
 import About from "./pages/About";
 import PracticeSetup from "./pages/PracticeSetup";
 import Practice from "./pages/Practice";
@@ -17,7 +17,6 @@ import BibleReadingPlan from "./pages/BibleReadingPlan";
 import BrowseQuotes from "./pages/BrowseQuotes";
 import AddQuote from "./pages/AddQuote";
 import Login from "./pages/Login";
-import { useNavigate } from 'react-router-dom';
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import SearchQuotes from "./pages/SearchQuotes";
 import BibleSearch from "./pages/BibleSearch";
@@ -29,6 +28,7 @@ import BrowseNuggets from "./pages/BrowseNuggets";
 import MyMemPsgList from "./pages/MyMemPsgList";
 //import {Constants} from "./model/constants";
 import SpinnerTimer from "./components/SpinnerTimer";
+import TopicList from "./pages/TopicList";
 
 const App = () => {
     const navigate = useNavigate();
@@ -36,6 +36,7 @@ const App = () => {
     const dispatcher = useDispatch();
     // console.log("App - selectedMenu from store is " + selectedMenu);
     const [busy, setBusy] = useState({state: false, message: ""});
+    const [current, setCurrent] = useState("1");
     const user = useSelector((state: AppState) => state.user);
     const { Header, Content, Footer } = Layout;
 
@@ -56,64 +57,69 @@ const App = () => {
         callServer();
     }, [dispatcher]);
 
-    const menuItems = [
+    const menuItems: MenuProps['items'] = [
         {
             key: 1,
-            label: "Main Menu",
-            path: "/mainMenu"
+            label: "Main Menu"
         },
         {
             key: 2,
-            label: "Practice Setup",
-            path: "/practiceSetup"
+            label: "Practice Setup"
         },
         {
             key: 3,
-            label: "Add Quote",
-            path: "/addQuote"
+            label: "Add Quote"
         },
         {
             key: 4,
-            label: "My Mem Psg List",
-            path: "/myMemPsgList"
+            label: "My Mem Psg List"
         },
         {
             key: 5,
-            label: "Search/Add",
-            path: "/searchOrAdd"
+            label: "Search/Add"
         },
         {
             key: 6,
-            label: "Bible Search",
-            path: "/bibleSearch"
+            label: "Bible Search"
         },
         {
             key: 7,
-            label: "View Chapter",
-            path: "/selectChapter"
+            label: "View Chapter"
         },
         {
             key: 8,
-            label: "About",
-            path: "/about"
+            label: "About"
         },
         {
             key: 9,
-            label: "Logout",
-            path: "/logout"
+            label: "Logout"
         }
     ];
 
-    const handleMenuItem = (item: {key: number, label: string, path: string}) => {
+    const menuPaths: {[key: number]: string} = {
+        1: "/mainMenu",
+        2: "/practiceSetup",
+        3: "/addQuote",
+        4: "/myMemPsgList",
+        5: "/searchOrAdd",
+        6: "/bibleSearch",
+        7: "/selectChapter",
+        8: "/about",
+        9: "/logout",
+    };
+
+    const handleMenuItem = item => {
         // console.log(item.label);
+        setCurrent(item.key);
         if (item.key === 9) {
             // logout
             CookieUtils.deleteCookie('user.name');
             dispatcher(stateActions.setUser(null));
             navigate("/")
         } else {
-            navigate(item.path);
+            const path = menuPaths[item.key];
             dispatcher(stateActions.setSelectedMenuItem(item.key));
+            navigate(path);
         }
     }
 
@@ -129,36 +135,32 @@ const App = () => {
                     }}>
                         <Image src="goldnuggeticon.png" width={65} height={65} alt="logo"/>
                     </div>
-                    <Menu theme="light" mode="horizontal" defaultSelectedKeys={['1']}
-                          overflowedIndicator={<MenuOutlined/>}>
-                        {menuItems.map(item => <Menu.Item key={item.key}
-                                                          onClick={() => handleMenuItem(item)}>{item.label}</Menu.Item>)}
-                    </Menu>
+                    <Menu onClick={handleMenuItem} items={menuItems} theme="light" mode="horizontal" selectedKeys={[current]}
+                          overflowedIndicator={<MenuOutlined/>}/>
                 </Header>
                 <Content style={{paddingLeft: "5px", paddingRight: "5px", marginTop: "20px"}}>
-                    <div className="site-layout-content">
-                        <Routes>
-                            <Route path="/" element={<Login/>}/>
-                            <Route path="/login" element={<Login/>}/>
-                            <Route element={<ProtectedRoutes/>}>
-                                <Route path="/mainMenu" element={<MainMenu/>}/>
-                                <Route path="/about" element={<About/>}/>
-                                <Route path="/practiceSetup" element={<PracticeSetup/>}/>
-                                <Route path="/practiceHist" element={<ViewMemoryPracticeHistory/>}/>
-                                <Route path="/practice" element={<Practice/>}/>
-                                <Route path="/selectChapter" element={<SelectChapter/>}/>
-                                <Route path="/readChapter" element={<ReadChapter/>}/>
-                                <Route path="/bibleReadingPlan" element={<BibleReadingPlan/>}/>
-                                <Route path="/selectVerses" element={<SelectVerses/>}/>
-                                <Route path="/browseQuotes" element={<BrowseQuotes/>}/>
-                                <Route path="/browseNuggets" element={<BrowseNuggets/>}/>
-                                <Route path="/searchQuotes" element={<SearchQuotes/>}/>
-                                <Route path="/bibleSearch" element={<BibleSearch/>}/>
-                                <Route path="/addQuote" element={<AddQuote/>}/>
-                                <Route path="/myMemPsgList" element={<MyMemPsgList/>}/>
-                            </Route>
-                        </Routes>
-                    </div>
+                    <Routes>
+                        <Route path="/" element={<Login/>}/>
+                        <Route path="/login" element={<Login/>}/>
+                        <Route element={<ProtectedRoutes/>}>
+                            <Route path="/mainMenu" element={<MainMenu/>}/>
+                            <Route path="/about" element={<About/>}/>
+                            <Route path="/practiceSetup" element={<PracticeSetup/>}/>
+                            <Route path="/practiceHist" element={<ViewMemoryPracticeHistory/>}/>
+                            <Route path="/practice" element={<Practice/>}/>
+                            <Route path="/selectChapter" element={<SelectChapter/>}/>
+                            <Route path="/readChapter" element={<ReadChapter/>}/>
+                            <Route path="/bibleReadingPlan" element={<BibleReadingPlan/>}/>
+                            <Route path="/selectVerses" element={<SelectVerses/>}/>
+                            <Route path="/browseQuotes" element={<BrowseQuotes/>}/>
+                            <Route path="/browseNuggets" element={<BrowseNuggets/>}/>
+                            <Route path="/searchQuotes" element={<SearchQuotes/>}/>
+                            <Route path="/bibleSearch" element={<BibleSearch/>}/>
+                            <Route path="/addQuote" element={<AddQuote/>}/>
+                            <Route path="/myMemPsgList" element={<MyMemPsgList/>}/>
+                            <Route path="/topicList" element={<TopicList/>}/>
+                        </Route>
+                    </Routes>
                 </Content>
                 <Footer style={{textAlign: 'center'}}>
                     {!StringUtils.isEmpty(user) &&

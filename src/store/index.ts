@@ -116,6 +116,9 @@ const state = createSlice({
         setStartingPassageId(state, action) {
             state.startingPassageId = parseInt(action.payload);
         },
+        setIncomingTopic(state, action) {
+            state.incomingTopic = action.payload;
+        },
         setFilteredQuoteIds(state, action) {
             state.filteredQuoteIds = action.payload;
         },

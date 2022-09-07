@@ -23,6 +23,7 @@ const BrowseNuggets = () => {
     const navigate = useNavigate();
     const user = useSelector((state: AppState) => state.user);
     const prefs = useSelector((state: AppState) => state.userPreferences);
+    const incomingTopic: { id: number; name: string } = useSelector((state: AppState) => state.incomingTopic);
     const startingPassageId = useSelector((state: AppState) => state.startingPassageId);
     const [busy, setBusy] = useState({state: false, message: ""});
     const [nuggetIdList, setNuggetIdList] = useState([]);
@@ -52,6 +53,9 @@ const BrowseNuggets = () => {
             setBusy({state: true, message: "Retrieving topic list from server..."});
             const topicListResponse = await memoryService.getTopicList(user);
             setTopicList(topicListResponse.data);
+            if (incomingTopic) {
+                filterToSelectedTopic();
+            }
             setBusy({state: false, message: ""});
         };
         callServer();
@@ -67,6 +71,18 @@ const BrowseNuggets = () => {
             setCurrentIndex(0);
         }
     }, [startingPassageId, nuggetIdList]);
+
+    useEffect(() => {
+        if (incomingTopic && incomingTopic.id !== -1) {
+            setSelectedTopic(incomingTopic.id);
+        }
+    }, [incomingTopic]);
+
+    useEffect(() => {
+        if (selectedTopic && selectedTopic !== -1) {
+            filterToSelectedTopic();
+        }
+    }, [selectedTopic, originalNuggetIdList]);
 
     const retrievePassage = useCallback(async () => {
         if (!nuggetIdList || currentIndex > (nuggetIdList.length - 1) || currentIndex < 0) {
@@ -101,9 +117,10 @@ const BrowseNuggets = () => {
             // filter
             setFilterVisible(true);
         } else if (key === "4") {
-            // filter
+            // clear filter
             setSelectedTopic(-1);
             setNuggetIdList(originalNuggetIdList);
+            dispatcher(stateActions.setIncomingTopic(null));
         }
     };
 
@@ -119,9 +136,11 @@ const BrowseNuggets = () => {
         });
     }, [selectedTranslation, retrievePassage, currentIndex, nuggetIdList]);
 
-    const handleOk = () => {
-        console.log("handleOk on filter dialog");
-        setFilterVisible(false);
+    const filterToSelectedTopic = () => {
+        if (selectedTopic === -1) {
+            console.log("Selected topic id not set yet...  returning");
+            return;
+        }
         const callServer = async () => {
             setBusy({state: true, message: "Retrieving passages for topic..."});
             const passagesByTopicResponse = await memoryService.getPassagesForTopic(selectedTopic, user);
@@ -134,6 +153,13 @@ const BrowseNuggets = () => {
             setBusy({state: false, message: ""});
         };
         callServer();
+    };
+
+    const handleOk = (val) => {
+        console.log("handleOk on filter dialog");
+        setSelectedTopic(val);
+        setFilterVisible(false);
+        filterToSelectedTopic();
     };
 
     return (
@@ -193,7 +219,7 @@ const BrowseNuggets = () => {
                         </Col>
                     </Space>
                 </Row>
-                {selectedTopic && selectedTopic !== -1 &&
+                {selectedTopic && selectedTopic !== -1 && topicList.length > 0 &&
                     <Row>
                         <Col><span style={{fontWeight: "bold"}}>Filtered Topic:</span> {topicList.find(tpc => tpc.id === selectedTopic).name}</Col>
                     </Row>
@@ -215,12 +241,12 @@ const BrowseNuggets = () => {
                     </SwitchTransition>
                 )}
             </Swipe>
-            <Modal title="Filter Dialog" visible={filterVisible} onOk={handleOk} onCancel={() => setFilterVisible(false)}>
+            <Modal footer={null} title="Filter Dialog" open={filterVisible}>
                 <>
                 <Row><Col>Filter By Topic:</Col></Row>
                 <Row>
                     <Col span={24}>
-                        <Select style={{width: "100%"}} size="large" value={selectedTopic} onChange={value => setSelectedTopic(value)}>
+                        <Select style={{width: "100%"}} size="large" value={selectedTopic} onChange={value => handleOk(value)}>
                             <Option value={-1}>--Select Topic--</Option>
                             {topicList.map(topic => (
                                     <Option key={topic.id} value={topic.id}>{topic.name}</Option>

@@ -43,9 +43,23 @@ const useMemoryPassages = () => {
         return passageId;
     };
 
+    const getTopicList = async (user: string) => {
+        const topicListResponse = await memoryService.getTopicList(user);
+        const topicsById: {id: number, name: string}[] = topicListResponse.data;
+        return topicsById;
+    };
+
+    const getPassagesForTopic = async (topicId: number, user: string) => {
+        const passagesForTopicResponse = await memoryService.getPassagesForTopic(topicId, user);
+        const passagesForTopic: Passage[] = passagesForTopicResponse.data;
+        return passagesForTopic;
+    };
+
     return {
         getMemPassages: getMemPassages,
-        addMemoryPassage: addMemoryPassage
+        addMemoryPassage: addMemoryPassage,
+        getTopicList: getTopicList,
+        getPassagesForTopic: getPassagesForTopic
     };
 };
 

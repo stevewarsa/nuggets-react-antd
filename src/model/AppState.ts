@@ -16,6 +16,7 @@ export interface AppState {
     allUsers: MemUser[];
     startingQuote: number;
     startingPassageId: number;
+    incomingTopic: { id: number; name: string };
     filteredQuoteIds: number[];
     existingQuoteList: Quote[];
     currentSearchString: string;
