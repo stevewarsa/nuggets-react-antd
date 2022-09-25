@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection SqlNoDataSourceInspection */
+/** @noinspection SqlDialectInspection */
 //header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
@@ -17,7 +18,7 @@ error_log($txt);
 $selectSql = "select chapter, verse, b.book_name, b._id from verse v, book b where b._id = v.book_id ";
 if ($testament == 'both') {
     // no restriction on books...
-    error_log("no restriction on books...");
+    error_log("no restriction on testament (both)...");
 } else if ($testament == 'new') {
     // filter on new testament
     error_log("filter on new testament...");

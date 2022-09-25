@@ -1,7 +1,7 @@
-import {Route, Routes, useNavigate} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import 'antd/dist/antd.css';
 import MainMenu from "./pages/MainMenu";
-import {Col, Image, Layout, Menu, MenuProps, Row} from "antd";
+import {Col, Layout, Row} from "antd";
 import About from "./pages/About";
 import PracticeSetup from "./pages/PracticeSetup";
 import Practice from "./pages/Practice";
@@ -21,24 +21,21 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import SearchQuotes from "./pages/SearchQuotes";
 import BibleSearch from "./pages/BibleSearch";
 import ViewMemoryPracticeHistory from "./pages/ViewMemoryPracticeHistory";
-import {MenuOutlined} from "@ant-design/icons";
 import {StringUtils} from "./helpers/string.utils";
-import {CookieUtils} from "./helpers/cookie-utils";
 import BrowseNuggets from "./pages/BrowseNuggets";
 import MyMemPsgList from "./pages/MyMemPsgList";
 //import {Constants} from "./model/constants";
 import SpinnerTimer from "./components/SpinnerTimer";
 import TopicList from "./pages/TopicList";
+import TopNav from "./components/TopNav";
 
 const App = () => {
-    const navigate = useNavigate();
     //console.log("Here is the location:", location);
     const dispatcher = useDispatch();
     // console.log("App - selectedMenu from store is " + selectedMenu);
     const [busy, setBusy] = useState({state: false, message: ""});
-    const [current, setCurrent] = useState("1");
     const user = useSelector((state: AppState) => state.user);
-    const { Header, Content, Footer } = Layout;
+    const { Content, Footer } = Layout;
 
     useEffect(() => {
         const callServer = async () => {
@@ -57,87 +54,12 @@ const App = () => {
         callServer();
     }, [dispatcher]);
 
-    const menuItems: MenuProps['items'] = [
-        {
-            key: 1,
-            label: "Main Menu"
-        },
-        {
-            key: 2,
-            label: "Practice Setup"
-        },
-        {
-            key: 3,
-            label: "Add Quote"
-        },
-        {
-            key: 4,
-            label: "My Mem Psg List"
-        },
-        {
-            key: 5,
-            label: "Search/Add"
-        },
-        {
-            key: 6,
-            label: "Bible Search"
-        },
-        {
-            key: 7,
-            label: "View Chapter"
-        },
-        {
-            key: 8,
-            label: "About"
-        },
-        {
-            key: 9,
-            label: "Logout"
-        }
-    ];
-
-    const menuPaths: {[key: number]: string} = {
-        1: "/mainMenu",
-        2: "/practiceSetup",
-        3: "/addQuote",
-        4: "/myMemPsgList",
-        5: "/searchOrAdd",
-        6: "/bibleSearch",
-        7: "/selectChapter",
-        8: "/about",
-        9: "/logout",
-    };
-
-    const handleMenuItem = item => {
-        // console.log(item.label);
-        setCurrent(item.key);
-        if (item.key === 9) {
-            // logout
-            CookieUtils.deleteCookie('user.name');
-            dispatcher(stateActions.setUser(null));
-            navigate("/")
-        } else {
-            const path = menuPaths[item.key];
-            dispatcher(stateActions.setSelectedMenuItem(item.key));
-            navigate(path);
-        }
-    }
-
     if (busy.state) {
         return <SpinnerTimer message={busy.message} />;
     } else {
         return (
             <Layout className="layout">
-                <Header style={{paddingLeft: "0px", paddingRight: "0px"}}>
-                    <div style={{
-                        float: 'left',
-                        backgroundColor: "white"
-                    }}>
-                        <Image src="goldnuggeticon.png" width={65} height={65} alt="logo"/>
-                    </div>
-                    <Menu onClick={handleMenuItem} items={menuItems} theme="light" mode="horizontal" selectedKeys={[current]}
-                          overflowedIndicator={<MenuOutlined/>}/>
-                </Header>
+                <TopNav/>
                 <Content style={{paddingLeft: "5px", paddingRight: "5px", marginTop: "20px"}}>
                     <Routes>
                         <Route path="/" element={<Login/>}/>
