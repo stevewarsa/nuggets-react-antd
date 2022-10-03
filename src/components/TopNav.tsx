@@ -25,6 +25,10 @@ const TopNav = () => {
             label: "Practice Setup"
         },
         {
+            key: 10,
+            label: "Bible Reading Plan"
+        },
+        {
             key: 3,
             label: "Add Quote"
         },
@@ -54,10 +58,10 @@ const TopNav = () => {
         6: "/bibleSearch",
         7: "/selectChapter",
         8: "/about",
+        10: "/bibleReadingPlan"
     };
 
     const handleMenuItem = item => {
-        // console.log(item.label);
         setCurrent(item.key);
         setState({visible: false});
         if (item.key === 9) {

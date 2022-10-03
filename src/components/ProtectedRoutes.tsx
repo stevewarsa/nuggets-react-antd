@@ -2,12 +2,11 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import {StringUtils} from "../helpers/string.utils";
 import {Outlet} from "react-router";
-import {Navigate, useLocation} from "react-router-dom";
+import {Navigate, useLocation, useSearchParams} from "react-router-dom";
 import memoryService from "../services/memory-service";
 import {stateActions} from "../store";
 import {useEffect, useState} from "react";
 import SpinnerTimer from "./SpinnerTimer";
-import {useSearchParams} from "react-router-dom";
 import {Constants} from "../model/constants";
 import {CookieUtils} from "../helpers/cookie-utils";
 

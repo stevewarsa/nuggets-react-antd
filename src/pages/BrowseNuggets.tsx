@@ -4,7 +4,7 @@ import {useCallback, useEffect, useState} from "react";
 import memoryService from "../services/memory-service";
 import {PassageUtils} from "../helpers/passage-utils";
 import SpinnerTimer from "../components/SpinnerTimer";
-import {Button, Col, Dropdown, Menu, Modal, Row, Select, Space} from "antd";
+import {Button, Col, Dropdown, Menu, Modal, notification, Row, Select, Space} from "antd";
 import Swipe from "react-easy-swipe";
 import {
     ArrowLeftOutlined,
@@ -17,6 +17,7 @@ import {stateActions} from "../store";
 import {VerseSelectionRequest} from "../model/verse-selection-request";
 import {useNavigate} from "react-router-dom";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
+import {Passage} from "../model/passage";
 
 const BrowseNuggets = () => {
     const dispatcher = useDispatch();
@@ -31,7 +32,7 @@ const BrowseNuggets = () => {
     const [topicList, setTopicList] = useState<{id: number, name: string}[]>([]);
     const [filterVisible, setFilterVisible] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [currentPassage, setCurrentPassage] = useState(undefined);
+    const [currentPassage, setCurrentPassage] = useState<Passage>(undefined);
     const [selectedTranslation, setSelectedTranslation] = useState("niv");
     const [selectedTopic, setSelectedTopic] = useState<number>(-1);
     const {Option} = Select;
@@ -63,9 +64,7 @@ const BrowseNuggets = () => {
 
     useEffect(() => {
         if (startingPassageId !== -1) {
-            // console.log("useEffect [startingPassageId, nuggetIdList] - current nugget list:", nuggetIdList);
             const foundIndex = nuggetIdList.findIndex(nugget => nugget.nuggetId === startingPassageId);
-            // console.log("useEffect [startingPassageId, nuggetIdList] - startingPassageId: " + startingPassageId + ", foundIndex: " + foundIndex);
             setCurrentIndex(foundIndex);
         } else {
             setCurrentIndex(0);
@@ -88,7 +87,6 @@ const BrowseNuggets = () => {
         if (!nuggetIdList || currentIndex > (nuggetIdList.length - 1) || currentIndex < 0) {
             return;
         }
-        // console.log("Current Index: " + currentIndex);
         let passageId: number = parseInt(nuggetIdList[currentIndex].nuggetId);
         setBusy({state: true, message: "Retrieving passage text..."});
         const passageResponse = await memoryService.getPassageById(passageId, selectedTranslation, user);
@@ -106,10 +104,20 @@ const BrowseNuggets = () => {
 
     const handleMenuClick = ({key}) => {
         if (key === "1") {
-            // console.log("handleMenuClick - Here are the verses for selection:");
-            // console.log(formattedVersesAsArray);
-            dispatcher(stateActions.setVerseSelectionRequest({passage: currentPassage, actionToPerform: "copy", backToPath: "/browseNuggets"} as VerseSelectionRequest));
-            navigate("/selectVerses");
+            if (currentPassage.verses.length === 1) {
+                // just immediately copy it to the clipboard
+                const psgRef = PassageUtils.getPassageStringNoIndex(currentPassage, true, true);
+                PassageUtils.copyPassageToClipboard(currentPassage, true);
+                notification.info({message: psgRef + " copied!", placement: "bottomRight"});
+            } else {
+                // otherwise, route the user to the select verses screen so they can select start/end verse
+                dispatcher(stateActions.setVerseSelectionRequest({
+                    passage: currentPassage,
+                    actionToPerform: "copy",
+                    backToPath: "/browseNuggets"
+                } as VerseSelectionRequest));
+                navigate("/selectVerses");
+            }
         } else if (key === "2") {
             // interlinear link
             PassageUtils.openInterlinearLink(currentPassage);
@@ -190,25 +198,25 @@ const BrowseNuggets = () => {
                         </Select>
                         <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
                         <Col span={6}>
-                            <Dropdown placement="bottomRight" trigger={["click"]} overlay={
-                                <Menu onClick={handleMenuClick}>
-                                    <Menu.Item key="1" icon={<CopyOutlined/>}>
+                            <Dropdown key="dd" placement="bottomRight" trigger={["click"]} overlay={
+                                <Menu key="menu" onClick={handleMenuClick}>
+                                    <Menu.Item key="1" icon={<CopyOutlined  key="copy"/>}>
                                         Copy
                                     </Menu.Item>
-                                    <Menu.Item key="2" icon={<LinkOutlined />}>
+                                    <Menu.Item key="2" icon={<LinkOutlined  key="interlinear" />}>
                                         Interlinear View
                                     </Menu.Item>
-                                    <Menu.Item key="3" icon={<FilterOutlined />}>
+                                    <Menu.Item key="3" icon={<FilterOutlined  key="filter" />}>
                                         Filter...
                                     </Menu.Item>
                                     {selectedTopic && selectedTopic !== -1 &&
-                                        <Menu.Item key="4" icon={<CloseOutlined/>}>
+                                        <Menu.Item key="4" icon={<CloseOutlined key="clear"/>}>
                                             Clear Filter
                                         </Menu.Item>
                                     }
                                 </Menu>
                             }>
-                                <MoreOutlined style={{
+                                <MoreOutlined key="more" style={{
                                     borderStyle: "solid",
                                     borderWidth: "thin",
                                     borderColor: "gray",

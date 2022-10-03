@@ -24,15 +24,12 @@ import ViewMemoryPracticeHistory from "./pages/ViewMemoryPracticeHistory";
 import {StringUtils} from "./helpers/string.utils";
 import BrowseNuggets from "./pages/BrowseNuggets";
 import MyMemPsgList from "./pages/MyMemPsgList";
-//import {Constants} from "./model/constants";
 import SpinnerTimer from "./components/SpinnerTimer";
 import TopicList from "./pages/TopicList";
 import TopNav from "./components/TopNav";
 
 const App = () => {
-    //console.log("Here is the location:", location);
     const dispatcher = useDispatch();
-    // console.log("App - selectedMenu from store is " + selectedMenu);
     const [busy, setBusy] = useState({state: false, message: ""});
     const user = useSelector((state: AppState) => state.user);
     const { Content, Footer } = Layout;
@@ -44,11 +41,6 @@ const App = () => {
             dispatcher(stateActions.setMaxChaptersByBook(locMaxChaptersByBook.data));
             const allUsers = await memoryService.getAllUsers();
             dispatcher(stateActions.setAllUsers(allUsers.data));
-            // for (let key of Object.keys(Constants.translationLongNames)) {
-            //     console.log("Loading max verse by book and chapter for translation: " + key);
-            //     const maxVerseByBookChapter = await memoryService.getMaxVerseByBookChapter(key);
-            //     dispatcher(stateActions.setMaxVerseByBookChapter({translation: key, maxVerseByBookChapter: maxVerseByBookChapter.data}));
-            // }
             setBusy({state: false, message: ""});
         };
         callServer();
