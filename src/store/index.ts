@@ -20,7 +20,9 @@ const initialState: AppState = {
     filteredQuoteIds: [],
     currentSearchString: null,
     userPreferences: null,
-    maxVerseByBookChapter: {}
+    maxVerseByBookChapter: {},
+    currentQuotesIndex: 0,
+    editPassageActive: false
 } as AppState;
 
 const state = createSlice({
@@ -35,36 +37,25 @@ const state = createSlice({
             state.maxVerseByBookChapter[action.payload.translation] = action.payload.maxVerseByBookChapter;
         },
         setPracticeConfig(state, action) {
-            // console.log("setPracticeConfig (reducer).  Incoming action is:");
-            // console.log(action);
             state.practiceConfig = action.payload;
         },
         setMemPassageList(state, action) {
-            // console.log("setMemPassageList (reducer). Incoming action is:");
-            // console.log(action);
             state.memPassageList = action.payload;
         },
         setVersesForMemoryPassage(state, action) {
-            // console.log("setVersesForMemoryPassage (reducer). Incoming action is:");
-            // console.log(action);
             const updateVersesActionPayload: {index: number, verses: Verse[]} = action.payload;
             state.memPassageList[updateVersesActionPayload.index].verses = updateVersesActionPayload.verses;
         },
         setSelectedMenuToPracticeSetup(state) {
-            // console.log("setSelectedMenuToPracticeSetup (reducer)");
             state.selectedMenuKey = 2;
         },
         setSelectedMenuItem(state, action) {
-            // console.log("setSelectedMenuItem (reducer) - action is:");
-            // console.log(action);
             state.selectedMenuKey = action.payload;
         },
         setMemoryTextOverrides(state, action) {
             state.memTextOverrides = action.payload;
         },
         setChapterSelection(state, action) {
-            // console.log("setChapterSelection (reducer) - action payload is:");
-            // console.log(action.payload);
             state.chapterSelection = action.payload;
         },
         nextChapter(state) {
@@ -99,12 +90,9 @@ const state = createSlice({
             }
         },
         setVerseSelectionRequest(state, action) {
-            // console.log("setVersesForSelection (reducer) - here is the payload:");
-            // console.log(action.payload);
             state.verseSelectionRequest = action.payload;
         },
         setUser(state, action) {
-            // console.log("setUser (reducer) - action.payload: " + action.payload);
             state.user = action.payload;
         },
         setAllUsers(state, action) {
@@ -130,6 +118,12 @@ const state = createSlice({
         },
         setUserPrefs(state, action) {
             state.userPreferences = action.payload;
+        },
+        setCurrentQuotesIndex(state, action) {
+            state.currentQuotesIndex = action.payload;
+        },
+        setEditPassageActive(state, action) {
+            state.editPassageActive = action.payload;
         }
     }
 });

@@ -106,6 +106,10 @@ const BrowseQuotes = () => {
     }, [allUsers, user]);
 
     useEffect(() => {
+        dispatcher(stateActions.setCurrentQuotesIndex(currentIndex));
+    }, [currentIndex]);
+
+    useEffect(() => {
         if (startingQuote > 0 && allQuotes.length > 0 && !(filteredQuoteIds && filteredQuoteIds.length > 0)) {
             const currIndex = allQuotes.findIndex(qt => qt.objectionId === startingQuote);
             if (currIndex >= 0) {
@@ -113,13 +117,6 @@ const BrowseQuotes = () => {
             }
         }
     }, [allQuotes, startingQuote]);
-
-    useEffect(() => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-    }, [currentIndex]);
 
     const handleNext = () => {
         setCurrentIndex(prev => {
@@ -365,7 +362,7 @@ const BrowseQuotes = () => {
                     </SwitchTransition>
                 }
             </Swipe>
-            <Modal title="Edit Quote" visible={editQuoteVisible} onOk={handleUpdateQuote} onCancel={handleUpdateQuoteCancel}>
+            <Modal title="Edit Quote" open={editQuoteVisible} onOk={handleUpdateQuote} onCancel={handleUpdateQuoteCancel}>
                 <Row style={{marginBottom: "5px"}}>
                     <Col style={{width: "100%"}}>
                         <TextArea
@@ -381,7 +378,7 @@ const BrowseQuotes = () => {
                     </Col>
                 </Row>
             </Modal>
-            <Modal title="Send Quote" visible={sendQuoteVisible} onOk={handleOk} onCancel={handleCancel}>
+            <Modal title="Send Quote" open={sendQuoteVisible} onOk={handleOk} onCancel={handleCancel}>
                 {modalBusy.state && <Row justify="center"><SpinnerTimer message={modalBusy.message}/></Row>}
                 <Form
                     labelCol={{ span: 4 }}

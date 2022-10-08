@@ -22,4 +22,6 @@ export interface AppState {
     currentSearchString: string;
     userPreferences: any[];
     maxVerseByBookChapter: {[translation: string]: []};
+    currentQuotesIndex: number;
+    editPassageActive: boolean;
 }

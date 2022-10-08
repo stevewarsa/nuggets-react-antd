@@ -20,7 +20,7 @@ class MemoryService {
     }
 
     public updateLastViewed(userName: string, passageId: number, lastViewedNum: number, lastViewedString: string) {
-        var encodedLastViewedString = encodeURIComponent(lastViewedString);
+        let encodedLastViewedString = encodeURIComponent(lastViewedString);
         return MemoryService.buildAxios().get<string>("/bible-app/server/update_last_viewed.php?user=" + userName + "&passageId=" + passageId + "&lastViewedNum=" + lastViewedNum + "&lastViewedStr=" + encodedLastViewedString);
     }
 

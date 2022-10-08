@@ -8,7 +8,7 @@ import {PassageUtils} from "../helpers/passage-utils";
 import {notification, Button, Col, Dropdown, Menu, Popover, Row, Space} from "antd";
 import {
     ArrowLeftOutlined,
-    ArrowRightOutlined,
+    ArrowRightOutlined, ArrowUpOutlined,
     CheckSquareOutlined,
     CopyOutlined, EditOutlined,
     InfoCircleOutlined,
@@ -31,6 +31,7 @@ const Practice = () => {
     const practiceConfig = useSelector((state: AppState) => state.practiceConfig);
     const memTextOverrides = useSelector((state: AppState) => state.memTextOverrides);
     const user = useSelector((state: AppState) => state.user);
+    const editPassageActive = useSelector((state: AppState) => state.editPassageActive);
     const [busy, setBusy] = useState({state: false, message: ""});
     const [memPassageList, setMemPassageList] = useState<Passage[]>([]);
     const [currentIndex, setCurrentIndex] = useState(-1);
@@ -58,10 +59,7 @@ const Practice = () => {
                 message: "Calling server to get passage " + (currentIndex + 1) + " with passage id " +
                     currPassage.passageId + "..."
             });
-            // console.log("populateVerses - currPassage has no verses, so calling server to get verses");
             const locMemoryPassageData: any = await memoryService.getPassage(currPassage, user);
-            // console.log("populateVerses - back from getting passage text.  Here is the data returned:");
-            // console.log(locMemoryPassageData.data);
             if (copyToClipboard) {
                 const clipboardContent = PassageUtils.getPassageForClipboard(locMemoryPassageData.data, true);
                 if (StringUtils.isEmpty(clipboardContent)) {
@@ -76,13 +74,9 @@ const Practice = () => {
     }, [memTextOverrides, currentIndex, updatePassageInList, user]);
 
     const displayPassageOnScreen = useCallback(async () => {
-        // console.log("displayPassageOnScreen - psgList:");
-        // console.log(memPassageList);
         const currPassage = memPassageList && memPassageList.length > currentIndex ?
             memPassageList[currentIndex] :
             null;
-        // console.log("displayPassageOnScreen - currPassage:");
-        // console.log(currPassage);
         if (!currPassage || isNaN(currPassage.passageId) || !currPassage.translationName || !memTextOverrides) {
             if (!memTextOverrides) {
                 console.log("displayPassageOnScreen - currPassage (and memTextOverrides) not ready yet - returning");
@@ -108,14 +102,32 @@ const Practice = () => {
     useEffect(() => {
         (async () => {
             setBusy({state: true, message: "Loading memory passages from DB..."});
-            // console.log("Inside anonymous async function - calling memoryService.getMemoryPsgList()...");
-            // console.log("Inside call server - setting memPassageList - there are " + tempPassages.length + " passages returned...");
             setMemPassageList(await getMemPassages(user, true));
             setShowPsgRef(practiceConfig.practiceMode === PassageUtils.BY_REF);
             handleNext();
             setBusy({state: false, message: ""});
         })();
-    }, [practiceConfig, memTextOverrides, user]);
+    }, [practiceConfig]);
+
+    useEffect(() => {
+        console.log("The memTextOverrides has been updated and now has " + memTextOverrides.length + " total passages");
+    }, [memTextOverrides]);
+
+    useEffect(() => {
+        console.log("Edit passage active changed");
+        if (!editPassageActive) {
+            setEditing(editPassageActive);
+            // this means that the EditPassage component was signaling that it should be closed, therefore
+            // it would be wise to update the memory passages list, but keep the index the same
+            (async () => {
+                setBusy({state: true, message: "Loading memory passages from DB..."});
+                setMemPassageList(await getMemPassages(user, true));
+                // and go back to the first verse...
+                setCurrentIndex(0);
+                setBusy({state: false, message: ""});
+            })();
+        }
+    }, [editPassageActive]);
 
     const handlePrev = () => {
         setShowingQuestion(true);
@@ -124,7 +136,6 @@ const Practice = () => {
         setEditing(false);
     };
     const handleNext = () => {
-        // console.log("handleNext - incrementing current index (currently " + currentIndex + ")");
         setShowingQuestion(true);
         setShowPsgRef(practiceConfig.practiceMode === PassageUtils.BY_REF);
         setCurrentIndex(prev => prev === (memPassageList.length - 1) ? 0 : prev + 1);
@@ -137,12 +148,10 @@ const Practice = () => {
     };
 
     useEffect(() => {
-        // console.log("useEffect [showPsgRef] - calling displayPassageOnScreen (current showPsgRef = " + showPsgRef + ")");
         displayPassageOnScreen();
     }, [showPsgRef]);
 
     useEffect(() => {
-        // console.log("useEffect [currentIndex] (currentIndex = " + currentIndex + ")");
         const currPassage = memPassageList && memPassageList.length > currentIndex ?
             memPassageList[currentIndex] :
             null;
@@ -177,7 +186,6 @@ const Practice = () => {
             // copy
             let clipboardContent = PassageUtils.getPassageForClipboard(currPassage, true);
             if (StringUtils.isEmpty(clipboardContent)) {
-                // console.log("calling populateVerses()...");
                 await populateVerses(currPassage, true);
             } else {
                 notification.info({message: PassageUtils.copyPassageToClipboard(currPassage, true) + " copied!", placement: "bottomRight"});
@@ -191,6 +199,7 @@ const Practice = () => {
             await populateVerses(currPassage, false);
             setBusy({state: false, message: ""});
             setEditing(true);
+            dispatcher(stateActions.setEditPassageActive(true));
         }
     };
 
@@ -200,7 +209,16 @@ const Practice = () => {
             <Row justify="center">
                 <h1>Memory Verses</h1>
             </Row>
-            {editing && <EditPassage passage={memPassageList[currentIndex]} />}
+            {editing &&
+                <>
+                <EditPassage passage={memPassageList[currentIndex]} />
+                    <Row justify="center">
+                        <Col>
+                            <Button icon={<ArrowUpOutlined />} onClick={() => setEditing(false)}/>
+                        </Col>
+                    </Row>
+                </>
+            }
             <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
                 <Row style={{marginBottom: "10px"}} justify="center" align="middle">
                     <Col>{currentIndex + 1} of {memPassageList.length}</Col>
@@ -217,7 +235,7 @@ const Practice = () => {
                             }
                             title="Additional Info"
                             trigger="click"
-                            visible={infoVisible}
+                            open={infoVisible}
                         >
                             <Button icon={<InfoCircleOutlined />} onClick={() => setInfoVisible(true)}/>
                         </Popover>

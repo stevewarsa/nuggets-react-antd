@@ -32,6 +32,7 @@ const App = () => {
     const dispatcher = useDispatch();
     const [busy, setBusy] = useState({state: false, message: ""});
     const user = useSelector((state: AppState) => state.user);
+    const currentQuotesIndex = useSelector((state: AppState) => state.currentQuotesIndex);
     const { Content, Footer } = Layout;
 
     useEffect(() => {
@@ -45,6 +46,14 @@ const App = () => {
         };
         callServer();
     }, [dispatcher]);
+
+    useEffect(() => {
+        console.log("App.useEffect[currentQuotesIndex=" + currentQuotesIndex + "] - scrolling to top...");
+        document.body.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }, [currentQuotesIndex]);
 
     if (busy.state) {
         return <SpinnerTimer message={busy.message} />;
