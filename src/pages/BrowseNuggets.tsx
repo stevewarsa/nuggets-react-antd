@@ -228,8 +228,8 @@ const BrowseNuggets = () => {
                     </Space>
                 </Row>
                 {selectedTopic && selectedTopic !== -1 && topicList.length > 0 &&
-                    <Row>
-                        <Col><span style={{fontWeight: "bold"}}>Filtered Topic:</span> {topicList.find(tpc => tpc.id === selectedTopic).name}</Col>
+                    <Row justify="center">
+                        <Col>(<span style={{fontWeight: "bold"}}>Filtered Topic:</span> {topicList.find(tpc => tpc.id === selectedTopic).name})</Col>
                     </Row>
                 }
                 {currentPassage && (

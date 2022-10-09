@@ -354,7 +354,7 @@ const BrowseQuotes = () => {
                             <Row key={"filtered-quotes-" + currentIndex}>
                                 <Col span={24}>
                                     <p
-                                        style={{marginTop: "10px"}}
+                                        style={{marginTop: "10px", overflow: "hidden"}}
                                         className="nugget-view"
                                         dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(StringUtils.isEmpty(searchString) ? filteredQuotes[currentIndex].answer : PassageUtils.updateAllMatches(searchString, filteredQuotes[currentIndex].answer))}}/>
                                 </Col>
