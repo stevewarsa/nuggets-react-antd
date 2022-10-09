@@ -48,11 +48,9 @@ const App = () => {
     }, [dispatcher]);
 
     useEffect(() => {
-        console.log("App.useEffect[currentQuotesIndex=" + currentQuotesIndex + "] - scrolling to top...");
-        document.body.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
+        const currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
+        console.log("App.useEffect[currentQuotesIndex=" + currentQuotesIndex + "] current scrollTop=" + currentScroll + " - scrolling to top...");
+        document.documentElement.scrollTop = 0;
     }, [currentQuotesIndex]);
 
     if (busy.state) {
