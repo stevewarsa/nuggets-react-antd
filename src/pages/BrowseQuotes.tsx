@@ -114,6 +114,7 @@ const BrowseQuotes = () => {
             const currIndex = allQuotes.findIndex(qt => qt.objectionId === startingQuote);
             if (currIndex >= 0) {
                 setCurrentIndex(currIndex);
+                dispatcher(stateActions.setStartingQuote(-1));
             }
         }
     }, [allQuotes, startingQuote]);
