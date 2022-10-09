@@ -26,15 +26,26 @@ const SelectChapter = () => {
         }
     }, [prefs]);
 
-    const handleBookChange = (value) => {
-        // console.log(`selected book ${value}`);
-        setBook(value);
-        const maxChapter = maxChaptersByBook.filter(m => m.bookName === value)[0].maxChapter;
+    // no dependencies - run this one time at the start-up of this component
+    useEffect(() => {
+        if (book !== "N/A") {
+            populateChapters(book);
+        }
+    }, []);
+
+    const populateChapters = (selectedBookName) => {
+        const maxChapter = maxChaptersByBook.filter(m => m.bookName === selectedBookName)[0].maxChapter;
         if (maxChapter > 0) {
             let chapters = Array.from({length: maxChapter}, (e, i) => i + 1);
             setBookChapters(chapters);
             setChapter(1);
         }
+    }
+
+    const handleBookChange = (value) => {
+        // console.log(`selected book ${value}`);
+        setBook(value);
+        populateChapters(value);
     };
 
     const handleChapterChange = (value) => {
