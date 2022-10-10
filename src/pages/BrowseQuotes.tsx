@@ -142,33 +142,41 @@ const BrowseQuotes = () => {
     };
 
     const handleMenuClick = ({key}) => {
-        if (key === "1") {
+        if (key === "copy") {
             // copy
-            let clipboardContent = filteredQuotes ? filteredQuotes[currentIndex].answer : allQuotes[currentIndex].answer;
+            let clipboardContent = getQuoteText();
             if (!StringUtils.isEmpty(clipboardContent)) {
                 copy(clipboardContent);
                 notification.info({message: "Quote copied!", placement: "bottomRight"});
             } else {
                 notification.warning({message: "Quote is empty - not copied!", placement: "bottomRight"});
             }
-        } else if (key === "2") {
-            let quoteText = filteredQuotes && filteredQuotes.length > currentIndex ? filteredQuotes[currentIndex].answer : "";
-            if (StringUtils.isEmpty(quoteText)) {
-                quoteText = allQuotes && allQuotes.length > currentIndex ? allQuotes[currentIndex].answer : "";
-            }
-            setQuoteForSend(quoteText);
-            setSendQuoteVisible(true);
-        } else if (key === "3") {
-            let quoteText = filteredQuotes && filteredQuotes.length > currentIndex ? filteredQuotes[currentIndex].answer : "";
-            if (StringUtils.isEmpty(quoteText)) {
-                quoteText = allQuotes && allQuotes.length > currentIndex ? allQuotes[currentIndex].answer : "";
-                setCurrentlyEditingQuoteObj(allQuotes[currentIndex]);
+        } else if (key === "send") {
+            let quoteText = getQuoteText();
+            if (!StringUtils.isEmpty(quoteText)) {
+                setQuoteForSend(quoteText);
+                setSendQuoteVisible(true);
             } else {
-                setCurrentlyEditingQuoteObj(filteredQuotes[currentIndex]);
+                notification.warning({message: "Unable to load quote text to send!"});
             }
-            setQuoteForEdit(quoteText);
-            setEditQuoteVisible(true);
+        } else if (key === "edit") {
+            let quoteText = getQuoteText();
+            if (!StringUtils.isEmpty(quoteText)) {
+                setCurrentlyEditingQuoteObj(allQuotes[currentIndex]);
+                setQuoteForEdit(quoteText);
+                setEditQuoteVisible(true);
+            } else {
+                notification.warning({message: "Unable to load quote text for editing!"});
+            }
         }
+    };
+
+    const getQuoteText = () => {
+        let quoteText = filteredQuotes && filteredQuotes.length > currentIndex ? filteredQuotes[currentIndex].answer : "";
+        if (StringUtils.isEmpty(quoteText)) {
+            quoteText = allQuotes && allQuotes.length > currentIndex ? allQuotes[currentIndex].answer : "";
+        }
+        return quoteText;
     };
 
     const handleSearch = () => {
@@ -300,13 +308,13 @@ const BrowseQuotes = () => {
                         <Col span={6}>
                             <Dropdown placement="bottomRight" trigger={["click"]} overlay={
                                 <Menu onClick={handleMenuClick}>
-                                    <Menu.Item key="1" icon={<CopyOutlined/>}>
+                                    <Menu.Item key="copy" icon={<CopyOutlined/>}>
                                         Copy
                                     </Menu.Item>
-                                    <Menu.Item key="2" icon={<MailOutlined />}>
+                                    <Menu.Item key="send" icon={<MailOutlined />}>
                                         Send Quote...
                                     </Menu.Item>
-                                    <Menu.Item key="3" icon={<EditOutlined />}>
+                                    <Menu.Item key="edit" icon={<EditOutlined />}>
                                         Edit Quote...
                                     </Menu.Item>
                                 </Menu>
