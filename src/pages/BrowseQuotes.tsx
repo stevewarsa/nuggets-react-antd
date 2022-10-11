@@ -72,14 +72,14 @@ const BrowseQuotes = () => {
         const callServer = async () => {
             setBusy({state: true, message: "Retrieving quotes from server..."});
             const quoteListResponse = await memoryService.getQuoteList(user);
-            const quotes: Quote[] = quoteListResponse.data.filter(({objectionId, answer}, index, a) =>
-                a.findIndex(e => objectionId === e.objectionId && answer === e.answer) === index)
+            const quotes: Quote[] = quoteListResponse.data.filter(({quoteId, quoteTx}, index, a) =>
+                a.findIndex(e => quoteId === e.quoteId && quoteTx === e.quoteTx) === index)
                 .filter(q => StringUtils.isEmpty(q.approved) || q.approved === "Y");
-            const dedupedQuotes = PassageUtils.removeDups(quotes, "objectionId");
+            const dedupedQuotes = PassageUtils.removeDups(quotes, "quoteId");
             PassageUtils.shuffleArray(dedupedQuotes);
             setAllQuotes(dedupedQuotes);
             if (filteredQuoteIds && filteredQuoteIds.length > 0) {
-                setFilteredQuotes(dedupedQuotes.filter(qt => filteredQuoteIds.includes(qt.objectionId)));
+                setFilteredQuotes(dedupedQuotes.filter(qt => filteredQuoteIds.includes(qt.quoteId)));
                 setCurrentIndex(0);
             }
             if (user) {
@@ -111,7 +111,7 @@ const BrowseQuotes = () => {
 
     useEffect(() => {
         if (startingQuote > 0 && allQuotes.length > 0 && !(filteredQuoteIds && filteredQuoteIds.length > 0)) {
-            const currIndex = allQuotes.findIndex(qt => qt.objectionId === startingQuote);
+            const currIndex = allQuotes.findIndex(qt => qt.quoteId === startingQuote);
             if (currIndex >= 0) {
                 setCurrentIndex(currIndex);
                 dispatcher(stateActions.setStartingQuote(-1));
@@ -172,9 +172,9 @@ const BrowseQuotes = () => {
     };
 
     const getQuoteText = () => {
-        let quoteText = filteredQuotes && filteredQuotes.length > currentIndex ? filteredQuotes[currentIndex].answer : "";
+        let quoteText = filteredQuotes && filteredQuotes.length > currentIndex ? filteredQuotes[currentIndex].quoteTx : "";
         if (StringUtils.isEmpty(quoteText)) {
-            quoteText = allQuotes && allQuotes.length > currentIndex ? allQuotes[currentIndex].answer : "";
+            quoteText = allQuotes && allQuotes.length > currentIndex ? allQuotes[currentIndex].quoteTx : "";
         }
         return quoteText;
     };
@@ -244,21 +244,21 @@ const BrowseQuotes = () => {
 
     const handleUpdateQuote = async () => {
         setBusy({state: true, message: "Updating quote..."});
-        const locQuote = {...currentlyEditingQuoteObj, answer: quoteForEdit};
+        const locQuote = {...currentlyEditingQuoteObj, quoteTx: quoteForEdit};
         console.log("Here is the updated quote:", locQuote);
         const updateQuoteResponse = await memoryService.updateQuote(locQuote, user);
         if (updateQuoteResponse.data === "success") {
             setAllQuotes(prevState => {
                 const locAllQuotes = [...prevState];
-                const editedQuote = locAllQuotes.find(qt => qt.objectionId === locQuote.objectionId);
-                editedQuote.answer = locQuote.answer;
+                const editedQuote = locAllQuotes.find(qt => qt.quoteId === locQuote.quoteId);
+                editedQuote.quoteTx = locQuote.quoteTx;
                 return locAllQuotes;
             });
             if (filteredQuotes && filteredQuotes.length > 0) {
                 setFilteredQuotes(prevState => {
                     const locFilteredQuotes = [...prevState];
-                    const editedQuote = locFilteredQuotes.find(qt => qt.objectionId === locQuote.objectionId);
-                    editedQuote.answer = locQuote.answer;
+                    const editedQuote = locFilteredQuotes.find(qt => qt.quoteId === locQuote.quoteId);
+                    editedQuote.quoteTx = locQuote.quoteTx;
                     return locFilteredQuotes;
                 });
             }
@@ -330,7 +330,7 @@ const BrowseQuotes = () => {
                         </Col>
                     </Space>
                 </Row>
-                {!filteredQuotes && allQuotes && allQuotes.length > currentIndex && !StringUtils.isEmpty(allQuotes[currentIndex].answer) &&
+                {!filteredQuotes && allQuotes && allQuotes.length > currentIndex && !StringUtils.isEmpty(allQuotes[currentIndex].quoteTx) &&
                     <SwitchTransition mode="out-in">
                         <CSSTransition
                             classNames="fade"
@@ -344,13 +344,13 @@ const BrowseQuotes = () => {
                                     <p
                                         style={{marginTop: "10px"}}
                                         className="nugget-view"
-                                        dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(allQuotes[currentIndex].answer)}}/>
+                                        dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(allQuotes[currentIndex].quoteTx)}}/>
                                 </Col>
                             </Row>
                         </CSSTransition>
                     </SwitchTransition>
                 }
-                {filteredQuotes && filteredQuotes.length > currentIndex && !StringUtils.isEmpty(filteredQuotes[currentIndex].answer) &&
+                {filteredQuotes && filteredQuotes.length > currentIndex && !StringUtils.isEmpty(filteredQuotes[currentIndex].quoteTx) &&
                     <SwitchTransition mode="out-in">
                         <CSSTransition
                             classNames="fade"
@@ -364,7 +364,7 @@ const BrowseQuotes = () => {
                                     <p
                                         style={{marginTop: "10px", overflow: "hidden"}}
                                         className="nugget-view"
-                                        dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(StringUtils.isEmpty(searchString) ? filteredQuotes[currentIndex].answer : PassageUtils.updateAllMatches(searchString, filteredQuotes[currentIndex].answer))}}/>
+                                        dangerouslySetInnerHTML={{__html: PassageUtils.updateLineFeedsWithBr(StringUtils.isEmpty(searchString) ? filteredQuotes[currentIndex].quoteTx : PassageUtils.updateAllMatches(searchString, filteredQuotes[currentIndex].quoteTx))}}/>
                                 </Col>
                             </Row>
                         </CSSTransition>
@@ -439,9 +439,9 @@ export const doFuzzySearch = (searchCriteria: string, quotes: Quote[]): QuoteMat
     const words = searchCriteria.split(" ").map(word => word.toUpperCase().trim());
     return quotes.map(qt => {
         let quoteMatch: QuoteMatch = {annotatedText: null, originalQuote: qt} as QuoteMatch;
-        const quoteText = qt.answer.toUpperCase();
+        const quoteText = qt.quoteTx.toUpperCase();
         if (quoteText.includes(searchCriteria.toUpperCase().trim())) {
-            quoteMatch.annotatedText = PassageUtils.updateAllMatches(searchCriteria, qt.answer);
+            quoteMatch.annotatedText = PassageUtils.updateAllMatches(searchCriteria, qt.quoteTx);
         } else {
             const quoteWords = quoteText.split(" ").map(word => word.trim());
             let foundWords: string[] = [];
@@ -463,7 +463,7 @@ export const doFuzzySearch = (searchCriteria: string, quotes: Quote[]): QuoteMat
                 }
             }
             if (foundWords.length > 0 && allWordsMatch) {
-                quoteMatch.annotatedText = qt.answer;
+                quoteMatch.annotatedText = qt.quoteTx;
                 for (let foundWord of foundWords) {
                     quoteMatch.annotatedText = PassageUtils.updateAllMatches(foundWord, quoteMatch.annotatedText);
                 }

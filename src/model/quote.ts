@@ -1,10 +1,7 @@
 export interface Quote {
-  objectionId: number;
-  prompt: string;
-  answer: string;
+  quoteId: number;
+  quoteTx: string;
   approved: string;
   fromUser: string;
   sourceId: number;
-  category: string;
-  answerId: number;
 }

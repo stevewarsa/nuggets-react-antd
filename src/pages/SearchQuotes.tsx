@@ -33,20 +33,20 @@ const SearchQuotes = () => {
         const callServer = async () => {
             setBusy({state: true, message: "Retrieving quotes from server..."});
             const quoteListResponse = await memoryService.getQuoteList(user);
-            const quotes: Quote[] = quoteListResponse.data.filter(({objectionId, answer}, index, a) =>
-                a.findIndex(e => objectionId === e.objectionId && answer === e.answer) === index)
+            const quotes: Quote[] = quoteListResponse.data.filter(({quoteId, quoteTx}, index, a) =>
+                a.findIndex(e => quoteId === e.quoteId && quoteTx === e.quoteTx) === index)
                 .filter(q => StringUtils.isEmpty(q.approved) || q.approved === "Y");
-            const newArray = PassageUtils.removeDups(quotes, "objectionId");
+            const newArray = PassageUtils.removeDups(quotes, "quoteId");
             setAllQuotes(newArray);
             setFilteredQuotes(newArray.map(q => {
-                return {originalQuote: q, annotatedText: q.answer} as QuoteMatch;
+                return {originalQuote: q, annotatedText: q.quoteTx} as QuoteMatch;
             }));
             setBusy({state: false, message: ""});
         };
         const processExistingQuotes = async () => {
             setAllQuotes(existingQuoteList);
             await setFilteredQuotes(existingQuoteList.map(q => {
-                return {originalQuote: q, annotatedText: q.answer} as QuoteMatch;
+                return {originalQuote: q, annotatedText: q.quoteTx} as QuoteMatch;
             }));
         };
         if (!existingQuoteList || existingQuoteList.length === 0) {
@@ -58,7 +58,7 @@ const SearchQuotes = () => {
 
     const handleFilterToCurrent = () => {
         dispatcher(stateActions.setCurrentSearchString(searchString));
-        dispatcher(stateActions.setFilteredQuoteIds(filteredQuotes.map(qt => qt.originalQuote.objectionId)));
+        dispatcher(stateActions.setFilteredQuoteIds(filteredQuotes.map(qt => qt.originalQuote.quoteId)));
         navigate("/browseQuotes");
     };
 
@@ -77,7 +77,7 @@ const SearchQuotes = () => {
     const handleFilterChanged = ev => {
         if (ev?.api?.rowModel?.rowsToDisplay) {
             const quotes = ev.api.rowModel.rowsToDisplay.map(row => {
-                return {originalQuote: row.data, annotatedText: row.data.answer} as QuoteMatch;
+                return {originalQuote: row.data, annotatedText: row.data.quoteTx} as QuoteMatch;
             });
             setFilteredQuotes(quotes);
         } else {
@@ -85,8 +85,8 @@ const SearchQuotes = () => {
         }
     };
 
-    const goTo = (objectionId: number) => {
-        dispatcher(stateActions.setStartingQuote(objectionId));
+    const goTo = (quoteId: number) => {
+        dispatcher(stateActions.setStartingQuote(quoteId));
         navigate("/browseQuotes");
     };
     const onPaginationChanged = (evt) => {
@@ -174,7 +174,7 @@ const SearchQuotes = () => {
                                 getRowStyle: () => {
                                     return {borderWidth: "thick"};
                                 },
-                                onCellClicked: (event: CellClickedEvent) => goTo((event.data as Quote).objectionId)
+                                onCellClicked: (event: CellClickedEvent) => goTo((event.data as Quote).quoteId)
                             }}
                             onGridReady={onGridReady}
                             onPaginationChanged={onPaginationChanged}
@@ -194,7 +194,7 @@ const SearchQuotes = () => {
                                 autoHeight={true}
                                 cellRenderer="quoteCellRenderer"
                                 cellRendererParams={{"searchString": searchString}}
-                                field="answer"
+                                field="quoteTx"
                                 headerName="Quote Text"/>
                         </AgGridReact>
                     </div>
