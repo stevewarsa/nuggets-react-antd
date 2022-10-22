@@ -84,6 +84,14 @@ class MemoryService {
         return MemoryService.buildAxios().get<number>("/bible-app/server/add_memory_passage.php?user=" + userName + "&translation=" + passage.translationId + "&book=" + passage.bookName + "&chapter=" + passage.chapter + "&start=" + passage.startVerse + "&end=" + passage.endVerse + "&queue=N");
     }
 
+    public addQuoteTopic(topic: {id: number, name: string}, quoteId: number, userName: string) {
+        return MemoryService.buildAxios().post<{quoteId: number, topic: {id: number, name: string}, message: string}>("/bible-app/server/add_quote_topic.php", {user: userName, topic: topic, quoteId: quoteId});
+    }
+
+    public removeQuoteTopic(topic: {id: number, name: string}, quoteId: number, userName: string) {
+        return MemoryService.buildAxios().post<{quoteId: number, topic: {id: number, name: string}, message: string}>("/bible-app/server/remove_quote_topic.php", {user: userName, topic: topic, quoteId: quoteId});
+    }
+
     public addEmailMapping(param: any) {
         return MemoryService.buildAxios().post<string>("/bible-app/serveadd_email_mapping.php", param);
     }

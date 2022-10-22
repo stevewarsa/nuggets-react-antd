@@ -27,10 +27,12 @@ import MyMemPsgList from "./pages/MyMemPsgList";
 import SpinnerTimer from "./components/SpinnerTimer";
 import TopicList from "./pages/TopicList";
 import TopNav from "./components/TopNav";
+import useMemoryPassages from "./hooks/use-memory-passages";
 
 const App = () => {
     const dispatcher = useDispatch();
     const [busy, setBusy] = useState({state: false, message: ""});
+    const {getTopicList} = useMemoryPassages();
     const user = useSelector((state: AppState) => state.user);
     const currentQuotesIndex = useSelector((state: AppState) => state.currentQuotesIndex);
     const { Content, Footer } = Layout;
@@ -45,11 +47,20 @@ const App = () => {
             setBusy({state: false, message: ""});
         };
         callServer();
-    }, [dispatcher]);
+    }, []);
 
     useEffect(() => {
-        const currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
-        console.log("App.useEffect[currentQuotesIndex=" + currentQuotesIndex + "] current scrollTop=" + currentScroll + " - scrolling to top...");
+        if (!StringUtils.isEmpty(user)) {
+            (async () => {
+                setBusy({state: true, message: "Loading topic list from DB..."});
+                const topics: { id: number, name: string }[] = await getTopicList(user);
+                dispatcher(stateActions.setTopicList(topics));
+                setBusy({state: false, message: ""});
+            })();
+        }
+    }, [user]);
+
+    useEffect(() => {
         document.documentElement.scrollTop = 0;
     }, [currentQuotesIndex]);
 

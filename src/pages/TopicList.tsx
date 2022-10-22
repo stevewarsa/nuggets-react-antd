@@ -9,6 +9,7 @@ import {useNavigate} from "react-router-dom";
 
 const TopicList = () => {
     const user = useSelector((state: AppState) => state.user);
+    const allTopics: {id: number, name: string}[] = useSelector((state: AppState) => state.topicList);
     const dispatcher = useDispatch();
     const navigate = useNavigate();
     const {getTopicList} = useMemoryPassages();
@@ -18,14 +19,9 @@ const TopicList = () => {
     const [filter, setFilter] = useState<string>(undefined);
 
     useEffect(() => {
-        (async () => {
-            setBusy({state: true, message: "Loading topic list from DB..."});
-            const topics: {id: number, name: string}[] = await getTopicList(user);
-            setTopicList(topics);
-            setFilteredTopicList(topics);
-            setBusy({state: false, message: ""});
-        })();
-    }, [user]);
+        setTopicList(allTopics);
+        setFilteredTopicList(allTopics);
+    }, [allTopics]);
 
     const handleTopicClick = (topic: { id: number; name: string }) => {
         console.log("User clicked on topic: " + topic.name + " (id=" + topic.id + ")");

@@ -4,6 +4,7 @@ import {Verse} from "../model/verse";
 import {Constants} from "../model/constants";
 import {PassageUtils} from "../helpers/passage-utils";
 import {StringUtils} from "../helpers/string.utils";
+import {Quote} from "../model/quote";
 
 const initialState: AppState = {
     practiceConfig: {},
@@ -17,12 +18,15 @@ const initialState: AppState = {
     allUsers: [],
     startingQuote: -1,
     startingPassageId: -1,
-    filteredQuoteIds: [],
     currentSearchString: null,
     userPreferences: null,
     maxVerseByBookChapter: {},
     currentQuotesIndex: 0,
-    editPassageActive: false
+    editPassageActive: false,
+    topicList: [],
+    allQuotes: [],
+    filteredQuotes: [],
+    currentQuoteTagsFiltered: []
 } as AppState;
 
 const state = createSlice({
@@ -107,12 +111,6 @@ const state = createSlice({
         setIncomingTopic(state, action) {
             state.incomingTopic = action.payload;
         },
-        setFilteredQuoteIds(state, action) {
-            state.filteredQuoteIds = action.payload;
-        },
-        setExistingQuoteList(state, action) {
-            state.existingQuoteList = action.payload;
-        },
         setCurrentSearchString(state, action) {
             state.currentSearchString = action.payload;
         },
@@ -124,6 +122,48 @@ const state = createSlice({
         },
         setEditPassageActive(state, action) {
             state.editPassageActive = action.payload;
+        },
+        setTopicList(state, action) {
+            state.topicList = action.payload;
+        },
+        setAllQuotes(state, action) {
+            state.allQuotes = action.payload;
+            state.filteredQuotes = action.payload;
+        },
+        setFilteredQuotes(state, action) {
+            state.filteredQuotes = action.payload;
+        },
+        filterByTags(state, action) {
+            const filteredTagIds: number[] = action.payload.map(tg => parseInt(tg));
+            const locFilterQuotes = state.filteredQuotes.filter(qt => {
+                const matchingTags = qt.tagIds.filter(tg => filteredTagIds.includes(tg));
+                // all tags have to match for this to be considered a match...
+                return (matchingTags.length === filteredTagIds.length);
+            });
+            if (locFilterQuotes.length > 0) {
+                state.filteredQuotes = locFilterQuotes;
+            }
+        },
+        updateQuoteInList(state, action) {
+            const locQuote: Quote = action.payload;
+            const editedQuote: Quote = state.allQuotes.find(qt => qt.quoteId === locQuote.quoteId);
+            if (editedQuote) {
+                editedQuote.quoteTx = locQuote.quoteTx;
+                editedQuote.tags = locQuote.tags;
+                editedQuote.tagIds = locQuote.tagIds;
+            }
+            if (state.filteredQuotes && state.filteredQuotes.length > 0) {
+                const editedFilteredQuote: Quote = state.filteredQuotes.find(qt => qt.quoteId === locQuote.quoteId);
+                if (editedFilteredQuote) {
+                    editedFilteredQuote.quoteTx = locQuote.quoteTx;
+                    editedFilteredQuote.tags = locQuote.tags;
+                    editedFilteredQuote.tagIds = locQuote.tagIds;
+                }
+            }
+        },
+        addNewTag(state, action) {
+            const tmpTopicList = [...state.topicList, action.payload];
+            state.topicList = tmpTopicList.sort((a, b) => a.name.localeCompare(b.name));
         }
     }
 });

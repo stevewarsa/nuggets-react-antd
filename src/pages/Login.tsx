@@ -8,7 +8,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import memoryService from "../services/memory-service";
 import {AppState} from "../model/AppState";
 import SpinnerTimer from "../components/SpinnerTimer";
-import {useIsMounted} from "../helpers/is-mounted";
+import {useIsMounted} from "../hooks/is-mounted";
 
 const Login = () => {
     const dispatcher = useDispatch();

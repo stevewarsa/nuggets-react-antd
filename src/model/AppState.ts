@@ -17,11 +17,13 @@ export interface AppState {
     startingQuote: number;
     startingPassageId: number;
     incomingTopic: { id: number; name: string };
-    filteredQuoteIds: number[];
-    existingQuoteList: Quote[];
+    topicList: { id: number; name: string }[];
+    allQuotes: Quote[];
+    filteredQuotes: Quote[];
     currentSearchString: string;
     userPreferences: any[];
     maxVerseByBookChapter: {[translation: string]: []};
     currentQuotesIndex: number;
     editPassageActive: boolean;
+    currentQuoteTagsFiltered: string[];
 }

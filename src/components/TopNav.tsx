@@ -7,59 +7,63 @@ import {stateActions} from "../store";
 import {MenuOutlined} from "@ant-design/icons";
 import styles from "./TopNav.module.css";
 
+const menuItems: MenuProps['items'] = [
+    {
+        key: 1,
+        label: "Main Menu"
+    },
+    {
+        key: 2,
+        label: "Practice Setup"
+    },
+    {
+        key: 10,
+        label: "Bible Reading Plan"
+    },
+    {
+        key: 11,
+        label: "Browse Quotes"
+    },
+    {
+        key: 3,
+        label: "Add Quote"
+    },
+    {
+        key: 4,
+        label: "My Mem Psg List"
+    },
+    {
+        key: 6,
+        label: "Bible Search"
+    },
+    {
+        key: 7,
+        label: "View Chapter"
+    },
+    {
+        key: 8,
+        label: "About"
+    }
+];
+
+const menuPaths: {[key: number]: string} = {
+    1: "/mainMenu",
+    2: "/practiceSetup",
+    3: "/addQuote",
+    4: "/myMemPsgList",
+    6: "/bibleSearch",
+    7: "/selectChapter",
+    8: "/about",
+    10: "/bibleReadingPlan",
+    11: "/browseQuotes"
+};
+
 const TopNav = () => {
     const navigate = useNavigate();
-    //console.log("Here is the location:", location);
     const dispatcher = useDispatch();
     const [current, setCurrent] = useState("1");
     const [state, setState] = useState({visible:false});
-    const { Header } = Layout;
-
-    const menuItems: MenuProps['items'] = [
-        {
-            key: 1,
-            label: "Main Menu"
-        },
-        {
-            key: 2,
-            label: "Practice Setup"
-        },
-        {
-            key: 10,
-            label: "Bible Reading Plan"
-        },
-        {
-            key: 3,
-            label: "Add Quote"
-        },
-        {
-            key: 4,
-            label: "My Mem Psg List"
-        },
-        {
-            key: 6,
-            label: "Bible Search"
-        },
-        {
-            key: 7,
-            label: "View Chapter"
-        },
-        {
-            key: 8,
-            label: "About"
-        }
-    ];
-
-    const menuPaths: {[key: number]: string} = {
-        1: "/mainMenu",
-        2: "/practiceSetup",
-        3: "/addQuote",
-        4: "/myMemPsgList",
-        6: "/bibleSearch",
-        7: "/selectChapter",
-        8: "/about",
-        10: "/bibleReadingPlan"
-    };
+    const {Header} = Layout;
 
     const handleMenuItem = item => {
         setCurrent(item.key);

@@ -4,4 +4,6 @@ export interface Quote {
   approved: string;
   fromUser: string;
   sourceId: number;
+  tags: {id: number; name: string}[];
+  tagIds: number[];
 }

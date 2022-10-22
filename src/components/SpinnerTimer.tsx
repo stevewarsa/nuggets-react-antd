@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {useIsMounted} from "../helpers/is-mounted";
+import {useIsMounted} from "../hooks/is-mounted";
 import {Spin} from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 

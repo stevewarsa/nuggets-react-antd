@@ -1,64 +1,43 @@
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import {useEffect, useRef, useState} from "react";
-import memoryService from "../services/memory-service";
 import {Quote} from "../model/quote";
-import {StringUtils} from "../helpers/string.utils";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {Button, Col, Input, Row} from "antd";
 import {QuoteMatch} from "../model/quote-match";
 import {stateActions} from "../store";
 import {useNavigate} from "react-router-dom";
-import {PassageUtils} from "../helpers/passage-utils";
 import {AgGridColumn, AgGridReact} from "ag-grid-react";
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {CellClickedEvent} from "ag-grid-community";
 import {DoubleLeftOutlined, DoubleRightOutlined, LeftOutlined, RightOutlined} from "@ant-design/icons";
 import QuoteCellRenderer from "../renderers/QuoteCellRenderer";
+import useLoadQuotes from "../hooks/use-load-quotes";
 
 const SearchQuotes = () => {
     const navigate = useNavigate();
     const dispatcher = useDispatch();
+    const {doQuotesLoad} = useLoadQuotes();
     const user = useSelector((state: AppState) => state.user);
-    const existingQuoteList = useSelector((state: AppState) => state.existingQuoteList);
+    const allQuotes = useSelector((state: AppState) => state.allQuotes);
     const [busy, setBusy] = useState({state: false, message: ""});
     const [searchString, setSearchString] = useState("");
-    const [allQuotes, setAllQuotes] = useState<Quote[]>([]);
     const [filteredQuotes, setFilteredQuotes] = useState<QuoteMatch[]>(null);
     const [paginationInfo, setPaginationInfo] = useState(null);
     const gridApiRef = useRef<any>(null); // <= defined useRef for gridApi
 
     useEffect(() => {
-        const callServer = async () => {
+        if (!allQuotes || allQuotes.length === 0) {
             setBusy({state: true, message: "Retrieving quotes from server..."});
-            const quoteListResponse = await memoryService.getQuoteList(user);
-            const quotes: Quote[] = quoteListResponse.data.filter(({quoteId, quoteTx}, index, a) =>
-                a.findIndex(e => quoteId === e.quoteId && quoteTx === e.quoteTx) === index)
-                .filter(q => StringUtils.isEmpty(q.approved) || q.approved === "Y");
-            const newArray = PassageUtils.removeDups(quotes, "quoteId");
-            setAllQuotes(newArray);
-            setFilteredQuotes(newArray.map(q => {
-                return {originalQuote: q, annotatedText: q.quoteTx} as QuoteMatch;
-            }));
+            doQuotesLoad();
             setBusy({state: false, message: ""});
-        };
-        const processExistingQuotes = async () => {
-            setAllQuotes(existingQuoteList);
-            await setFilteredQuotes(existingQuoteList.map(q => {
-                return {originalQuote: q, annotatedText: q.quoteTx} as QuoteMatch;
-            }));
-        };
-        if (!existingQuoteList || existingQuoteList.length === 0) {
-            callServer();
-        } else {
-            processExistingQuotes();
         }
-    }, [user, existingQuoteList]);
+    }, [user]);
 
     const handleFilterToCurrent = () => {
         dispatcher(stateActions.setCurrentSearchString(searchString));
-        dispatcher(stateActions.setFilteredQuoteIds(filteredQuotes.map(qt => qt.originalQuote.quoteId)));
+        dispatcher(stateActions.setFilteredQuotes(filteredQuotes.map(qt => qt.originalQuote)));
         navigate("/browseQuotes");
     };
 

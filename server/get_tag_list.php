@@ -1,6 +1,6 @@
-<?php /** @noinspection SqlNoDataSourceInspection */
+<?php /** @noinspection SqlDialectInspection */
+/** @noinspection SqlNoDataSourceInspection */
 /** @noinspection SqlResolve */
-//header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json; charset=utf8');
 include_once('./Tag.php');
 include_once('./Passage.php');
@@ -37,4 +37,4 @@ if (isset($_REQUEST['tagId'])) {
     print_r(json_encode($arrayName));
 }
 
-?>
+

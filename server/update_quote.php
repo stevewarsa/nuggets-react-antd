@@ -27,4 +27,4 @@ try {
   error_log("An error occurred while updating the quote: " . $e->getMessage());
   print_r(json_encode("error"));
 }
-?>
+
