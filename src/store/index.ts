@@ -26,7 +26,8 @@ const initialState: AppState = {
     topicList: [],
     allQuotes: [],
     filteredQuotes: [],
-    currentQuoteTagsFiltered: []
+    currentQuoteTagsFiltered: [],
+    recentTopicsUsed: []
 } as AppState;
 
 const state = createSlice({
@@ -142,6 +143,7 @@ const state = createSlice({
             });
             if (locFilterQuotes.length > 0) {
                 state.filteredQuotes = locFilterQuotes;
+                state.currentQuoteTagsFiltered = state.topicList.filter(topic => filteredTagIds.includes(topic.id)).map(topic => topic.name);
             }
         },
         updateQuoteInList(state, action) {
@@ -161,9 +163,14 @@ const state = createSlice({
                 }
             }
         },
-        addNewTag(state, action) {
+        addNewTopic(state, action) {
             const tmpTopicList = [...state.topicList, action.payload];
             state.topicList = tmpTopicList.sort((a, b) => a.name.localeCompare(b.name));
+        },
+        addRecentTopicUsed(state, action) {
+            if (state.recentTopicsUsed.filter(tg => tg.id === action.payload.id).length === 0) {
+                state.recentTopicsUsed.push(action.payload);
+            }
         }
     }
 });

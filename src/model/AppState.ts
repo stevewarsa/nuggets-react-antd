@@ -26,4 +26,5 @@ export interface AppState {
     currentQuotesIndex: number;
     editPassageActive: boolean;
     currentQuoteTagsFiltered: string[];
+    recentTopicsUsed: { id: number; name: string }[];
 }

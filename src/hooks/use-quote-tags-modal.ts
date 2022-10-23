@@ -24,6 +24,7 @@ const useQuoteTagsModal = (quote: Quote, visible: boolean) => {
             if (response.message === "success") {
                 const updatedQuote = {...quote, tags: [...quote.tags, tg], tagIds: [...quote.tagIds, tg.id]};
                 dispatcher(stateActions.updateQuoteInList(updatedQuote));
+                dispatcher(stateActions.addRecentTopicUsed(tg));
                 console.log("useQuoteTags.addExistingTagToQuote setting quote tags visible to false, current value of visible is " + visible);
                 setQuoteTagsVisible(false);
             } else {
@@ -37,7 +38,7 @@ const useQuoteTagsModal = (quote: Quote, visible: boolean) => {
     };
 
     const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTagInputValue(e.target.value);
+        setTagInputValue(e.target.value.trim());
     };
 
     const handleTagInputConfirm = () => {
@@ -49,6 +50,7 @@ const useQuoteTagsModal = (quote: Quote, visible: boolean) => {
                     if (response.message === "success") {
                         const updatedQuote = {...quote, tags: [...quote.tags, foundTag], tagIds: [...quote.tagIds, foundTag.id]};
                         dispatcher(stateActions.updateQuoteInList(updatedQuote));
+                        dispatcher(stateActions.addRecentTopicUsed(foundTag));
                         setQuoteTagsVisible(false);
                     } else {
                         console.log("Error adding typed tag matching existing tag to quote! Here's the response:", response);
@@ -61,9 +63,10 @@ const useQuoteTagsModal = (quote: Quote, visible: boolean) => {
             } else {
                 addQuoteTopic({id: -1, name: tagInputValue}, quote.quoteId, user).then(response => {
                     if (response.message === "success" && response.topic) {
-                        dispatcher(stateActions.addNewTag(response.topic));
+                        dispatcher(stateActions.addNewTopic(response.topic));
                         const updatedQuote = {...quote, tags: [...quote.tags, response.topic], tagIds: [...quote.tagIds, response.topic.id]};
                         dispatcher(stateActions.updateQuoteInList(updatedQuote));
+                        dispatcher(stateActions.addRecentTopicUsed(response.topic));
                         setQuoteTagsVisible(false);
                     } else {
                         console.log("Error adding new tag to quote! Here's the response:", response);
