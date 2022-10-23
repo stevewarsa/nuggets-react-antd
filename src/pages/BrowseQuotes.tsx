@@ -13,7 +13,7 @@ import {
     ArrowLeftOutlined,
     ArrowRightOutlined,
     CopyOutlined, EditOutlined,
-    EyeInvisibleOutlined, FilterOutlined, MailOutlined,
+    EyeInvisibleOutlined, MailOutlined,
     MoreOutlined,
     SearchOutlined, UnorderedListOutlined
 } from "@ant-design/icons";
@@ -23,7 +23,7 @@ import useBrowseQuotes from "../hooks/use-browse-quotes";
 import QuoteTagsModal from "../components/QuoteTagsModal";
 import EditQuote from "../components/EditQuote";
 import SendQuote from "../components/SendQuote";
-import FilterByTag from "../components/FilterByTag";
+import FilterByTagDrawer from "../components/FilterByTagDrawer";
 
 const BrowseQuotes = () => {
     const {
@@ -36,8 +36,6 @@ const BrowseQuotes = () => {
         setSelectTagsVisible,
         sendQuoteVisible,
         setSendQuoteVisible,
-        filterByTagVisible,
-        setFilterByTagVisible,
         searchString,
         currentIndex,
         handleSearch,
@@ -51,8 +49,7 @@ const BrowseQuotes = () => {
         {label: "Copy", key: "copy", icon: <CopyOutlined/>},
         {label: "Send Quote...", key: "send", icon: <MailOutlined />},
         {label: "Edit Quote...", key: "edit", icon: <EditOutlined />},
-        {label: "Topics...", key: "topics", icon: <UnorderedListOutlined />},
-        {label: "Filter By Tag...", key: "filterbytag", icon: <FilterOutlined />}
+        {label: "Topics...", key: "topics", icon: <UnorderedListOutlined />}
     ];
 
     return (
@@ -68,6 +65,7 @@ const BrowseQuotes = () => {
                 </Row>
                 <Row justify="center">
                     <Space>
+                        <Col><FilterByTagDrawer/></Col>
                         <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
                         <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
                         <Col span={6}><Button disabled={!isFiltered} icon={<EyeInvisibleOutlined/>}
@@ -123,10 +121,6 @@ const BrowseQuotes = () => {
                 currentQuote: filteredQuotes[currentIndex],
                 visible: sendQuoteVisible,
                 setVisibleFunction: setSendQuoteVisible
-            }} />
-            <FilterByTag props={{
-                visible: filterByTagVisible,
-                setVisibleFunction: setFilterByTagVisible
             }} />
         </>
     );

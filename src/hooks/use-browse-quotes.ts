@@ -25,7 +25,6 @@ const useBrowseQuotes = () => {
     const [selectTagsVisible, setSelectTagsVisible] = useState(false);
     const [editingQuote, setEditingQuote] = useState(false);
     const [sendQuoteVisible, setSendQuoteVisible] = useState(false);
-    const [filterByTagVisible, setFilterByTagVisible] = useState(false);
     const [isFiltered, setIsFiltered] = useState(false);
 
     useEffect(() => {
@@ -93,8 +92,6 @@ const useBrowseQuotes = () => {
             setEditingQuote(true);
         } else if (key === "topics") {
             setSelectTagsVisible(true);
-        } else if (key === "filterbytag") {
-            setFilterByTagVisible(true);
         }
     };
 
@@ -121,8 +118,6 @@ const useBrowseQuotes = () => {
         setEditingQuote: setEditingQuote,
         selectTagsVisible: selectTagsVisible,
         setSelectTagsVisible: setSelectTagsVisible,
-        filterByTagVisible: filterByTagVisible,
-        setFilterByTagVisible: setFilterByTagVisible,
         searchString: searchString,
         currentIndex: currentIndex,
         user: user,
