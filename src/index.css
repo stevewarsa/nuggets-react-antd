@@ -84,4 +84,5 @@ code {
   margin-bottom: 15px !important;
   font-weight: bold !important;
   font-size: 18px !important;
+  cursor: pointer;
 }
