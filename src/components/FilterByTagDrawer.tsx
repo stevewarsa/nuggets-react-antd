@@ -48,6 +48,7 @@ const FilterByTagDrawer = () => {
         if (selectedTopicIds && selectedTopicIds.length > 0) {
             console.log("FilterByTagDrawer.onSubmitFilter - filtering quotes down to following list of topic ids:", selectedTopicIds);
             dispatcher(stateActions.filterByTags(selectedTopicIds));
+            dispatcher(stateActions.setCurrentQuotesIndex(0));
         }
         setSelectedTopicIds([]);
         setFilter(undefined);

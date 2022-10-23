@@ -91,21 +91,20 @@ const QuoteTagsModal = ({props}: {props: QuoteTagsProps}) => {
                 />
             )}
             {!tagInputVisible && (
-                <Tag onClick={showTagInput} style={{marginBottom: "15px", fontWeight: "bold", fontSize: "18px"}}>
+                <Tag onClick={showTagInput} className="topic">
                     <PlusOutlined /> New Tag
                 </Tag>
             )}
             {props.currentQuote && recentTopicsUsed && recentTopicsUsed.length > 0 && <h3>Recent Topics Used:</h3>}
             {props.currentQuote && recentTopicsUsed && recentTopicsUsed.length > 0 && recentTopicsUsed.filter(tg => !props.currentQuote.tagIds.includes(tg.id)).map(tg => (
-                <Tag key={tg.id + "-recent"} onClick={() => addExistingTagToQuote(tg)} style={{marginBottom: "15px", fontWeight: "bold", fontSize: "18px"}}>
+                <Tag key={tg.id + "-recent"} onClick={() => addExistingTagToQuote(tg)} className="topic">
                     <PlusOutlined /> {tg.name}
                 </Tag>
             ))}
             {props.currentQuote && recentTopicsUsed && recentTopicsUsed.length > 0 && <Divider style={{color: "black"}} dashed />}
             {props.currentQuote && allTopics && allTopics.length > 0 && <h3>All Topics:</h3>}
             {props.currentQuote && allTopics.length > 0 && allTopics.filter(tg => !props.currentQuote.tagIds.includes(tg.id)).map(tg => (
-                        <Tag key={tg.id} onClick={() => addExistingTagToQuote(tg)}
-                             style={{marginBottom: "10px", fontWeight: "bold", fontSize: "18px"}}>
+                        <Tag key={tg.id} onClick={() => addExistingTagToQuote(tg)} className="topic">
                             <PlusOutlined/> {tg.name}
                         </Tag>
                     ))

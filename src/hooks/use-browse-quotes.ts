@@ -19,6 +19,7 @@ const useBrowseQuotes = () => {
     const allQuotes = useSelector((appState: AppState) => appState.allQuotes);
     const filteredQuotes = useSelector((appState: AppState) => appState.filteredQuotes);
     const startingQuote = useSelector((state: AppState) => state.startingQuote);
+    const currentQuotesIndex = useSelector((state: AppState) => state.currentQuotesIndex);
 
     const [busy, setBusy] = useState({state: false, message: ""});
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -36,7 +37,18 @@ const useBrowseQuotes = () => {
     }, [user]);
 
     useEffect(() => {
-        dispatcher(stateActions.setCurrentQuotesIndex(currentIndex));
+        // if the store's index changed, and it is not the same as the current (local) index, it may be because of
+        // filtering by tag, so update the local index in this component to match the store's index
+        if (currentQuotesIndex !== currentIndex) {
+            setCurrentIndex(currentQuotesIndex);
+        }
+    }, [currentQuotesIndex]);
+
+    useEffect(() => {
+        // if the local index changes and it is not equal to the store index, then dispatch that change to the store
+        if (currentIndex !== currentQuotesIndex) {
+            dispatcher(stateActions.setCurrentQuotesIndex(currentIndex));
+        }
     }, [currentIndex]);
 
     useEffect(() => {
