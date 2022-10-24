@@ -5,12 +5,14 @@ import {AppState} from "../model/AppState";
 import useMemoryPassages from "./use-memory-passages";
 import {stateActions} from "../store";
 import {Modal} from "antd";
+import useRemoveTopic from "./use-remove-topic";
 
-const useQuoteTagsModal = (quote: Quote, visible: boolean) => {
+const useQuoteTags = (quote: Quote, visible: boolean) => {
     const dispatcher = useDispatch();
     const allTags: {id: number, name: string}[] = useSelector((appState: AppState) => appState.topicList);
     const user = useSelector((state: AppState) => state.user);
-    const {addQuoteTopic, removeQuoteTopic} = useMemoryPassages();
+    const {addQuoteTopic} = useMemoryPassages();
+    const {handleRemoveTopic} = useRemoveTopic();
     const [tagInputVisible, setTagInputVisible] = useState(false);
     const [tagInputValue, setTagInputValue] = useState("");
     const [quoteTagsVisible, setQuoteTagsVisible] = useState(false);
@@ -86,25 +88,6 @@ const useQuoteTagsModal = (quote: Quote, visible: boolean) => {
         setTagInputVisible(true);
     };
 
-    const handleClose = async (removedTag: {id: number; name: string}) => {
-        const newTags = quote.tags.filter(tag => tag.id !== removedTag.id);
-        const newTagIds = quote.tagIds.filter(tagId => tagId !== removedTag.id);
-        console.log("Removed tag from this quote:", removedTag);
-        console.log("Remaining tags for this quote:", newTags);
-        const updatedQuote = {...quote, tags: newTags, tagIds: newTagIds};
-        removeQuoteTopic(removedTag, quote.quoteId, user).then(response => {
-            if (response.message === "success") {
-                dispatcher(stateActions.updateQuoteInList(updatedQuote));
-                setQuoteTagsVisible(false);
-            } else {
-                Modal.error({
-                    title: "Error",
-                    content: "Error removing tag from quote!",
-                });
-            }
-        });
-    };
-
     const handleTagOk = () => {
         console.log("useQuoteTags.handleTagOk setting quote tags visible to false, current value of visible is " + visible);
         setQuoteTagsVisible(false);
@@ -121,15 +104,16 @@ const useQuoteTagsModal = (quote: Quote, visible: boolean) => {
         tagInputValue: tagInputValue,
         setTagInputValue: setTagInputValue,
         quoteTagsVisible: quoteTagsVisible,
+        setQuoteTagsVisible: setQuoteTagsVisible,
         addExistingTagToQuote: addExistingTagToQuote,
         handleTagInputChange: handleTagInputChange,
         handleTagInputConfirm: handleTagInputConfirm,
         handleTagOk: handleTagOk,
         handleTagCancel: handleTagCancel,
         showTagInput: showTagInput,
-        handleClose: handleClose,
+        handleClose: handleRemoveTopic,
         quote: quote
     };
 };
 
-export default useQuoteTagsModal;
+export default useQuoteTags;

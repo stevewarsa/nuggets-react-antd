@@ -2,11 +2,11 @@ import {StringUtils} from "../helpers/string.utils";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {
     Button,
-    Col,
+    Col, Collapse,
     Dropdown,
     Menu, MenuProps,
     Row,
-    Space
+    Space, Tag
 } from "antd";
 import Swipe from "react-easy-swipe";
 import {
@@ -20,10 +20,21 @@ import {
 import {PassageUtils} from "../helpers/passage-utils";
 import {CSSTransition, SwitchTransition} from "react-transition-group";
 import useBrowseQuotes from "../hooks/use-browse-quotes";
-import QuoteTagsModal from "../components/QuoteTagsModal";
 import EditQuote from "../components/EditQuote";
+import QuoteTags from "../components/QuoteTags";
 import SendQuote from "../components/SendQuote";
 import FilterByTagDrawer from "../components/FilterByTagDrawer";
+import React, {useState} from "react";
+import useRemoveTopic from "../hooks/use-remove-topic";
+
+const { Panel } = Collapse;
+
+const items: MenuProps["items"] = [
+    {label: "Copy", key: "copy", icon: <CopyOutlined/>},
+    {label: "Send Quote...", key: "send", icon: <MailOutlined />},
+    {label: "Edit Quote...", key: "edit", icon: <EditOutlined />},
+    {label: "Topics...", key: "topics", icon: <UnorderedListOutlined />}
+];
 
 const BrowseQuotes = () => {
     const {
@@ -44,26 +55,26 @@ const BrowseQuotes = () => {
         handlePrev,
         handleNext,
     } = useBrowseQuotes();
+    const {handleRemoveTopic} = useRemoveTopic();
+    const [associatedTagsOpen, setAssociatedTagsOpen] = useState(false);
 
-    const items: MenuProps["items"] = [
-        {label: "Copy", key: "copy", icon: <CopyOutlined/>},
-        {label: "Send Quote...", key: "send", icon: <MailOutlined />},
-        {label: "Edit Quote...", key: "edit", icon: <EditOutlined />},
-        {label: "Topics...", key: "topics", icon: <UnorderedListOutlined />}
-    ];
+    const handleClose = (topic: {id: number, name: string}) => {
+        console.log("Remove topic: ", topic);
+        handleRemoveTopic(topic, filteredQuotes[currentIndex]).then(() => setAssociatedTagsOpen(false));
+    };
 
     return (
         <>
             {busy.state && <SpinnerTimer message={busy.message}/>}
-            <Row justify="center">
+            <Row key="title-row" justify="center">
                 <h1>Browse Quotes</h1>
             </Row>
             <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
-                <Row style={{marginBottom: "10px"}} justify="center" align="middle">
+                <Row key="index-row" style={{marginBottom: "10px"}} justify="center" align="middle">
                     <Col>{currentIndex + 1} of {filteredQuotes.length}</Col>
                     <Col style={{marginLeft: "5px"}}><Button icon={<SearchOutlined/>} onClick={handleSearch}/></Col>
                 </Row>
-                <Row justify="center">
+                <Row key="quote-nav-row" justify="center">
                     <Space>
                         <Col><FilterByTagDrawer/></Col>
                         <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
@@ -85,6 +96,27 @@ const BrowseQuotes = () => {
                         </Col>
                     </Space>
                 </Row>
+                {filteredQuotes[currentIndex] && filteredQuotes[currentIndex].tags.length > 0 &&
+                    <Row key="tags-row" justify="center">
+                        <Col>
+                            <Collapse activeKey={associatedTagsOpen ? "1" : null} ghost onChange={(activeKeyString: string[]) => setAssociatedTagsOpen(activeKeyString.length > 0)}>
+                                <Panel header={"Associated Topics (" + filteredQuotes[currentIndex].tags.length + ")"} key="1" style={{fontWeight: "bolder", fontSize: "18px"}}>
+                                    {filteredQuotes[currentIndex] && filteredQuotes[currentIndex].tags.map(topic => (
+                                        <Tag closable
+                                             onClose={e => {
+                                                 e.preventDefault();
+                                                 handleClose(topic);
+                                             }}
+                                             key={topic.id}
+                                             className="topic">
+                                            {topic.name}
+                                        </Tag>
+                                    ))}
+                                </Panel>
+                            </Collapse>
+                        </Col>
+                    </Row>
+                }
                 {filteredQuotes && filteredQuotes.length > currentIndex && !StringUtils.isEmpty(filteredQuotes[currentIndex].quoteTx) &&
                     <SwitchTransition mode="out-in">
                         <CSSTransition
@@ -107,7 +139,7 @@ const BrowseQuotes = () => {
                 }
             </Swipe>
             {/*Down here are all the modals that can be popped up (Tags, Edit Quote, Send Quote)*/}
-            <QuoteTagsModal props={{
+            <QuoteTags props={{
                 currentQuote: filteredQuotes[currentIndex],
                 visible: selectTagsVisible,
                 setVisibleFunction: setSelectTagsVisible

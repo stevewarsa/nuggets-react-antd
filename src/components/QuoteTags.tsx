@@ -2,7 +2,7 @@ import {TweenOneGroup} from "rc-tween-one";
 import {Divider, Input, InputRef, Modal, Tag} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import {Quote} from "../model/quote";
-import useQuoteTagsModal from "../hooks/use-quote-tags-modal";
+import useQuoteTags from "../hooks/use-quote-tags";
 import React, {useEffect, useRef} from "react";
 import {useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
@@ -13,11 +13,12 @@ interface QuoteTagsProps {
     setVisibleFunction: Function;
 }
 
-const QuoteTagsModal = ({props}: {props: QuoteTagsProps}) => {
+const QuoteTags = ({props}: {props: QuoteTagsProps}) => {
     const {
         tagInputVisible,
         tagInputValue,
         quoteTagsVisible,
+        setQuoteTagsVisible,
         addExistingTagToQuote,
         handleTagInputChange,
         handleTagInputConfirm,
@@ -25,7 +26,7 @@ const QuoteTagsModal = ({props}: {props: QuoteTagsProps}) => {
         handleTagCancel,
         showTagInput,
         handleClose
-    } = useQuoteTagsModal(props.currentQuote, props.visible);
+    } = useQuoteTags(props.currentQuote, props.visible);
     const allTopics: {id: number, name: string}[] = useSelector((appState: AppState) => appState.topicList);
     const recentTopicsUsed: {id: number, name: string}[] = useSelector((appState: AppState) => appState.recentTopicsUsed);
     const tagInputRef = useRef<InputRef>(null);
@@ -67,9 +68,10 @@ const QuoteTagsModal = ({props}: {props: QuoteTagsProps}) => {
                                 closable
                                 onClose={e => {
                                     e.preventDefault();
-                                    handleClose(tag);
+                                    handleClose(tag, props.currentQuote);
+                                    setQuoteTagsVisible(false);
                                 }}
-                                style={{marginBottom: "2px"}}
+                                className="topic"
                             >
                                 {tag.name}
                             </Tag>
@@ -113,4 +115,4 @@ const QuoteTagsModal = ({props}: {props: QuoteTagsProps}) => {
     );
 };
 
-export default QuoteTagsModal;
+export default QuoteTags;
