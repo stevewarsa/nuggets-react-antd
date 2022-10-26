@@ -32,7 +32,7 @@ const AddQuote = () => {
         const response = await memoryService.addNonBibleQuote(qtParam, user);
         if (response.data.quoteId > 1) {
             setBusy({state: false, message: ""});
-            dispatcher(stateActions.setStartingQuote(response.data.quoteId));
+            dispatcher(stateActions.addNewQuote(response.data));
             navigate("/browseQuotes");
         } else {
             setBusy({state: false, message: ""});

@@ -131,6 +131,17 @@ const state = createSlice({
             state.allQuotes = action.payload;
             state.filteredQuotes = action.payload;
         },
+        addNewQuote(state, action) {
+            const quoteToAdd: Quote = action.payload;
+            if (!quoteToAdd.hasOwnProperty("tags")) {
+                quoteToAdd.tags = [];
+                quoteToAdd.tagIds = [];
+            }
+            console.log("store.addNewQuote - here is the quote being added:", quoteToAdd);
+            state.allQuotes = [...state.allQuotes, quoteToAdd];
+            state.filteredQuotes = state.allQuotes;
+            state.startingQuote = quoteToAdd.quoteId;
+        },
         setFilteredQuotes(state, action) {
             state.filteredQuotes = action.payload;
         },
