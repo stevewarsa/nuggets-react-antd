@@ -29,11 +29,9 @@ const useBrowseQuotes = () => {
     const [isFiltered, setIsFiltered] = useState(false);
 
     useEffect(() => {
-        if (!allQuotes || allQuotes.length === 0) {
-            setBusy({state: true, message: "Retrieving quotes from server..."});
-            doQuotesLoad();
-            setBusy({state: false, message: ""});
-        }
+        setBusy({state: true, message: "Retrieving quotes from server..."});
+        doQuotesLoad();
+        setBusy({state: false, message: ""});
     }, [user]);
 
     useEffect(() => {

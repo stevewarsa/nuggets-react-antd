@@ -1,6 +1,6 @@
 import {PlusCircleOutlined} from "@ant-design/icons";
 import {Button, Col, Input, Row} from "antd";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import memoryService from "../services/memory-service";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {useNavigate} from "react-router-dom";
@@ -8,14 +8,22 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import {stateActions} from "../store";
 import {Constants} from "../model/constants";
+import useLoadQuotes from "../hooks/use-load-quotes";
 
 const AddQuote = () => {
     const navigate = useNavigate();
     const dispatcher = useDispatch();
+    const {doQuotesLoad} = useLoadQuotes();
     const [quote, setQuote] = useState("");
     const [busy, setBusy] = useState({state: false, message: ""});
     const { TextArea } = Input;
     const user = useSelector((state: AppState) => state.user);
+
+    useEffect(() => {
+        setBusy({state: true, message: "Retrieving quotes from server..."});
+        doQuotesLoad();
+        setBusy({state: false, message: ""});
+    }, [user]);
 
     const handleInput = (evt) => {
         setQuote(evt.target.value);

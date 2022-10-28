@@ -38,7 +38,8 @@ const useSendQuote = (currentQuote: Quote, visible: boolean) => {
     }, [user]);
 
     useEffect(() => {
-        if (!StringUtils.isEmpty(user) && allUsers && allUsers.length > 0) {
+        const emailMappingsEmpty = !usersWithEmail || Object.keys(usersWithEmail).length === 0;
+        if (emailMappingsEmpty && !StringUtils.isEmpty(user) && allUsers && allUsers.length > 0) {
             (async () => {
                 const emailMappingsResponse = await memoryService.getEmailMappings({user: user});
                 const mappings = emailMappingsResponse.data;
@@ -51,7 +52,7 @@ const useSendQuote = (currentQuote: Quote, visible: boolean) => {
                 }
             })();
         }
-    }, [allUsers, user]);
+    }, [allUsers, user, usersWithEmail]);
 
     const handleOk = async () => {
         if (StringUtils.isEmpty(userToSendTo)) {
