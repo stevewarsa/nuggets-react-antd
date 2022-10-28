@@ -92,6 +92,10 @@ class MemoryService {
         return MemoryService.buildAxios().post<{quoteId: number, topic: {id: number, name: string}, message: string}>("/bible-app/server/remove_quote_topic.php", {user: userName, topic: topic, quoteId: quoteId});
     }
 
+    public removeQuote(quoteId: number, userName: string) {
+        return MemoryService.buildAxios().post<{quoteId: number, message: string}>("/bible-app/server/remove_quote.php", {user: userName, quoteId: quoteId});
+    }
+
     public addEmailMapping(param: any) {
         return MemoryService.buildAxios().post<string>("/bible-app/serveadd_email_mapping.php", param);
     }

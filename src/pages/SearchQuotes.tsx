@@ -28,11 +28,9 @@ const SearchQuotes = () => {
     const gridApiRef = useRef<any>(null); // <= defined useRef for gridApi
 
     useEffect(() => {
-        if (!allQuotes || allQuotes.length === 0) {
-            setBusy({state: true, message: "Retrieving quotes from server..."});
-            doQuotesLoad();
-            setBusy({state: false, message: ""});
-        }
+        setBusy({state: true, message: "Retrieving quotes from server..."});
+        doQuotesLoad();
+        setBusy({state: false, message: ""});
     }, [user]);
 
     const handleFilterToCurrent = () => {
@@ -44,6 +42,7 @@ const SearchQuotes = () => {
     const onGridReady = (params) => {
         params.api.resetRowHeights();
         gridApiRef.current = params.api // assigned gridApi value on Grid ready
+        gridApiRef.current.setDomLayout('autoHeight');
     };
 
     const handleTableFilter = (evt) => {
@@ -132,7 +131,7 @@ const SearchQuotes = () => {
                         <Button disabled={paginationInfo?.totalRows === allQuotes?.length} type="primary" onClick={handleFilterToCurrent}>Browse Current Result</Button>
                     </Col>
                 </Row>
-                <div style={{ width: "100%", height: "350px" }}>
+                <div style={{ width: "100%", height: "100%" }}>
                     <div
                         id="myGrid"
                         style={{

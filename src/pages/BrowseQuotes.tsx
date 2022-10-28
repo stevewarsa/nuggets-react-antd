@@ -10,11 +10,10 @@ import {
 } from "antd";
 import Swipe from "react-easy-swipe";
 import {
-    ArrowLeftOutlined,
-    ArrowRightOutlined,
-    CopyOutlined, EditOutlined,
+    ArrowLeftOutlined, ArrowRightOutlined,
+    CopyOutlined, DeleteOutlined,
     EyeInvisibleOutlined, MailOutlined,
-    MoreOutlined,
+    MoreOutlined, EditOutlined,
     SearchOutlined, UnorderedListOutlined
 } from "@ant-design/icons";
 import {PassageUtils} from "../helpers/passage-utils";
@@ -33,7 +32,8 @@ const items: MenuProps["items"] = [
     {label: "Copy", key: "copy", icon: <CopyOutlined/>},
     {label: "Send Quote...", key: "send", icon: <MailOutlined />},
     {label: "Edit Quote...", key: "edit", icon: <EditOutlined />},
-    {label: "Topics...", key: "topics", icon: <UnorderedListOutlined />}
+    {label: "Topics...", key: "topics", icon: <UnorderedListOutlined />},
+    {label: "Delete...", key: "delete", icon: <DeleteOutlined />}
 ];
 
 const BrowseQuotes = () => {

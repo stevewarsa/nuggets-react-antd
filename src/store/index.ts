@@ -142,6 +142,11 @@ const state = createSlice({
             state.filteredQuotes = state.allQuotes;
             state.startingQuote = quoteToAdd.quoteId;
         },
+        removeQuote(state, action) {
+            const quoteId: number = action.payload;
+            state.allQuotes = [...state.allQuotes].filter(qt => qt.quoteId !== quoteId);
+            state.filteredQuotes = state.allQuotes;
+        },
         setFilteredQuotes(state, action) {
             state.filteredQuotes = action.payload;
         },

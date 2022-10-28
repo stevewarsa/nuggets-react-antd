@@ -5,8 +5,9 @@ import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import {AppState} from "../model/AppState";
 import copy from "copy-to-clipboard";
-import {notification} from "antd";
+import {Modal, notification} from "antd";
 import useLoadQuotes from "./use-load-quotes";
+import memoryService from "../services/memory-service";
 
 const useBrowseQuotes = () => {
     const dispatcher = useDispatch();
@@ -97,6 +98,30 @@ const useBrowseQuotes = () => {
             setEditingQuote(true);
         } else if (key === "topics") {
             setSelectTagsVisible(true);
+        } else if (key === "delete") {
+            Modal.confirm({
+                title: 'Do you want to delete this quote?',
+                content: 'Please confirm that you would like to permanently delete this quote from the database',
+                okText: "Delete Quote",
+                cancelText: "Keep Quote",
+                closable: true,
+                async onOk() {
+                    let quoteId = filteredQuotes && filteredQuotes.length > currentIndex ? filteredQuotes[currentIndex].quoteId : -1;
+                    if (quoteId !== -1) {
+                        const removeQuoteResponse = await memoryService.removeQuote(quoteId, user);
+                        const response = removeQuoteResponse.data;
+                        if (response.message === "success") {
+                            dispatcher(stateActions.removeQuote(quoteId));
+                            notification.info({message: "Quote removed!", placement: "bottomRight"});
+                        } else {
+                            notification.warning({message: "Unable to remove quote", placement: "bottomRight"});
+                        }
+                    } else {
+                        notification.warning({message: "Unable to remove quote - no current quote loaded", placement: "bottomRight"});
+                    }
+                },
+                onCancel() {},
+            });
         }
     };
 
