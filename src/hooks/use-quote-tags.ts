@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import {Quote} from "../model/quote";
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
@@ -16,6 +16,7 @@ const useQuoteTags = (quote: Quote, visible: boolean) => {
     const [tagInputVisible, setTagInputVisible] = useState(false);
     const [tagInputValue, setTagInputValue] = useState("");
     const [quoteTagsVisible, setQuoteTagsVisible] = useState(false);
+    const [filter, setFilter] = useState(undefined);
 
     useEffect(() => {
         setQuoteTagsVisible(visible);
@@ -36,10 +37,11 @@ const useQuoteTags = (quote: Quote, visible: boolean) => {
                     content: "Error adding existing tag to quote!",
                 });
             }
+            setFilter(undefined);
         });
     };
 
-    const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleTagInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setTagInputValue(e.target.value.trim());
     };
 
@@ -89,13 +91,18 @@ const useQuoteTags = (quote: Quote, visible: boolean) => {
     };
 
     const handleTagOk = () => {
-        console.log("useQuoteTags.handleTagOk setting quote tags visible to false, current value of visible is " + visible);
         setQuoteTagsVisible(false);
+        setFilter(undefined);
     };
 
     const handleTagCancel = () => {
-        console.log("useQuoteTags.handleTagCancel setting quote tags visible to false, current value of visible is " + visible);
         setQuoteTagsVisible(false);
+        setFilter(undefined);
+    };
+
+    const handleTagFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const filterValue = e.target.value.trim();
+        setFilter(filterValue);
     };
 
     return {
@@ -105,6 +112,7 @@ const useQuoteTags = (quote: Quote, visible: boolean) => {
         setTagInputValue: setTagInputValue,
         quoteTagsVisible: quoteTagsVisible,
         setQuoteTagsVisible: setQuoteTagsVisible,
+        filter: filter,
         addExistingTagToQuote: addExistingTagToQuote,
         handleTagInputChange: handleTagInputChange,
         handleTagInputConfirm: handleTagInputConfirm,
@@ -112,6 +120,7 @@ const useQuoteTags = (quote: Quote, visible: boolean) => {
         handleTagCancel: handleTagCancel,
         showTagInput: showTagInput,
         handleClose: handleRemoveTopic,
+        handleTagFilterChange: handleTagFilterChange,
         quote: quote
     };
 };

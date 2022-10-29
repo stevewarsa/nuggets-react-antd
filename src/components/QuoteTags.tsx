@@ -18,6 +18,8 @@ const QuoteTags = ({props}: {props: QuoteTagsProps}) => {
         tagInputVisible,
         tagInputValue,
         quoteTagsVisible,
+        filter,
+        handleTagFilterChange,
         setQuoteTagsVisible,
         addExistingTagToQuote,
         handleTagInputChange,
@@ -30,12 +32,22 @@ const QuoteTags = ({props}: {props: QuoteTagsProps}) => {
     const allTopics: {id: number, name: string}[] = useSelector((appState: AppState) => appState.topicList);
     const recentTopicsUsed: {id: number, name: string}[] = useSelector((appState: AppState) => appState.recentTopicsUsed);
     const tagInputRef = useRef<InputRef>(null);
+    const tagFilterRef = useRef<InputRef>(null);
 
     useEffect(() => {
         if (tagInputVisible) {
             tagInputRef.current.focus();
         }
     }, [tagInputVisible]);
+
+    useEffect(() => {
+        if (quoteTagsVisible && tagFilterRef && tagFilterRef.current) {
+            console.log("QuoteTags.useEffect[quoteTagsVisible] - focusing the tag filter text box...");
+            setTimeout(() => {
+                tagFilterRef.current.focus();
+            }, 500);
+        }
+    }, [quoteTagsVisible, props.currentQuote, allTopics]);
 
     useEffect(() => {
         props.setVisibleFunction(quoteTagsVisible);
@@ -98,14 +110,34 @@ const QuoteTags = ({props}: {props: QuoteTagsProps}) => {
                 </Tag>
             )}
             {props.currentQuote && recentTopicsUsed && recentTopicsUsed.length > 0 && <h3>Recent Topics Used:</h3>}
-            {props.currentQuote && recentTopicsUsed && recentTopicsUsed.length > 0 && recentTopicsUsed.filter(tg => !props.currentQuote.tagIds.includes(tg.id)).map(tg => (
+            {props.currentQuote &&
+                recentTopicsUsed &&
+                recentTopicsUsed.length > 0 &&
+                recentTopicsUsed.filter(tg => !props.currentQuote.tagIds.includes(tg.id)).map(tg => (
                 <Tag key={tg.id + "-recent"} onClick={() => addExistingTagToQuote(tg)} className="topic">
                     <PlusOutlined /> {tg.name}
                 </Tag>
             ))}
             {props.currentQuote && recentTopicsUsed && recentTopicsUsed.length > 0 && <Divider style={{color: "black"}} dashed />}
-            {props.currentQuote && allTopics && allTopics.length > 0 && <h3>All Topics:</h3>}
-            {props.currentQuote && allTopics.length > 0 && allTopics.filter(tg => !props.currentQuote.tagIds.includes(tg.id)).map(tg => (
+            {props.currentQuote && allTopics && allTopics.length > 0 &&
+                <>
+                    <h3>All Topics:</h3>
+                    <Input
+                        ref={tagFilterRef}
+                        type="text"
+                        size="middle"
+                        style={{ width: 150 }}
+                        value={filter}
+                        autoFocus
+                        onChange={handleTagFilterChange}
+                        placeholder="Filter Tags"
+                    />
+                    <br/><br/>
+                </>
+            }
+            {props.currentQuote &&
+                allTopics.length > 0 &&
+                allTopics.filter(tg => !props.currentQuote.tagIds.includes(tg.id) && (!filter || tg.name.toLowerCase().indexOf(filter.toLowerCase()) >= 0)).map(tg => (
                         <Tag key={tg.id} onClick={() => addExistingTagToQuote(tg)} className="topic">
                             <PlusOutlined/> {tg.name}
                         </Tag>
