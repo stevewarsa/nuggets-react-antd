@@ -65,7 +65,7 @@ const Login = () => {
             setBusy({state: false, message: ""});
             redirectAfterLogin();
         } else {
-            //console.log("onFinish - response: " + response.data);
+            console.log("onFinish - response: " + response.data);
             setBusy({state: false, message: ""});
         }
     };
@@ -88,7 +88,7 @@ const Login = () => {
 
     const handleUserName = (evt) => {
         setInitVals(prev => {
-            return {...prev, username: evt.target.value};
+            return {...prev, username: evt.target.value.trim()};
         });
     };
 

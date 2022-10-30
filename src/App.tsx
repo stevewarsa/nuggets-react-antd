@@ -38,15 +38,14 @@ const App = () => {
     const { Content, Footer } = Layout;
 
     useEffect(() => {
-        const callServer = async () => {
+        (async () => {
             setBusy({state: true, message: "Calling server to get initialization data..."});
             const locMaxChaptersByBook = await memoryService.getMaxChaptersByBook();
             dispatcher(stateActions.setMaxChaptersByBook(locMaxChaptersByBook.data));
             const allUsers = await memoryService.getAllUsers();
             dispatcher(stateActions.setAllUsers(allUsers.data));
             setBusy({state: false, message: ""});
-        };
-        callServer();
+        })();
     }, []);
 
     useEffect(() => {

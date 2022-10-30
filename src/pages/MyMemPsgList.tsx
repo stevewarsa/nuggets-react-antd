@@ -31,8 +31,6 @@ const MyMemPsgList = () => {
     useEffect(() => {
         (async () => {
             setBusy({state: true, message: "Loading memory passages from server..."});
-            // console.log("Inside anonymous async function - calling memoryService.getMemoryPsgList()...");
-            // console.log("Inside call server - setting memPassageList - there are " + tempPassages.length + " passages returned...");
             const passages = await getMemPassages(user, true);
             setMemPassageList(passages);
             setFilteredMemPassageList(passages);
