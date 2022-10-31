@@ -1,5 +1,5 @@
 import {Button, Col, Divider, Input, Radio, Row, Select} from "antd";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Constants} from "../model/constants";
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
@@ -7,7 +7,6 @@ import {PassageUtils} from "../helpers/passage-utils";
 import {SearchOutlined} from "@ant-design/icons";
 import memoryService from "../services/memory-service";
 import SpinnerTimer from "../components/SpinnerTimer";
-import React from "react";
 import {Passage} from "../model/passage";
 import {stateActions} from "../store";
 import {useNavigate} from "react-router-dom";

@@ -17,12 +17,14 @@ const useQuoteTags = (quote: Quote, visible: boolean) => {
     const [tagInputValue, setTagInputValue] = useState("");
     const [quoteTagsVisible, setQuoteTagsVisible] = useState(false);
     const [filter, setFilter] = useState(undefined);
+    const [busy, setBusy] = useState({state: false, message: ""});
 
     useEffect(() => {
         setQuoteTagsVisible(visible);
     }, [visible]);
 
     const addExistingTagToQuote = (tg: { id: number; name: string }) => {
+        setBusy({state: true, message: "Adding topic '" + tg.name + "' to quote..."});
         addQuoteTopic(tg, quote.quoteId, user).then(response => {
             if (response.message === "success") {
                 const updatedQuote = {...quote, tags: [...quote.tags, tg], tagIds: [...quote.tagIds, tg.id]};
@@ -38,6 +40,7 @@ const useQuoteTags = (quote: Quote, visible: boolean) => {
                 });
             }
             setFilter(undefined);
+            setBusy({state: false, message: ""});
         });
     };
 
@@ -113,6 +116,7 @@ const useQuoteTags = (quote: Quote, visible: boolean) => {
         quoteTagsVisible: quoteTagsVisible,
         setQuoteTagsVisible: setQuoteTagsVisible,
         filter: filter,
+        busy: busy,
         addExistingTagToQuote: addExistingTagToQuote,
         handleTagInputChange: handleTagInputChange,
         handleTagInputConfirm: handleTagInputConfirm,
