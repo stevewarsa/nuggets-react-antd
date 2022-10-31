@@ -46,14 +46,14 @@ const useBrowseQuotes = () => {
         if (filteredQuotes && allQuotes) {
             setIsFiltered(filteredQuotes.length < allQuotes.length);
         }
-        if (currentIndex >= filteredQuotes.length) {
+        if (filteredQuotes && currentIndex >= filteredQuotes.length) {
             setCurrentIndex(0);
         }
     }, [filteredQuotes, allQuotes]);
 
 
     useEffect(() => {
-        if (startingQuote > 0 && filteredQuotes.length > 0) {
+        if (startingQuote > 0 && filteredQuotes && filteredQuotes.length > 0) {
             const currIndex = filteredQuotes.findIndex(qt => qt.quoteId === startingQuote);
             if (currIndex >= 0) {
                 setCurrentIndex(currIndex);

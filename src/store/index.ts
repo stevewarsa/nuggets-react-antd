@@ -25,7 +25,7 @@ const initialState: AppState = {
     editPassageActive: false,
     topicList: [],
     allQuotes: [],
-    filteredQuotes: [],
+    filteredQuotes: null,
     currentQuoteTagsFiltered: [],
     recentTopicsUsed: []
 } as AppState;

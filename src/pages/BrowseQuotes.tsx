@@ -62,8 +62,10 @@ const BrowseQuotes = () => {
         console.log("Remove topic: ", topic);
         handleRemoveTopic(topic, filteredQuotes[currentIndex]).then(() => setAssociatedTagsOpen(false));
     };
-    if (!filteredQuotes || filteredQuotes.length === 0) {
-        return <h3>There are no quotes configured.  Select 'Add Quote' menu to add one...</h3>;
+    if (!filteredQuotes) {
+        return <Row key="spinner-row" justify="center"><SpinnerTimer message="Loading quotes from server..." /></Row>;
+    } else if (filteredQuotes.length === 0) {
+        return <Row key="no-quotes-row" justify="center"><h5>There are no quotes configured.  Select 'Add Quote' menu to add one...</h5></Row>;
     } else {
         return (
             <>
