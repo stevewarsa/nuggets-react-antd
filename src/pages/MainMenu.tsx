@@ -47,6 +47,11 @@ const MainMenu = () => {
                     key: "2.1",
                     label: "Bible Search",
                     action: "/bibleSearch"
+                },
+                {
+                    key: "2.2",
+                    label: "Go To Passage By Ref",
+                    action: "/goToPassage"
                 }
             ]
         },

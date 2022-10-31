@@ -28,6 +28,7 @@ import SpinnerTimer from "./components/SpinnerTimer";
 import TopicList from "./pages/TopicList";
 import TopNav from "./components/TopNav";
 import useMemoryPassages from "./hooks/use-memory-passages";
+import GoToPassageByRef from "./pages/GoToPassageByRef";
 
 const App = () => {
     const dispatcher = useDispatch();
@@ -90,6 +91,7 @@ const App = () => {
                             <Route path="/addQuote" element={<AddQuote/>}/>
                             <Route path="/myMemPsgList" element={<MyMemPsgList/>}/>
                             <Route path="/topicList" element={<TopicList/>}/>
+                            <Route path="/goToPassage" element={<GoToPassageByRef/>}/>
                         </Route>
                     </Routes>
                 </Content>

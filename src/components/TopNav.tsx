@@ -29,6 +29,10 @@ const menuItems: MenuProps['items'] = [
         label: "Add Quote"
     },
     {
+        key: 12,
+        label: "Go To Passage By Ref"
+    },
+    {
         key: 4,
         label: "My Mem Psg List"
     },
@@ -55,7 +59,8 @@ const menuPaths: {[key: number]: string} = {
     7: "/selectChapter",
     8: "/about",
     10: "/bibleReadingPlan",
-    11: "/browseQuotes"
+    11: "/browseQuotes",
+    12: "/goToPassage"
 };
 
 const TopNav = () => {

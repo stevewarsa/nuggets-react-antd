@@ -1,5 +1,5 @@
 import {TweenOneGroup} from "rc-tween-one";
-import {Divider, Input, InputRef, Modal, Row, Tag} from "antd";
+import {Divider, Input, InputRef, Modal, Tag} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import {Quote} from "../model/quote";
 import useQuoteTags from "../hooks/use-quote-tags";
