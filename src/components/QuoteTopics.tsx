@@ -2,63 +2,63 @@ import {TweenOneGroup} from "rc-tween-one";
 import {Divider, Input, InputRef, Modal, Tag} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import {Quote} from "../model/quote";
-import useQuoteTags from "../hooks/use-quote-tags";
+import useQuoteTopics from "../hooks/use-quote-topics";
 import React, {useEffect, useRef} from "react";
 import {useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import SpinnerTimer from "./SpinnerTimer";
 
-interface QuoteTagsProps {
+interface QuoteTopicsProps {
     currentQuote: Quote;
     visible: boolean;
     setVisibleFunction: Function;
 }
 
-const QuoteTags = ({props}: {props: QuoteTagsProps}) => {
+const QuoteTopics = ({props}: {props: QuoteTopicsProps}) => {
     const {
-        tagInputVisible,
-        tagInputValue,
-        quoteTagsVisible,
+        topicInputVisible,
+        topicInputValue,
+        quoteTopicsVisible,
         filter,
         busy,
-        handleTagFilterChange,
-        setQuoteTagsVisible,
-        addExistingTagToQuote,
-        handleTagInputChange,
-        handleTagInputConfirm,
-        handleTagOk,
-        handleTagCancel,
-        showTagInput,
-        handleClose
-    } = useQuoteTags(props.currentQuote, props.visible);
+        handleTopicFilterChange,
+        setQuoteTopicsVisible,
+        addExistingTopicToQuote,
+        handleTopicInputChange,
+        handleTopicInputConfirm,
+        handleTopicOk,
+        handleTopicCancel,
+        showTopicInput,
+        handleRemoveTopic
+    } = useQuoteTopics(props.currentQuote, props.visible);
     const allTopics: {id: number, name: string}[] = useSelector((appState: AppState) => appState.topicList);
     const recentTopicsUsed: {id: number, name: string}[] = useSelector((appState: AppState) => appState.recentTopicsUsed);
-    const tagInputRef = useRef<InputRef>(null);
-    const tagFilterRef = useRef<InputRef>(null);
+    const topicInputRef = useRef<InputRef>(null);
+    const topicFilterRef = useRef<InputRef>(null);
 
     useEffect(() => {
-        if (tagInputVisible) {
-            tagInputRef.current.focus();
+        if (topicInputVisible) {
+            topicInputRef.current.focus();
         }
-    }, [tagInputVisible]);
+    }, [topicInputVisible]);
 
     useEffect(() => {
-        if (quoteTagsVisible && tagFilterRef && tagFilterRef.current) {
-            console.log("QuoteTags.useEffect[quoteTagsVisible] - focusing the tag filter text box...");
+        if (quoteTopicsVisible && topicFilterRef && topicFilterRef.current) {
+            console.log("QuoteTopics.useEffect[quoteTopicsVisible] - focusing the topic filter text box...");
             setTimeout(() => {
-                tagFilterRef.current.focus();
+                topicFilterRef.current.focus();
             }, 500);
         }
-    }, [quoteTagsVisible, props.currentQuote, allTopics]);
+    }, [quoteTopicsVisible, props.currentQuote, allTopics]);
 
     useEffect(() => {
-        props.setVisibleFunction(quoteTagsVisible);
-    }, [quoteTagsVisible]);
+        props.setVisibleFunction(quoteTopicsVisible);
+    }, [quoteTopicsVisible]);
     return (
-        <Modal title="Quote Tags" open={quoteTagsVisible} onOk={handleTagOk} onCancel={handleTagCancel}>
+        <Modal title="Quote Topics" open={quoteTopicsVisible} onOk={handleTopicOk} onCancel={handleTopicCancel}>
             {props.currentQuote && props.currentQuote.tags && props.currentQuote.tags.length > 0 &&
                 <fieldset style={{borderStyle: "solid", borderWidth: "1px", marginBottom: "10px", padding: "10px"}}>
-                    <legend>Associated Tags</legend>
+                    <legend>Associated Topics</legend>
                     <TweenOneGroup
                         enter={{
                             scale: 0.8,
@@ -74,41 +74,41 @@ const QuoteTags = ({props}: {props: QuoteTagsProps}) => {
                         leave={{opacity: 0, width: 0, scale: 0, duration: 200}}
                         appear={false}
                     >
-                        {props.currentQuote && props.currentQuote.tags.map(tag => (
-                            <span key={tag.id} style={{display: 'inline-block'}}>
+                        {props.currentQuote && props.currentQuote.tags.map(topic => (
+                            <span key={topic.id} style={{display: 'inline-block'}}>
                         <Tag
-                            key={tag.id}
+                            key={topic.id}
                             closable
                             onClose={e => {
                                 e.preventDefault();
-                                handleClose(tag, props.currentQuote);
-                                setQuoteTagsVisible(false);
+                                handleRemoveTopic(topic, props.currentQuote);
+                                setQuoteTopicsVisible(false);
                             }}
                             className="topic"
                         >
-                            {tag.name}
+                            {topic.name}
                         </Tag>
                     </span>
                         ))}
                     </TweenOneGroup>
                 </fieldset>
             }
-            {tagInputVisible && (
+            {topicInputVisible && (
                 <Input
-                    ref={tagInputRef}
+                    ref={topicInputRef}
                     type="text"
                     size="small"
                     style={{width: 78}}
-                    value={tagInputValue}
-                    onChange={handleTagInputChange}
-                    onBlur={handleTagInputConfirm}
-                    onPressEnter={handleTagInputConfirm}
+                    value={topicInputValue}
+                    onChange={handleTopicInputChange}
+                    onBlur={handleTopicInputConfirm}
+                    onPressEnter={handleTopicInputConfirm}
                 />
             )}
             {busy.state && <SpinnerTimer message={busy.message} />}
-            {!tagInputVisible && (
-                <Tag onClick={showTagInput} className="topic">
-                    <PlusOutlined/> New Tag
+            {!topicInputVisible && (
+                <Tag onClick={showTopicInput} className="topic">
+                    <PlusOutlined/> New Topic
                 </Tag>
             )}
             {props.currentQuote && recentTopicsUsed && recentTopicsUsed.length > 0 && <h3>Recent Topics Used:</h3>}
@@ -116,7 +116,7 @@ const QuoteTags = ({props}: {props: QuoteTagsProps}) => {
                 recentTopicsUsed &&
                 recentTopicsUsed.length > 0 &&
                 recentTopicsUsed.filter(tg => !props.currentQuote.tagIds.includes(tg.id)).map(tg => (
-                    <Tag key={tg.id + "-recent"} onClick={() => addExistingTagToQuote(tg)} className="topic">
+                    <Tag key={tg.id + "-recent"} onClick={() => addExistingTopicToQuote(tg)} className="topic">
                         <PlusOutlined/> {tg.name}
                     </Tag>
                 ))}
@@ -126,14 +126,14 @@ const QuoteTags = ({props}: {props: QuoteTagsProps}) => {
                 <>
                     <h3>All Topics:</h3>
                     <Input
-                        ref={tagFilterRef}
+                        ref={topicFilterRef}
                         type="text"
                         size="middle"
                         style={{width: 150}}
                         value={filter}
                         autoFocus
-                        onChange={handleTagFilterChange}
-                        placeholder="Filter Tags"
+                        onChange={handleTopicFilterChange}
+                        placeholder="Filter Topics"
                     />
                     <br/><br/>
                 </>
@@ -141,7 +141,7 @@ const QuoteTags = ({props}: {props: QuoteTagsProps}) => {
             {props.currentQuote &&
                 allTopics.length > 0 &&
                 allTopics.filter(tg => !props.currentQuote.tagIds.includes(tg.id) && (!filter || tg.name.toLowerCase().indexOf(filter.toLowerCase()) >= 0)).map(tg => (
-                    <Tag key={tg.id} onClick={() => addExistingTagToQuote(tg)} className="topic">
+                    <Tag key={tg.id} onClick={() => addExistingTopicToQuote(tg)} className="topic">
                         <PlusOutlined/> {tg.name}
                     </Tag>
                 ))
@@ -150,4 +150,4 @@ const QuoteTags = ({props}: {props: QuoteTagsProps}) => {
     );
 };
 
-export default QuoteTags;
+export default QuoteTopics;

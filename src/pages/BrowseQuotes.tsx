@@ -20,7 +20,7 @@ import {PassageUtils} from "../helpers/passage-utils";
 import {CSSTransition, SwitchTransition} from "react-transition-group";
 import useBrowseQuotes from "../hooks/use-browse-quotes";
 import EditQuote from "../components/EditQuote";
-import QuoteTags from "../components/QuoteTags";
+import QuoteTopics from "../components/QuoteTopics";
 import SendQuote from "../components/SendQuote";
 import FilterByTagDrawer from "../components/FilterByTagDrawer";
 import React, {useState} from "react";
@@ -56,11 +56,11 @@ const BrowseQuotes = () => {
         handleNext,
     } = useBrowseQuotes();
     const {handleRemoveTopic} = useRemoveTopic();
-    const [associatedTagsOpen, setAssociatedTagsOpen] = useState(false);
+    const [associatedTopicsOpen, setAssociatedTopicsOpen] = useState(false);
 
     const handleClose = (topic: {id: number, name: string}) => {
         console.log("Remove topic: ", topic);
-        handleRemoveTopic(topic, filteredQuotes[currentIndex]).then(() => setAssociatedTagsOpen(false));
+        handleRemoveTopic(topic, filteredQuotes[currentIndex]).then(() => setAssociatedTopicsOpen(false));
     };
     if (!filteredQuotes) {
         return <Row key="spinner-row" justify="center"><SpinnerTimer message="Loading quotes from server..." /></Row>;
@@ -103,8 +103,8 @@ const BrowseQuotes = () => {
                     {filteredQuotes[currentIndex] && filteredQuotes[currentIndex].tags.length > 0 &&
                         <Row key="tags-row" justify="center">
                             <Col>
-                                <Collapse activeKey={associatedTagsOpen ? "1" : null} ghost
-                                          onChange={(activeKeyString: string[]) => setAssociatedTagsOpen(activeKeyString.length > 0)}>
+                                <Collapse activeKey={associatedTopicsOpen ? "1" : null} ghost
+                                          onChange={(activeKeyString: string[]) => setAssociatedTopicsOpen(activeKeyString.length > 0)}>
                                     <Panel
                                         header={"Associated Topics (" + filteredQuotes[currentIndex].tags.length + ")"}
                                         key="1" style={{fontWeight: "bolder", fontSize: "18px"}}>
@@ -146,7 +146,7 @@ const BrowseQuotes = () => {
                     }
                 </Swipe>
                 {/*Down here are all the modals that can be popped up (Tags, Edit Quote, Send Quote)*/}
-                <QuoteTags props={{
+                <QuoteTopics props={{
                     currentQuote: filteredQuotes[currentIndex],
                     visible: selectTagsVisible,
                     setVisibleFunction: setSelectTagsVisible

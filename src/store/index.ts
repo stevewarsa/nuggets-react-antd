@@ -5,6 +5,7 @@ import {Constants} from "../model/constants";
 import {PassageUtils} from "../helpers/passage-utils";
 import {StringUtils} from "../helpers/string.utils";
 import {Quote} from "../model/quote";
+import {notification} from "antd";
 
 const initialState: AppState = {
     practiceConfig: {},
@@ -160,6 +161,17 @@ const state = createSlice({
             if (locFilterQuotes.length > 0) {
                 state.filteredQuotes = locFilterQuotes;
                 state.currentQuoteTagsFiltered = state.topicList.filter(topic => filteredTagIds.includes(topic.id)).map(topic => topic.name);
+            } else {
+                notification.warning({message: "No quotes exist with selected topics", placement: "topRight"});
+            }
+        },
+        filterToQuotesWhereNoTags(state) {
+            const locFilterQuotes = state.filteredQuotes.filter(qt => qt.tags.length === 0 && qt.tagIds.length === 0);
+            if (locFilterQuotes.length > 0) {
+                state.filteredQuotes = locFilterQuotes;
+                state.currentQuoteTagsFiltered = [];
+            } else {
+                notification.warning({message: "No quotes exist without associated topics", placement: "topRight"});
             }
         },
         updateQuoteInList(state, action) {

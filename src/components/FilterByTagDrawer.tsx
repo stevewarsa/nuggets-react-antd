@@ -1,4 +1,4 @@
-import {Button, Checkbox, Drawer, Input, List, Space} from "antd";
+import {Button, Checkbox, Drawer, Input, List, Modal, Space} from "antd";
 import {useEffect, useState} from "react";
 import {FilterOutlined} from "@ant-design/icons";
 import {useDispatch, useSelector} from "react-redux";
@@ -49,6 +49,20 @@ const FilterByTagDrawer = () => {
             console.log("FilterByTagDrawer.onSubmitFilter - filtering quotes down to following list of topic ids:", selectedTopicIds);
             dispatcher(stateActions.filterByTags(selectedTopicIds));
             dispatcher(stateActions.setCurrentQuotesIndex(0));
+        } else {
+            console.log("FilterByTagDrawer.onSubmitFilter - check if user would like to filter to quotes not having any tags", selectedTopicIds);
+            Modal.confirm({
+                title: "Filter to No Topics?",
+                content: "Would you like to filter the list to quotes without topics?",
+                okText: "Yes",
+                cancelText: "No",
+                closable: true,
+                onOk() {
+                    dispatcher(stateActions.filterToQuotesWhereNoTags());
+                    dispatcher(stateActions.setCurrentQuotesIndex(0));
+                },
+                onCancel() {},
+            });
         }
         setSelectedTopicIds([]);
         setFilter(undefined);
