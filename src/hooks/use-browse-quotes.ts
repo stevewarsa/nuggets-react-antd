@@ -21,6 +21,7 @@ const useBrowseQuotes = () => {
     const filteredQuotes = useSelector((appState: AppState) => appState.filteredQuotes);
     const startingQuote = useSelector((state: AppState) => state.startingQuote);
     const currentQuotesIndex = useSelector((state: AppState) => state.currentQuotesIndex);
+    const currentQuoteTagsFiltered = useSelector((state: AppState) => state.currentQuoteTagsFiltered);
 
     const [busy, setBusy] = useState({state: false, message: ""});
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -152,6 +153,7 @@ const useBrowseQuotes = () => {
         currentIndex: currentIndex,
         user: user,
         isFiltered: isFiltered,
+        currentQuoteTagsFiltered: currentQuoteTagsFiltered,
         handleNext: handleNext,
         handlePrev: handlePrev,
         handleClearFilter: handleClearFilter,

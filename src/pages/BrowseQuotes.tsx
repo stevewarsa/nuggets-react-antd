@@ -49,6 +49,7 @@ const BrowseQuotes = () => {
         setSendQuoteVisible,
         searchString,
         currentIndex,
+        currentQuoteTagsFiltered,
         handleSearch,
         handleClearFilter,
         handleMenuClick,
@@ -57,6 +58,7 @@ const BrowseQuotes = () => {
     } = useBrowseQuotes();
     const {handleRemoveTopic} = useRemoveTopic();
     const [associatedTopicsOpen, setAssociatedTopicsOpen] = useState(false);
+    const [currentTopicsFilteredOpen, setCurrentTopicsFilteredOpen] = useState(false);
 
     const handleClose = (topic: {id: number, name: string}) => {
         console.log("Remove topic: ", topic);
@@ -117,6 +119,26 @@ const BrowseQuotes = () => {
                                                  key={topic.id}
                                                  className="topic">
                                                 {topic.name}
+                                            </Tag>
+                                        ))}
+                                    </Panel>
+                                </Collapse>
+                            </Col>
+                        </Row>
+                    }
+                    {currentQuoteTagsFiltered && currentQuoteTagsFiltered.length > 0 &&
+                        <Row key="tags-filtered-row" justify="center">
+                            <Col>
+                                <Collapse activeKey={currentTopicsFilteredOpen ? "1" : null} ghost
+                                          onChange={(activeKeyString: string[]) => setCurrentTopicsFilteredOpen(activeKeyString.length > 0)}>
+                                    <Panel
+                                        header={"Current Topics Filtered (" + currentQuoteTagsFiltered.length + ")"}
+                                        key="1" style={{fontWeight: "bolder", fontSize: "18px"}}>
+                                        {currentQuoteTagsFiltered.map(topic => (
+                                            <Tag
+                                                 key={topic}
+                                                 className="topic">
+                                                {topic}
                                             </Tag>
                                         ))}
                                     </Panel>

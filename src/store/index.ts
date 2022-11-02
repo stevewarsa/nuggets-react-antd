@@ -150,6 +150,9 @@ const state = createSlice({
         },
         setFilteredQuotes(state, action) {
             state.filteredQuotes = action.payload;
+            if (action.payload.length === state.allQuotes.length) {
+                state.currentQuoteTagsFiltered = [];
+            }
         },
         filterByTags(state, action) {
             const filteredTagIds: number[] = action.payload.map(tg => parseInt(tg));

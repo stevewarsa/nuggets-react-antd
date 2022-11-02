@@ -20,10 +20,10 @@ const SearchQuotes = () => {
     const dispatcher = useDispatch();
     const {doQuotesLoad} = useLoadQuotes();
     const user = useSelector((state: AppState) => state.user);
-    const allQuotes = useSelector((state: AppState) => state.allQuotes);
+    const filteredQuotes = useSelector((appState: AppState) => appState.filteredQuotes);
     const [busy, setBusy] = useState({state: false, message: ""});
     const [searchString, setSearchString] = useState("");
-    const [filteredQuotes, setFilteredQuotes] = useState<QuoteMatch[]>(null);
+    const [filteredQuoteMatches, setFilteredQuoteMatches] = useState<QuoteMatch[]>(null);
     const [paginationInfo, setPaginationInfo] = useState(null);
     const gridApiRef = useRef<any>(null); // <= defined useRef for gridApi
 
@@ -35,7 +35,7 @@ const SearchQuotes = () => {
 
     const handleFilterToCurrent = () => {
         dispatcher(stateActions.setCurrentSearchString(searchString));
-        dispatcher(stateActions.setFilteredQuotes(filteredQuotes.map(qt => qt.originalQuote)));
+        dispatcher(stateActions.setFilteredQuotes(filteredQuoteMatches.map(qt => qt.originalQuote)));
         navigate("/browseQuotes");
     };
 
@@ -57,7 +57,7 @@ const SearchQuotes = () => {
             const quotes = ev.api.rowModel.rowsToDisplay.map(row => {
                 return {originalQuote: row.data, annotatedText: row.data.quoteTx} as QuoteMatch;
             });
-            setFilteredQuotes(quotes);
+            setFilteredQuoteMatches(quotes);
         } else {
             console.log("handleFilterChanged - no rows ");
         }
@@ -67,6 +67,7 @@ const SearchQuotes = () => {
         dispatcher(stateActions.setStartingQuote(quoteId));
         navigate("/browseQuotes");
     };
+
     const onPaginationChanged = (evt) => {
         if (evt && evt.api) {
             const pgInfo = {
@@ -128,7 +129,7 @@ const SearchQuotes = () => {
                 </Row>
                 <Row justify="center">
                     <Col>
-                        <Button disabled={paginationInfo?.totalRows === allQuotes?.length} type="primary" onClick={handleFilterToCurrent}>Browse Current Result</Button>
+                        <Button disabled={paginationInfo?.totalRows === filteredQuotes?.length} type="primary" onClick={handleFilterToCurrent}>Browse Current Result</Button>
                     </Col>
                 </Row>
                 <div style={{ width: "100%", height: "100%" }}>
@@ -142,7 +143,7 @@ const SearchQuotes = () => {
                     >
                         <AgGridReact
                             reactUi={true}
-                            rowData={allQuotes}
+                            rowData={filteredQuotes}
                             frameworkComponents={{
                                 quoteCellRenderer: QuoteCellRenderer
                             }}
