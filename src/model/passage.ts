@@ -15,4 +15,5 @@ export class Passage {
     last_viewed_num: number;
     passageRefAppendLetter: string;
     verses: Verse[];
+    topics: {id: number, name: string}[];
 }

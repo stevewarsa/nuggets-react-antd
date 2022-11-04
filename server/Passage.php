@@ -27,6 +27,7 @@ class Passage {
     public $passageRefAppendLetter = null;
 
     public $verses = array();
+    public $topics = array();
 
 
 

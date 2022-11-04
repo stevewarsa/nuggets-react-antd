@@ -141,6 +141,10 @@ class MemoryService {
         return MemoryService.buildAxios().get<Passage[]>("/bible-app/server/get_tag_list.php?tagId=" + topicId + '&user=' + currentUser);
     }
 
+    public removePassageTopic(topic: {id: number, name: string}, passageId: number, userName: string) {
+        return MemoryService.buildAxios().post<{passageId: number, topic: {id: number, name: string}, message: string}>("/bible-app/server/remove_passage_topic.php", {user: userName, topic: topic, passageId: passageId});
+    }
+
     public updatePassage(updatePassageParam: UpdatePassageParam) {
         return MemoryService.buildAxios().post<string>("/bible-app/server/update_passage.php", updatePassageParam);
     }

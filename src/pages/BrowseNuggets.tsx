@@ -1,23 +1,37 @@
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
-import {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import memoryService from "../services/memory-service";
 import {PassageUtils} from "../helpers/passage-utils";
 import SpinnerTimer from "../components/SpinnerTimer";
-import {Button, Col, Dropdown, Menu, Modal, notification, Row, Select, Space} from "antd";
+import {Button, Col, Collapse, Dropdown, Menu, MenuProps, Modal, notification, Row, Select, Space, Tag} from "antd";
 import Swipe from "react-easy-swipe";
 import {
     ArrowLeftOutlined,
     ArrowRightOutlined, CloseOutlined,
     CopyOutlined, FilterOutlined, LinkOutlined,
-    MoreOutlined
+    MoreOutlined,
 } from "@ant-design/icons";
 import {Constants} from "../model/constants";
 import {stateActions} from "../store";
 import {VerseSelectionRequest} from "../model/verse-selection-request";
 import {useNavigate} from "react-router-dom";
-import { CSSTransition, SwitchTransition } from "react-transition-group";
+import {CSSTransition, SwitchTransition} from "react-transition-group";
 import {Passage} from "../model/passage";
+const {Panel} = Collapse;
+const {Option} = Select;
+
+const menuItemsNoFilter: MenuProps["items"] = [
+    {label: "Copy", key: "copy", icon: <CopyOutlined/>},
+    {label: "Interlinear View...", key: "interlinear", icon: <LinkOutlined />},
+    {label: "Clear Filter...", key: "clear", icon: <CloseOutlined />}
+];
+
+const menuItemsNoClear: MenuProps["items"] = [
+    {label: "Copy", key: "copy", icon: <CopyOutlined/>},
+    {label: "Interlinear View...", key: "interlinear", icon: <LinkOutlined />},
+    {label: "Filter...", key: "filter", icon: <FilterOutlined />}
+];
 
 const BrowseNuggets = () => {
     const dispatcher = useDispatch();
@@ -35,7 +49,8 @@ const BrowseNuggets = () => {
     const [currentPassage, setCurrentPassage] = useState<Passage>(undefined);
     const [selectedTranslation, setSelectedTranslation] = useState("niv");
     const [selectedTopic, setSelectedTopic] = useState<number>(-1);
-    const {Option} = Select;
+    const [topicFiltered, setTopicFiltered] = useState<boolean>(false);
+    const [associatedTopicsOpen, setAssociatedTopicsOpen] = useState(false);
 
     useEffect(() => {
         if (prefs) {
@@ -44,7 +59,7 @@ const BrowseNuggets = () => {
     }, [prefs]);
 
     useEffect(() => {
-        const callServer = async () => {
+        (async () => {
             setBusy({state: true, message: "Retrieving nugget list from server..."});
             const nuggetIdListResponse = await memoryService.getNuggetIdList(user);
             const nuggetIdList = nuggetIdListResponse.data;
@@ -58,8 +73,7 @@ const BrowseNuggets = () => {
                 filterToSelectedTopic();
             }
             setBusy({state: false, message: ""});
-        };
-        callServer();
+        })();
     }, [user]);
 
     useEffect(() => {
@@ -103,7 +117,7 @@ const BrowseNuggets = () => {
     };
 
     const handleMenuClick = ({key}) => {
-        if (key === "1") {
+        if (key === "copy") {
             if (currentPassage.verses.length === 1) {
                 // just immediately copy it to the clipboard
                 const psgRef = PassageUtils.getPassageStringNoIndex(currentPassage, true, true);
@@ -118,16 +132,17 @@ const BrowseNuggets = () => {
                 } as VerseSelectionRequest));
                 navigate("/selectVerses");
             }
-        } else if (key === "2") {
+        } else if (key === "interlinear") {
             // interlinear link
             PassageUtils.openInterlinearLink(currentPassage);
-        } else if (key === "3") {
+        } else if (key === "filter") {
             // filter
             setFilterVisible(true);
-        } else if (key === "4") {
+        } else if (key === "clear") {
             // clear filter
             setSelectedTopic(-1);
             setNuggetIdList(originalNuggetIdList);
+            setTopicFiltered(false);
             dispatcher(stateActions.setIncomingTopic(null));
         }
     };
@@ -149,18 +164,15 @@ const BrowseNuggets = () => {
             console.log("Selected topic id not set yet...  returning");
             return;
         }
-        const callServer = async () => {
+        (async () => {
             setBusy({state: true, message: "Retrieving passages for topic..."});
             const passagesByTopicResponse = await memoryService.getPassagesForTopic(selectedTopic, user);
             const passagesByTopic = passagesByTopicResponse.data;
-            console.log("passages by topic:", passagesByTopic);
-            console.log("nugget id list:", nuggetIdList);
             const filteredNuggetIdList = nuggetIdList.filter(nugget => passagesByTopic.find(tpcPsg => tpcPsg.passageId === nugget.nuggetId));
-            console.log("filtered passage list is:", filteredNuggetIdList);
             setNuggetIdList(filteredNuggetIdList);
+            setTopicFiltered(true);
             setBusy({state: false, message: ""});
-        };
-        callServer();
+        })();
     };
 
     const handleOk = (val) => {
@@ -168,6 +180,23 @@ const BrowseNuggets = () => {
         setSelectedTopic(val);
         setFilterVisible(false);
         filterToSelectedTopic();
+    };
+    const handleRemoveTopic = (topic: { id: number, name: string }) => {
+        setBusy({state: true, message: "Removing topic from passage..."});
+        console.log("Remove topic: ", topic);
+        memoryService.removePassageTopic(topic, currentPassage.passageId, user)
+            .then((removePassageTopicResponse) => {
+                console.log(removePassageTopicResponse.data);
+                setBusy({state: false, message: ""});
+                if (removePassageTopicResponse.data.message === "success") {
+                    notification.success({message: "Removed topic '" + topic.name + "' from current passage!", placement: "bottomRight"});
+                    const updatedPassage = {...currentPassage, topics: currentPassage.topics.filter(tpc => tpc.id !== topic.id)};
+                    setCurrentPassage(updatedPassage);
+                    setAssociatedTopicsOpen(false);
+                } else {
+                    notification.warning({message: "Unable to remove topic '" + topic.name + "' from current passage.", placement: "topLeft"});
+                }
+            });
     };
 
     return (
@@ -199,22 +228,7 @@ const BrowseNuggets = () => {
                         <Col span={6}><Button icon={<ArrowRightOutlined/>} onClick={handleNext}/></Col>
                         <Col span={6}>
                             <Dropdown key="dd" placement="bottomRight" trigger={["click"]} overlay={
-                                <Menu key="menu" onClick={handleMenuClick}>
-                                    <Menu.Item key="1" icon={<CopyOutlined  key="copy"/>}>
-                                        Copy
-                                    </Menu.Item>
-                                    <Menu.Item key="2" icon={<LinkOutlined  key="interlinear" />}>
-                                        Interlinear View
-                                    </Menu.Item>
-                                    <Menu.Item key="3" icon={<FilterOutlined  key="filter" />}>
-                                        Filter...
-                                    </Menu.Item>
-                                    {selectedTopic && selectedTopic !== -1 &&
-                                        <Menu.Item key="4" icon={<CloseOutlined key="clear"/>}>
-                                            Clear Filter
-                                        </Menu.Item>
-                                    }
-                                </Menu>
+                                <Menu key="menu" onClick={handleMenuClick} items={topicFiltered ? menuItemsNoFilter : menuItemsNoClear}/>
                             }>
                                 <MoreOutlined key="more" style={{
                                     borderStyle: "solid",
@@ -227,9 +241,33 @@ const BrowseNuggets = () => {
                         </Col>
                     </Space>
                 </Row>
-                {selectedTopic && selectedTopic !== -1 && topicList.length > 0 &&
+                {topicFiltered && selectedTopic !== -1 && topicList.length > 0 &&
                     <Row justify="center">
                         <Col>(<span style={{fontWeight: "bold"}}>Filtered Topic:</span> {topicList.find(tpc => tpc.id === selectedTopic).name})</Col>
+                    </Row>
+                }
+                {currentPassage && currentPassage.topics && currentPassage.topics.length > 0 &&
+                    <Row key="tags-row" justify="center">
+                        <Col>
+                            <Collapse activeKey={associatedTopicsOpen ? "1" : null} ghost
+                                      onChange={(activeKeyString: string[]) => setAssociatedTopicsOpen(activeKeyString.length > 0)}>
+                                <Panel
+                                    header={"Associated Topics (" + currentPassage.topics.length + ")"}
+                                    key="1" style={{fontWeight: "bolder", fontSize: "18px"}}>
+                                    {currentPassage.topics.map(topic => (
+                                        <Tag closable
+                                             onClose={e => {
+                                                 e.preventDefault();
+                                                 handleRemoveTopic(topic);
+                                             }}
+                                             key={topic.id}
+                                             className="topic">
+                                            {topic.name}
+                                        </Tag>
+                                    ))}
+                                </Panel>
+                            </Collapse>
+                        </Col>
                     </Row>
                 }
                 {currentPassage && (

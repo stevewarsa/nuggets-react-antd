@@ -1,5 +1,5 @@
-<?php
-//header('Access-Control-Allow-Origin: *');
+<?php /** @noinspection SqlNoDataSourceInspection */
+/** @noinspection SqlDialectInspection */
 include_once('./Passage.php');
 function objectToArray($d) {
     if (is_object($d)) {
@@ -26,6 +26,18 @@ $bookId = $row["book_id"];
 $chapter = $row["chapter"];
 $startVerse = $row["start_verse"];
 $endVerse = $row["end_verse"];
+$statement->close();
+
+$statement = $db->prepare("select t.tag_id, t.tag_name from tag t, tag_nugget tp where t.tag_id = tp.tag_id and nugget_id = :id");
+$statement->bindValue(':id', $id);
+$results = $statement->execute();
+$topicsArray= array();
+while ($row = $results->fetchArray()) {
+    $topic = new stdClass();
+    $topic->id = $row['tag_id'];
+    $topic->name = $row['tag_name'];
+    array_push($topicsArray, $topic);
+}
 $statement->close();
 $db->close();
 
@@ -58,16 +70,17 @@ while ($row = $results->fetchArray()) {
     $versePart->versePartId = $row["verse_part_id"];
     $versePart->verseText = $row["verse_text"];
     if ($row["is_words_of_christ"] == "Y") {
-        $versePart->wordsOfChrist = TRUE;
+        $versePart->wordsOfChrist = true;
     } else {
-        $versePart->wordsOfChrist = FALSE;
+        $versePart->wordsOfChrist = false;
     }
     $verse->addVersePart($versePart);
     $passage->bookName = $row["book_name"];
 }
 $statement->close();
+$passage->topics = $topicsArray;
+
 $db->close();
 header('Content-Type: application/json; charset=utf8');
 print_r(json_encode(objectToArray($passage)));
 
-?>
