@@ -4,11 +4,12 @@ import {AppState} from "../model/AppState";
 import {Passage} from "../model/passage";
 import {PassageUtils} from "../helpers/passage-utils";
 import {Quote} from "../model/quote";
+import {Topic} from "../model/topic";
 
 const useMemoryPassages = () => {
     const memTextOverrides = useSelector((state: AppState) => state.memTextOverrides);
     const practiceConfig = useSelector((state: AppState) => state.practiceConfig);
-    const allTags: {id: number, name: string}[] = useSelector((appState: AppState) => appState.topicList);
+    const allTags: Topic[] = useSelector((appState: AppState) => appState.topicList);
 
     const getMemPassages = async (user: string, sort: boolean) => {
         const locMemoryPassagesData: any = await memoryService.getMemoryPsgList(user);
@@ -45,12 +46,12 @@ const useMemoryPassages = () => {
         return passageId;
     };
 
-    const addQuoteTopic = async (topic: {id: number, name: string}, quoteId: number, user: string) => {
+    const addQuoteTopic = async (topic: Topic, quoteId: number, user: string) => {
         const addQuoteTopicResponse = await memoryService.addQuoteTopic(topic, quoteId, user);
         return addQuoteTopicResponse.data;
     };
 
-    const removeQuoteTopic = async (topic: {id: number, name: string}, quoteId: number, user: string) => {
+    const removeQuoteTopic = async (topic: Topic, quoteId: number, user: string) => {
         const removeQuoteTopicResponse = await memoryService.removeQuoteTopic(topic, quoteId, user);
         return removeQuoteTopicResponse.data;
     };
@@ -78,7 +79,7 @@ const useMemoryPassages = () => {
 
     const getTopicList = async (user: string) => {
         const topicListResponse = await memoryService.getTopicList(user);
-        const topicsById: {id: number, name: string}[] = topicListResponse.data;
+        const topicsById: Topic[] = topicListResponse.data;
         return topicsById;
     };
 

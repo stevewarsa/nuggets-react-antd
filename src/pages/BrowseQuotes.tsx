@@ -25,6 +25,7 @@ import SendQuote from "../components/SendQuote";
 import FilterByTagDrawer from "../components/FilterByTagDrawer";
 import React, {useState} from "react";
 import useRemoveTopic from "../hooks/use-remove-topic";
+import {Topic} from "../model/topic";
 
 const { Panel } = Collapse;
 
@@ -60,7 +61,7 @@ const BrowseQuotes = () => {
     const [associatedTopicsOpen, setAssociatedTopicsOpen] = useState(false);
     const [currentTopicsFilteredOpen, setCurrentTopicsFilteredOpen] = useState(false);
 
-    const handleClose = (topic: {id: number, name: string}) => {
+    const handleClose = (topic: Topic) => {
         console.log("Remove topic: ", topic);
         handleRemoveTopic(topic, filteredQuotes[currentIndex]).then(() => setAssociatedTopicsOpen(false));
     };

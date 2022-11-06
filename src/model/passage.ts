@@ -1,4 +1,5 @@
 import {Verse} from "./verse";
+import {Topic} from "./topic";
 
 export class Passage {
     passageId: number;
@@ -15,5 +16,5 @@ export class Passage {
     last_viewed_num: number;
     passageRefAppendLetter: string;
     verses: Verse[];
-    topics: {id: number, name: string}[];
+    topics: Topic[];
 }

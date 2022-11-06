@@ -7,10 +7,11 @@ import {stateActions} from "../store";
 import {Modal, notification} from "antd";
 import useRemoveTopic from "./use-remove-topic";
 import {StringUtils} from "../helpers/string.utils";
+import {Topic} from "../model/topic";
 
 const useQuoteTopics = (quote: Quote, visible: boolean) => {
     const dispatcher = useDispatch();
-    const allTopics: {id: number, name: string}[] = useSelector((appState: AppState) => appState.topicList);
+    const allTopics: Topic[] = useSelector((appState: AppState) => appState.topicList);
     const user = useSelector((state: AppState) => state.user);
     const {addQuoteTopic} = useMemoryPassages();
     const {handleRemoveTopic} = useRemoveTopic();
@@ -24,7 +25,7 @@ const useQuoteTopics = (quote: Quote, visible: boolean) => {
         setQuoteTopicsVisible(visible);
     }, [visible]);
 
-    const addExistingTopicToQuote = (tg: { id: number; name: string }) => {
+    const addExistingTopicToQuote = (tg: Topic) => {
         setBusy({state: true, message: "Adding topic '" + tg.name + "' to quote..."});
         addQuoteTopic(tg, quote.quoteId, user).then(response => {
             if (response.message === "success") {
@@ -78,7 +79,8 @@ const useQuoteTopics = (quote: Quote, visible: boolean) => {
                 }
             });
         } else {
-            addQuoteTopic({id: -1, name: locTopicInputVal}, quote.quoteId, user).then(response => {
+            const newTopic: Topic = {id: -1, name: locTopicInputVal};
+            addQuoteTopic(newTopic, quote.quoteId, user).then(response => {
                 if (response.message === "success" && response.topic) {
                     dispatcher(stateActions.addNewTopic(response.topic));
                     const updatedQuote = {...quote, tags: [...quote.tags, response.topic], tagIds: [...quote.tagIds, response.topic.id]};

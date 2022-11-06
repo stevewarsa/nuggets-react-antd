@@ -1,21 +1,19 @@
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import {useEffect, useState} from "react";
-import useMemoryPassages from "../hooks/use-memory-passages";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {Col, Input, Row} from "antd";
 import {stateActions} from "../store";
 import {useNavigate} from "react-router-dom";
+import {Topic} from "../model/topic";
 
 const TopicList = () => {
-    const user = useSelector((state: AppState) => state.user);
-    const allTopics: {id: number, name: string}[] = useSelector((state: AppState) => state.topicList);
+    const allTopics: Topic[] = useSelector((state: AppState) => state.topicList);
     const dispatcher = useDispatch();
     const navigate = useNavigate();
-    const {getTopicList} = useMemoryPassages();
     const [busy, setBusy] = useState({state: false, message: ""});
-    const [topicList, setTopicList] = useState<{id: number, name: string}[]>([]);
-    const [filteredTopicList, setFilteredTopicList] = useState<{id: number, name: string}[]>([]);
+    const [topicList, setTopicList] = useState<Topic[]>([]);
+    const [filteredTopicList, setFilteredTopicList] = useState<Topic[]>([]);
     const [filter, setFilter] = useState<string>(undefined);
 
     useEffect(() => {
@@ -23,7 +21,7 @@ const TopicList = () => {
         setFilteredTopicList(allTopics);
     }, [allTopics]);
 
-    const handleTopicClick = (topic: { id: number; name: string }) => {
+    const handleTopicClick = (topic: Topic) => {
         console.log("User clicked on topic: " + topic.name + " (id=" + topic.id + ")");
         dispatcher(stateActions.setIncomingTopic(topic));
         navigate("/browseNuggets");

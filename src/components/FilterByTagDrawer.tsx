@@ -5,13 +5,14 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import {CheckboxChangeEvent} from "antd/es/checkbox";
 import {stateActions} from "../store";
+import {Topic} from "../model/topic";
 
 const FilterByTagDrawer = () => {
     const dispatcher = useDispatch();
-    const allTags: {id: number, name: string}[] = useSelector((appState: AppState) => appState.topicList);
+    const allTags: Topic[] = useSelector((appState: AppState) => appState.topicList);
     const [open, setOpen] = useState(false);
     const [filter, setFilter] = useState<string>(undefined);
-    const [filteredTopicList, setFilteredTopicList] = useState<{id: number, name: string}[]>([]);
+    const [filteredTopicList, setFilteredTopicList] = useState<Topic[]>([]);
     const [selectedTopicIds, setSelectedTopicIds] = useState<number[]>([]);
 
     useEffect(() => {

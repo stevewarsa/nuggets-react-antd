@@ -1,6 +1,6 @@
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import memoryService from "../services/memory-service";
 import {PassageUtils} from "../helpers/passage-utils";
 import SpinnerTimer from "../components/SpinnerTimer";
@@ -10,7 +10,7 @@ import {
     ArrowLeftOutlined,
     ArrowRightOutlined, CloseOutlined,
     CopyOutlined, FilterOutlined, LinkOutlined,
-    MoreOutlined,
+    MoreOutlined, UnorderedListOutlined,
 } from "@ant-design/icons";
 import {Constants} from "../model/constants";
 import {stateActions} from "../store";
@@ -18,19 +18,23 @@ import {VerseSelectionRequest} from "../model/verse-selection-request";
 import {useNavigate} from "react-router-dom";
 import {CSSTransition, SwitchTransition} from "react-transition-group";
 import {Passage} from "../model/passage";
+import {Topic} from "../model/topic";
+import TopicSelection from "../components/TopicSelection";
 const {Panel} = Collapse;
 const {Option} = Select;
 
 const menuItemsNoFilter: MenuProps["items"] = [
     {label: "Copy", key: "copy", icon: <CopyOutlined/>},
     {label: "Interlinear View...", key: "interlinear", icon: <LinkOutlined />},
-    {label: "Clear Filter...", key: "clear", icon: <CloseOutlined />}
+    {label: "Clear Filter...", key: "clear", icon: <CloseOutlined />},
+    {label: "Topics...", key: "topics", icon: <UnorderedListOutlined />}
 ];
 
 const menuItemsNoClear: MenuProps["items"] = [
     {label: "Copy", key: "copy", icon: <CopyOutlined/>},
     {label: "Interlinear View...", key: "interlinear", icon: <LinkOutlined />},
-    {label: "Filter...", key: "filter", icon: <FilterOutlined />}
+    {label: "Filter...", key: "filter", icon: <FilterOutlined />},
+    {label: "Topics...", key: "topics", icon: <UnorderedListOutlined />}
 ];
 
 const BrowseNuggets = () => {
@@ -38,12 +42,12 @@ const BrowseNuggets = () => {
     const navigate = useNavigate();
     const user = useSelector((state: AppState) => state.user);
     const prefs = useSelector((state: AppState) => state.userPreferences);
-    const incomingTopic: { id: number; name: string } = useSelector((state: AppState) => state.incomingTopic);
+    const incomingTopic: Topic = useSelector((state: AppState) => state.incomingTopic);
     const startingPassageId = useSelector((state: AppState) => state.startingPassageId);
     const [busy, setBusy] = useState({state: false, message: ""});
     const [nuggetIdList, setNuggetIdList] = useState([]);
     const [originalNuggetIdList, setOriginalNuggetIdList] = useState([]);
-    const [topicList, setTopicList] = useState<{id: number, name: string}[]>([]);
+    const [topicList, setTopicList] = useState<Topic[]>([]);
     const [filterVisible, setFilterVisible] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [currentPassage, setCurrentPassage] = useState<Passage>(undefined);
@@ -51,6 +55,8 @@ const BrowseNuggets = () => {
     const [selectedTopic, setSelectedTopic] = useState<number>(-1);
     const [topicFiltered, setTopicFiltered] = useState<boolean>(false);
     const [associatedTopicsOpen, setAssociatedTopicsOpen] = useState(false);
+    const [topicSelectionOpen, setTopicSelectionOpen] = useState(false);
+    const topicSelectionComp = useRef();
 
     useEffect(() => {
         if (prefs) {
@@ -144,6 +150,8 @@ const BrowseNuggets = () => {
             setNuggetIdList(originalNuggetIdList);
             setTopicFiltered(false);
             dispatcher(stateActions.setIncomingTopic(null));
+        } else if (key === "topics") {
+            setTopicSelectionOpen(true);
         }
     };
 
@@ -303,6 +311,40 @@ const BrowseNuggets = () => {
                 </Row>
                 </>
             </Modal>
+            {currentPassage &&
+                <Modal footer={null}
+                       onCancel={() => {
+                           // @ts-ignore
+                           topicSelectionComp.current.cleanup();
+                           setTopicSelectionOpen(false);
+                       }}
+                       open={topicSelectionOpen}
+                       title={"Topics for " + PassageUtils.getPassageStringNoIndex(currentPassage, true, true)}>
+                    <TopicSelection ref={topicSelectionComp} props={{
+                        associatedTopics: currentPassage.topics,
+                        addTopicFunction: (topics: Topic[]) => {
+                            console.log("BrowseNuggets.TopicSelection modal - Adding topic: ", topics);
+                            setBusy({state: true, message: "Adding topic to passage..."});
+                            memoryService.addPassageTopics(topics.map(tpc => tpc.id), currentPassage.passageId, user).then(response => {
+                                setBusy({state: false, message: ""});
+                                if (response.data === "success") {
+                                    notification.success({message: "Added topics to current passage!", placement: "bottomRight"});
+                                    const updatedTopics = [...currentPassage.topics];
+                                    for (const topic of topics) {
+                                        updatedTopics.push(topic);
+                                    }
+                                    const updatedPassage = {...currentPassage, topics: updatedTopics};
+                                    setCurrentPassage(updatedPassage);
+                                    setAssociatedTopicsOpen(false);
+                                } else {
+                                    notification.warning({message: "Unable to add topics to current passage.", placement: "topLeft"});
+                                }
+                            });
+                            setTopicSelectionOpen(false);
+                        }
+                    }}/>
+                </Modal>
+            }
         </>
     );
 };

@@ -7,6 +7,7 @@ import React, {useEffect, useRef} from "react";
 import {useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import SpinnerTimer from "./SpinnerTimer";
+import {Topic} from "../model/topic";
 
 interface QuoteTopicsProps {
     currentQuote: Quote;
@@ -31,8 +32,8 @@ const QuoteTopics = ({props}: {props: QuoteTopicsProps}) => {
         showTopicInput,
         handleRemoveTopic
     } = useQuoteTopics(props.currentQuote, props.visible);
-    const allTopics: {id: number, name: string}[] = useSelector((appState: AppState) => appState.topicList);
-    const recentTopicsUsed: {id: number, name: string}[] = useSelector((appState: AppState) => appState.recentTopicsUsed);
+    const allTopics: Topic[] = useSelector((appState: AppState) => appState.topicList);
+    const recentTopicsUsed: Topic[] = useSelector((appState: AppState) => appState.recentTopicsUsed);
     const topicInputRef = useRef<InputRef>(null);
     const topicFilterRef = useRef<InputRef>(null);
 
@@ -74,7 +75,7 @@ const QuoteTopics = ({props}: {props: QuoteTopicsProps}) => {
                         leave={{opacity: 0, width: 0, scale: 0, duration: 200}}
                         appear={false}
                     >
-                        {props.currentQuote && props.currentQuote.tags.map(topic => (
+                        {props.currentQuote.tags.map(topic => (
                             <span key={topic.id} style={{display: 'inline-block'}}>
                         <Tag
                             key={topic.id}

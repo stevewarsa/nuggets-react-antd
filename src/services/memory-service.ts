@@ -5,6 +5,7 @@ import {Quote} from "../model/quote";
 import {MemUser} from "../model/mem-user";
 import axiosRetry from "axios-retry";
 import {UpdatePassageParam} from "../model/update-passage-param";
+import {Topic} from "../model/topic";
 
 class MemoryService {
     public getMemoryPsgList(user: string) {
@@ -84,12 +85,12 @@ class MemoryService {
         return MemoryService.buildAxios().get<number>("/bible-app/server/add_memory_passage.php?user=" + userName + "&translation=" + passage.translationId + "&book=" + passage.bookName + "&chapter=" + passage.chapter + "&start=" + passage.startVerse + "&end=" + passage.endVerse + "&queue=N");
     }
 
-    public addQuoteTopic(topic: {id: number, name: string}, quoteId: number, userName: string) {
-        return MemoryService.buildAxios().post<{quoteId: number, topic: {id: number, name: string}, message: string}>("/bible-app/server/add_quote_topic.php", {user: userName, topic: topic, quoteId: quoteId});
+    public addQuoteTopic(topic: Topic, quoteId: number, userName: string) {
+        return MemoryService.buildAxios().post<{quoteId: number, topic: Topic, message: string}>("/bible-app/server/add_quote_topic.php", {user: userName, topic: topic, quoteId: quoteId});
     }
 
-    public removeQuoteTopic(topic: {id: number, name: string}, quoteId: number, userName: string) {
-        return MemoryService.buildAxios().post<{quoteId: number, topic: {id: number, name: string}, message: string}>("/bible-app/server/remove_quote_topic.php", {user: userName, topic: topic, quoteId: quoteId});
+    public removeQuoteTopic(topic: Topic, quoteId: number, userName: string) {
+        return MemoryService.buildAxios().post<{quoteId: number, topic: Topic, message: string}>("/bible-app/server/remove_quote_topic.php", {user: userName, topic: topic, quoteId: quoteId});
     }
 
     public removeQuote(quoteId: number, userName: string) {
@@ -134,15 +135,19 @@ class MemoryService {
     }
 
     public getTopicList(currentUser: string) {
-        return MemoryService.buildAxios().get<{id: number, name: string}[]>("/bible-app/server/get_tag_list.php?user=" + currentUser);
+        return MemoryService.buildAxios().get<Topic[]>("/bible-app/server/get_tag_list.php?user=" + currentUser);
     }
 
     public getPassagesForTopic(topicId: number, currentUser: string) {
         return MemoryService.buildAxios().get<Passage[]>("/bible-app/server/get_tag_list.php?tagId=" + topicId + '&user=' + currentUser);
     }
 
-    public removePassageTopic(topic: {id: number, name: string}, passageId: number, userName: string) {
-        return MemoryService.buildAxios().post<{passageId: number, topic: {id: number, name: string}, message: string}>("/bible-app/server/remove_passage_topic.php", {user: userName, topic: topic, passageId: passageId});
+    public removePassageTopic(topic: Topic, passageId: number, userName: string) {
+        return MemoryService.buildAxios().post<{passageId: number, topic: Topic, message: string}>("/bible-app/server/remove_passage_topic.php", {user: userName, topic: topic, passageId: passageId});
+    }
+
+    public addPassageTopics(topicIds: number[], passageId: number, userName: string) {
+        return MemoryService.buildAxios().post<string>("/bible-app/server/add_passage_topic.php", {user: userName, topicIds: topicIds, passageId: passageId});
     }
 
     public updatePassage(updatePassageParam: UpdatePassageParam) {

@@ -3,6 +3,7 @@ import {Passage} from "./passage";
 import {VerseSelectionRequest} from "./verse-selection-request";
 import {MemUser} from "./mem-user";
 import {Quote} from "./quote";
+import {Topic} from "./topic";
 
 export interface AppState {
     practiceConfig: PracticeConfig;
@@ -16,8 +17,8 @@ export interface AppState {
     allUsers: MemUser[];
     startingQuote: number;
     startingPassageId: number;
-    incomingTopic: { id: number; name: string };
-    topicList: { id: number; name: string }[];
+    incomingTopic: Topic;
+    topicList: Topic[];
     allQuotes: Quote[];
     filteredQuotes: Quote[];
     currentSearchString: string;
@@ -26,5 +27,5 @@ export interface AppState {
     currentQuotesIndex: number;
     editPassageActive: boolean;
     currentQuoteTagsFiltered: string[];
-    recentTopicsUsed: { id: number; name: string }[];
+    recentTopicsUsed: Topic[];
 }
