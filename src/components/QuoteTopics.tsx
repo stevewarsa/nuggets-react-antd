@@ -1,5 +1,5 @@
 import {TweenOneGroup} from "rc-tween-one";
-import {Divider, Input, InputRef, Modal, Tag} from "antd";
+import {Input, InputRef, Modal, Tag} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import {Quote} from "../model/quote";
 import useQuoteTopics from "../hooks/use-quote-topics";
@@ -8,6 +8,7 @@ import {useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import SpinnerTimer from "./SpinnerTimer";
 import {Topic} from "../model/topic";
+import TopicSelection from "./TopicSelection";
 
 interface QuoteTopicsProps {
     currentQuote: Quote;
@@ -20,11 +21,9 @@ const QuoteTopics = ({props}: {props: QuoteTopicsProps}) => {
         topicInputVisible,
         topicInputValue,
         quoteTopicsVisible,
-        filter,
         busy,
-        handleTopicFilterChange,
         setQuoteTopicsVisible,
-        addExistingTopicToQuote,
+        addExistingTopicsToQuote,
         handleTopicInputChange,
         handleTopicInputConfirm,
         handleTopicOk,
@@ -33,7 +32,6 @@ const QuoteTopics = ({props}: {props: QuoteTopicsProps}) => {
         handleRemoveTopic
     } = useQuoteTopics(props.currentQuote, props.visible);
     const allTopics: Topic[] = useSelector((appState: AppState) => appState.topicList);
-    const recentTopicsUsed: Topic[] = useSelector((appState: AppState) => appState.recentTopicsUsed);
     const topicInputRef = useRef<InputRef>(null);
     const topicFilterRef = useRef<InputRef>(null);
 
@@ -55,6 +53,7 @@ const QuoteTopics = ({props}: {props: QuoteTopicsProps}) => {
     useEffect(() => {
         props.setVisibleFunction(quoteTopicsVisible);
     }, [quoteTopicsVisible]);
+
     return (
         <Modal title="Quote Topics" open={quoteTopicsVisible} onOk={handleTopicOk} onCancel={handleTopicCancel}>
             {props.currentQuote && props.currentQuote.tags && props.currentQuote.tags.length > 0 &&
@@ -112,40 +111,8 @@ const QuoteTopics = ({props}: {props: QuoteTopicsProps}) => {
                     <PlusOutlined/> New Topic
                 </Tag>
             )}
-            {props.currentQuote && recentTopicsUsed && recentTopicsUsed.length > 0 && <h3>Recent Topics Used:</h3>}
             {props.currentQuote &&
-                recentTopicsUsed &&
-                recentTopicsUsed.length > 0 &&
-                recentTopicsUsed.filter(tg => !props.currentQuote.tagIds.includes(tg.id)).map(tg => (
-                    <Tag key={tg.id + "-recent"} onClick={() => addExistingTopicToQuote(tg)} className="topic">
-                        <PlusOutlined/> {tg.name}
-                    </Tag>
-                ))}
-            {props.currentQuote && recentTopicsUsed && recentTopicsUsed.length > 0 &&
-                <Divider style={{color: "black"}} dashed/>}
-            {props.currentQuote && allTopics && allTopics.length > 0 &&
-                <>
-                    <h3>All Topics:</h3>
-                    <Input
-                        ref={topicFilterRef}
-                        type="text"
-                        size="middle"
-                        style={{width: 150}}
-                        value={filter}
-                        autoFocus
-                        onChange={handleTopicFilterChange}
-                        placeholder="Filter Topics"
-                    />
-                    <br/><br/>
-                </>
-            }
-            {props.currentQuote &&
-                allTopics.length > 0 &&
-                allTopics.filter(tg => !props.currentQuote.tagIds.includes(tg.id) && (!filter || tg.name.toLowerCase().indexOf(filter.toLowerCase()) >= 0)).map(tg => (
-                    <Tag key={tg.id} onClick={() => addExistingTopicToQuote(tg)} className="topic">
-                        <PlusOutlined/> {tg.name}
-                    </Tag>
-                ))
+                <TopicSelection props={{associatedTopics: props.currentQuote.tags, addTopicFunction: addExistingTopicsToQuote}} />
             }
         </Modal>
     );

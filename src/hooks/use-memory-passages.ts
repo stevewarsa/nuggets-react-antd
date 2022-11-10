@@ -46,8 +46,8 @@ const useMemoryPassages = () => {
         return passageId;
     };
 
-    const addQuoteTopic = async (topic: Topic, quoteId: number, user: string) => {
-        const addQuoteTopicResponse = await memoryService.addQuoteTopic(topic, quoteId, user);
+    const addQuoteTopics = async (topics: Topic[], quoteId: number, user: string) => {
+        const addQuoteTopicResponse = await memoryService.addQuoteTopics(topics, quoteId, user);
         return addQuoteTopicResponse.data;
     };
 
@@ -94,7 +94,7 @@ const useMemoryPassages = () => {
         addMemoryPassage: addMemoryPassage,
         getTopicList: getTopicList,
         getPassagesForTopic: getPassagesForTopic,
-        addQuoteTopic: addQuoteTopic,
+        addQuoteTopics: addQuoteTopics,
         getQuoteList: getQuoteList,
         removeQuoteTopic: removeQuoteTopic
     };

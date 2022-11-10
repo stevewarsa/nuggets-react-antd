@@ -1,7 +1,7 @@
 import {Topic} from "../model/topic";
 import {useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
-import React, {ChangeEvent, forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
+import React, {ChangeEvent, forwardRef, useImperativeHandle, useRef, useState} from "react";
 import {Button, Checkbox, Col, Divider, Input, InputRef, Row, Tag} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 
@@ -82,7 +82,7 @@ const TopicSelection = forwardRef(({props}: {props: TopicSelectionProps}, ref) =
                             <Checkbox onClick={(evt) => handleAddRemovePendingTopic(evt, topic)}
                                       checked={topicsPendingAdd.length > 0 && topicsPendingAdd.filter(tpc => topic.id === tpc.id).length === 1}>
                             </Checkbox>
-                            <Tag onClick={() => props.addTopicFunction([topic])} className="topic">
+                            <Tag style={{marginLeft: 4}} onClick={() => props.addTopicFunction([topic])} className="topic">
                                 <PlusOutlined/> {topic.name}
                             </Tag>
                         </Col>

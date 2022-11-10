@@ -194,13 +194,15 @@ const state = createSlice({
                 }
             }
         },
-        addNewTopic(state, action) {
+        addNewTopics(state, action) {
             const tmpTopicList = [...state.topicList, action.payload];
             state.topicList = tmpTopicList.sort((a, b) => a.name.localeCompare(b.name));
         },
-        addRecentTopicUsed(state, action) {
-            if (state.recentTopicsUsed.filter(tg => tg.id === action.payload.id).length === 0) {
-                state.recentTopicsUsed.push(action.payload);
+        addRecentTopicsUsed(state, action) {
+            for (const topic of action.payload) {
+                if (state.recentTopicsUsed.filter(tg => tg.id === topic.id).length === 0) {
+                    state.recentTopicsUsed.push(topic);
+                }
             }
         }
     }

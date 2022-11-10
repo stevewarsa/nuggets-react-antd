@@ -13,7 +13,7 @@ const useQuoteTopics = (quote: Quote, visible: boolean) => {
     const dispatcher = useDispatch();
     const allTopics: Topic[] = useSelector((appState: AppState) => appState.topicList);
     const user = useSelector((state: AppState) => state.user);
-    const {addQuoteTopic} = useMemoryPassages();
+    const {addQuoteTopics} = useMemoryPassages();
     const {handleRemoveTopic} = useRemoveTopic();
     const [topicInputVisible, setTopicInputVisible] = useState(false);
     const [topicInputValue, setTopicInputValue] = useState("");
@@ -25,13 +25,21 @@ const useQuoteTopics = (quote: Quote, visible: boolean) => {
         setQuoteTopicsVisible(visible);
     }, [visible]);
 
-    const addExistingTopicToQuote = (tg: Topic) => {
-        setBusy({state: true, message: "Adding topic '" + tg.name + "' to quote..."});
-        addQuoteTopic(tg, quote.quoteId, user).then(response => {
+    const addExistingTopicsToQuote = (topics: Topic[]) => {
+        setBusy({state: true, message: "Adding topics to quote..."});
+        addQuoteTopics(topics, quote.quoteId, user).then(response => {
             if (response.message === "success") {
-                const updatedQuote = {...quote, tags: [...quote.tags, tg], tagIds: [...quote.tagIds, tg.id]};
+                const updatedTopics = [...quote.tags];
+                const updatedTopicIds = [...quote.tagIds];
+                for (const topic of topics) {
+                    updatedTopics.push(topic);
+                }
+                for (const topicId of topics.map(tpc => tpc.id)) {
+                    updatedTopicIds.push(topicId);
+                }
+                const updatedQuote = {...quote, tags: updatedTopics, tagIds: updatedTopicIds};
                 dispatcher(stateActions.updateQuoteInList(updatedQuote));
-                dispatcher(stateActions.addRecentTopicUsed(tg));
+                dispatcher(stateActions.addRecentTopicsUsed(topics));
                 console.log("useQuoteTags.addExistingTagToQuote setting quote tags visible to false, current value of visible is " + visible);
                 setQuoteTopicsVisible(false);
             } else {
@@ -64,11 +72,11 @@ const useQuoteTopics = (quote: Quote, visible: boolean) => {
         const foundTopic = allTopics.find(tg => tg.name === locTopicInputVal);
         if (foundTopic) {
             // this topic exists, so just associate it with the current quote
-            addQuoteTopic(foundTopic, quote.quoteId, user).then(response => {
+            addQuoteTopics([foundTopic], quote.quoteId, user).then(response => {
                 if (response.message === "success") {
                     const updatedQuote = {...quote, tags: [...quote.tags, foundTopic], tagIds: [...quote.tagIds, foundTopic.id]};
                     dispatcher(stateActions.updateQuoteInList(updatedQuote));
-                    dispatcher(stateActions.addRecentTopicUsed(foundTopic));
+                    dispatcher(stateActions.addRecentTopicsUsed([foundTopic]));
                     setQuoteTopicsVisible(false);
                 } else {
                     console.log("Error adding typed topic matching existing topic to quote! Here's the response:", response);
@@ -80,12 +88,12 @@ const useQuoteTopics = (quote: Quote, visible: boolean) => {
             });
         } else {
             const newTopic: Topic = {id: -1, name: locTopicInputVal};
-            addQuoteTopic(newTopic, quote.quoteId, user).then(response => {
-                if (response.message === "success" && response.topic) {
-                    dispatcher(stateActions.addNewTopic(response.topic));
-                    const updatedQuote = {...quote, tags: [...quote.tags, response.topic], tagIds: [...quote.tagIds, response.topic.id]};
+            addQuoteTopics([newTopic], quote.quoteId, user).then(response => {
+                if (response.message === "success" && response.topics) {
+                    dispatcher(stateActions.addNewTopics(response.topics));
+                    const updatedQuote = {...quote, tags: [...quote.tags, response.topics], tagIds: [...quote.tagIds, response.topics.map(tpc => tpc.id)]};
                     dispatcher(stateActions.updateQuoteInList(updatedQuote));
-                    dispatcher(stateActions.addRecentTopicUsed(response.topic));
+                    dispatcher(stateActions.addRecentTopicsUsed(response.topics));
                     setQuoteTopicsVisible(false);
                 } else {
                     console.log("Error adding new topic to quote! Here's the response:", response);
@@ -128,7 +136,7 @@ const useQuoteTopics = (quote: Quote, visible: boolean) => {
         setQuoteTopicsVisible: setQuoteTopicsVisible,
         filter: filter,
         busy: busy,
-        addExistingTopicToQuote: addExistingTopicToQuote,
+        addExistingTopicsToQuote: addExistingTopicsToQuote,
         handleTopicInputChange: handleTopicInputChange,
         handleTopicInputConfirm: handleTopicInputConfirm,
         handleTopicOk: handleTopicOk,
