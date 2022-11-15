@@ -15,8 +15,6 @@ const useQuoteTopics = (quote: Quote, visible: boolean) => {
     const user = useSelector((state: AppState) => state.user);
     const {addQuoteTopics} = useMemoryPassages();
     const {handleRemoveTopic} = useRemoveTopic();
-    const [topicInputVisible, setTopicInputVisible] = useState(false);
-    const [topicInputValue, setTopicInputValue] = useState("");
     const [quoteTopicsVisible, setQuoteTopicsVisible] = useState(false);
     const [filter, setFilter] = useState(undefined);
     const [busy, setBusy] = useState({state: false, message: ""});
@@ -54,11 +52,7 @@ const useQuoteTopics = (quote: Quote, visible: boolean) => {
         });
     };
 
-    const handleTopicInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setTopicInputValue(e.target.value);
-    };
-
-    const handleTopicInputConfirm = () => {
+    const handleTopicInputConfirm = (topicInputValue: string) => {
         const locTopicInputVal = topicInputValue && !StringUtils.isEmpty(topicInputValue) ? topicInputValue.trim() : null;
         if (!locTopicInputVal) {
             notification.warning({message: "No topic text entered", placement: "bottomRight"});
@@ -104,12 +98,6 @@ const useQuoteTopics = (quote: Quote, visible: boolean) => {
                 }
             });
         }
-        setTopicInputVisible(false);
-        setTopicInputValue("");
-    };
-
-    const showTopicInput = () => {
-        setTopicInputVisible(true);
     };
 
     const handleTopicOk = () => {
@@ -128,20 +116,14 @@ const useQuoteTopics = (quote: Quote, visible: boolean) => {
     };
 
     return {
-        topicInputVisible: topicInputVisible,
-        setTopicInputVisible: setTopicInputVisible,
-        topicInputValue: topicInputValue,
-        setTopicInputValue: setTopicInputValue,
         quoteTopicsVisible: quoteTopicsVisible,
         setQuoteTopicsVisible: setQuoteTopicsVisible,
         filter: filter,
         busy: busy,
         addExistingTopicsToQuote: addExistingTopicsToQuote,
-        handleTopicInputChange: handleTopicInputChange,
         handleTopicInputConfirm: handleTopicInputConfirm,
         handleTopicOk: handleTopicOk,
         handleTopicCancel: handleTopicCancel,
-        showTopicInput: showTopicInput,
         handleRemoveTopic: handleRemoveTopic,
         handleTopicFilterChange: handleTopicFilterChange,
         quote: quote

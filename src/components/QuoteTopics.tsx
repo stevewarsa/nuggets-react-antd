@@ -1,6 +1,5 @@
 import {TweenOneGroup} from "rc-tween-one";
-import {Input, InputRef, Modal, Tag} from "antd";
-import {PlusOutlined} from "@ant-design/icons";
+import {InputRef, Modal, Tag} from "antd";
 import {Quote} from "../model/quote";
 import useQuoteTopics from "../hooks/use-quote-topics";
 import React, {useEffect, useRef} from "react";
@@ -18,28 +17,17 @@ interface QuoteTopicsProps {
 
 const QuoteTopics = ({props}: {props: QuoteTopicsProps}) => {
     const {
-        topicInputVisible,
-        topicInputValue,
         quoteTopicsVisible,
         busy,
         setQuoteTopicsVisible,
         addExistingTopicsToQuote,
-        handleTopicInputChange,
         handleTopicInputConfirm,
         handleTopicOk,
         handleTopicCancel,
-        showTopicInput,
         handleRemoveTopic
     } = useQuoteTopics(props.currentQuote, props.visible);
     const allTopics: Topic[] = useSelector((appState: AppState) => appState.topicList);
-    const topicInputRef = useRef<InputRef>(null);
     const topicFilterRef = useRef<InputRef>(null);
-
-    useEffect(() => {
-        if (topicInputVisible) {
-            topicInputRef.current.focus();
-        }
-    }, [topicInputVisible]);
 
     useEffect(() => {
         if (quoteTopicsVisible && topicFilterRef && topicFilterRef.current) {
@@ -93,26 +81,13 @@ const QuoteTopics = ({props}: {props: QuoteTopicsProps}) => {
                     </TweenOneGroup>
                 </fieldset>
             }
-            {topicInputVisible && (
-                <Input
-                    ref={topicInputRef}
-                    type="text"
-                    size="small"
-                    style={{width: 78}}
-                    value={topicInputValue}
-                    onChange={handleTopicInputChange}
-                    onBlur={handleTopicInputConfirm}
-                    onPressEnter={handleTopicInputConfirm}
-                />
-            )}
             {busy.state && <SpinnerTimer message={busy.message} />}
-            {!topicInputVisible && (
-                <Tag onClick={showTopicInput} className="topic">
-                    <PlusOutlined/> New Topic
-                </Tag>
-            )}
             {props.currentQuote &&
-                <TopicSelection props={{associatedTopics: props.currentQuote.tags, addTopicFunction: addExistingTopicsToQuote}} />
+                <TopicSelection props={{
+                    associatedTopics: props.currentQuote.tags,
+                    addTopicFunction: addExistingTopicsToQuote,
+                    newTopicFunction: handleTopicInputConfirm
+                }} />
             }
         </Modal>
     );

@@ -207,6 +207,16 @@ const BrowseNuggets = () => {
             });
     };
 
+    function finishAddTopics(topics: Topic[]) {
+        const updatedTopics = [...currentPassage.topics];
+        for (const topic of topics) {
+            updatedTopics.push(topic);
+        }
+        const updatedPassage = {...currentPassage, topics: updatedTopics};
+        setCurrentPassage(updatedPassage);
+        setAssociatedTopicsOpen(false);
+    }
+
     return (
         <>
             <Row justify="center">
@@ -323,21 +333,28 @@ const BrowseNuggets = () => {
                     <TopicSelection ref={topicSelectionComp} props={{
                         associatedTopics: currentPassage.topics,
                         addTopicFunction: (topics: Topic[]) => {
-                            console.log("BrowseNuggets.TopicSelection modal - Adding topic: ", topics);
-                            setBusy({state: true, message: "Adding topic to passage..."});
+                            console.log("BrowseNuggets.TopicSelection modal - Adding topics: ", topics);
+                            setBusy({state: true, message: "Adding topic(s) to passage..."});
                             memoryService.addPassageTopics(topics.map(tpc => tpc.id), currentPassage.passageId, user).then(response => {
                                 setBusy({state: false, message: ""});
                                 if (response.data === "success") {
                                     notification.success({message: "Added topics to current passage!", placement: "bottomRight"});
-                                    const updatedTopics = [...currentPassage.topics];
-                                    for (const topic of topics) {
-                                        updatedTopics.push(topic);
-                                    }
-                                    const updatedPassage = {...currentPassage, topics: updatedTopics};
-                                    setCurrentPassage(updatedPassage);
-                                    setAssociatedTopicsOpen(false);
+                                    finishAddTopics(topics);
                                 } else {
                                     notification.warning({message: "Unable to add topics to current passage.", placement: "topLeft"});
+                                }
+                            });
+                            setTopicSelectionOpen(false);
+                        },
+                        newTopicFunction: (newTopicValue: string) => {
+                            setBusy({state: true, message: "Adding new topic '" + newTopicValue + "' to passage..."});
+                            memoryService.addNewPassageTopic({id: -1, name: newTopicValue.trim()}, currentPassage.passageId, user).then(response => {
+                                setBusy({state: false, message: ""});
+                                if (response.data.message === "success") {
+                                    notification.success({message: "Added topic to current passage!", placement: "bottomRight"});
+                                    finishAddTopics([response.data.topic]);
+                                } else {
+                                    notification.warning({message: "Unable to add topic to current passage.", placement: "topLeft"});
                                 }
                             });
                             setTopicSelectionOpen(false);

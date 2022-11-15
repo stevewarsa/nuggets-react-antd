@@ -150,6 +150,10 @@ class MemoryService {
         return MemoryService.buildAxios().post<string>("/bible-app/server/add_passage_topic.php", {user: userName, topicIds: topicIds, passageId: passageId});
     }
 
+    public addNewPassageTopic(topic: Topic, passageId: number, userName: string) {
+        return MemoryService.buildAxios().post<{message: string, topic: Topic, passageId: number}>("/bible-app/server/add_new_passage_topic.php", {user: userName, topic: topic, passageId: passageId});
+    }
+
     public updatePassage(updatePassageParam: UpdatePassageParam) {
         return MemoryService.buildAxios().post<string>("/bible-app/server/update_passage.php", updatePassageParam);
     }
