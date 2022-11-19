@@ -87,9 +87,16 @@ const TopicSelection = forwardRef(({props}: {props: TopicSelectionProps}, ref) =
             {recentTopicsUsed &&
                 recentTopicsUsed.length > 0 &&
                 recentTopicsUsed.filter(tg => !props.associatedTopics.map(topic => topic.id).includes(tg.id)).map(tg => (
-                    <Tag key={tg.id + "-recent"} onClick={() => props.addTopicFunction([tg])} className="topic">
-                        <PlusOutlined/> {tg.name}
-                    </Tag>
+                    <Row>
+                        <Col>
+                            <Checkbox onClick={(evt) => handleAddRemovePendingTopic(evt, tg)}
+                                      checked={topicsPendingAdd.length > 0 && topicsPendingAdd.filter(tpc => tg.id === tpc.id).length === 1}>
+                            </Checkbox>
+                            <Tag key={tg.id + "-recent"} style={{marginLeft: 4}} onClick={() => props.addTopicFunction([tg])} className="topic">
+                                <PlusOutlined/> {tg.name}
+                            </Tag>
+                        </Col>
+                    </Row>
                 ))}
             {recentTopicsUsed && recentTopicsUsed.length > 0 &&
                 <Divider style={{color: "black"}} dashed/>}
@@ -110,7 +117,15 @@ const TopicSelection = forwardRef(({props}: {props: TopicSelectionProps}, ref) =
                             />
                         </Col>
                         <Col>
-                            <Button icon={<CloseSquareOutlined/>} onClick={() => setFilter(undefined)}/>
+                            <Button icon={<CloseSquareOutlined/>} onClick={() => {
+                                setFilter(undefined);
+                                if (topicFilterRef && topicFilterRef.current) {
+                                    console.log("clearTopicFilter button - focusing the topic filter text box...");
+                                    setTimeout(() => {
+                                        topicFilterRef.current.focus();
+                                    }, 500);
+                                }
+                            }}/>
                         </Col>
                     </Row>
                     <br/><br/>
