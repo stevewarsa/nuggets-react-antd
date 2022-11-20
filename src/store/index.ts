@@ -195,7 +195,7 @@ const state = createSlice({
             }
         },
         addNewTopics(state, action) {
-            const tmpTopicList = [...state.topicList, action.payload];
+            const tmpTopicList = [...state.topicList, ...action.payload];
             state.topicList = tmpTopicList.sort((a, b) => a.name.localeCompare(b.name));
         },
         addRecentTopicsUsed(state, action) {

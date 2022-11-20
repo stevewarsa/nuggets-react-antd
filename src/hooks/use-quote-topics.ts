@@ -85,7 +85,8 @@ const useQuoteTopics = (quote: Quote, visible: boolean) => {
             addQuoteTopics([newTopic], quote.quoteId, user).then(response => {
                 if (response.message === "success" && response.topics) {
                     dispatcher(stateActions.addNewTopics(response.topics));
-                    const updatedQuote = {...quote, tags: [...quote.tags, response.topics], tagIds: [...quote.tagIds, response.topics.map(tpc => tpc.id)]};
+                    const addedTopicIds = response.topics.map(tpc => tpc.id);
+                    const updatedQuote = {...quote, tags: [...quote.tags, ...response.topics], tagIds: [...quote.tagIds, ...addedTopicIds]};
                     dispatcher(stateActions.updateQuoteInList(updatedQuote));
                     dispatcher(stateActions.addRecentTopicsUsed(response.topics));
                     setQuoteTopicsVisible(false);

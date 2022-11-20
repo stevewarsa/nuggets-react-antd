@@ -79,7 +79,12 @@ const TopicSelection = forwardRef(({props}: {props: TopicSelectionProps}, ref) =
                 />
             )}
             {!newTopicInputVisible && (
-                <Tag onClick={() => setNewTopicInputVisible(true)} className="topic">
+                <Tag onClick={() => {
+                    setNewTopicInputVisible(true);
+                    setTimeout(() => {
+                        newTopicInputRef.current.focus();
+                    }, 200);
+                }} className="topic">
                     <PlusOutlined/> New Topic
                 </Tag>
             )}
@@ -87,12 +92,12 @@ const TopicSelection = forwardRef(({props}: {props: TopicSelectionProps}, ref) =
             {recentTopicsUsed &&
                 recentTopicsUsed.length > 0 &&
                 recentTopicsUsed.filter(tg => !props.associatedTopics.map(topic => topic.id).includes(tg.id)).map(tg => (
-                    <Row>
+                    <Row key={tg.id + "-recent"}>
                         <Col>
                             <Checkbox onClick={(evt) => handleAddRemovePendingTopic(evt, tg)}
                                       checked={topicsPendingAdd.length > 0 && topicsPendingAdd.filter(tpc => tg.id === tpc.id).length === 1}>
                             </Checkbox>
-                            <Tag key={tg.id + "-recent"} style={{marginLeft: 4}} onClick={() => props.addTopicFunction([tg])} className="topic">
+                            <Tag style={{marginLeft: 4}} onClick={() => props.addTopicFunction([tg])} className="topic">
                                 <PlusOutlined/> {tg.name}
                             </Tag>
                         </Col>
