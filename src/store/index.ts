@@ -199,11 +199,13 @@ const state = createSlice({
             state.topicList = tmpTopicList.sort((a, b) => a.name.localeCompare(b.name));
         },
         addRecentTopicsUsed(state, action) {
+            let locRecentTopics = [...state.recentTopicsUsed];
             for (const topic of action.payload) {
-                if (state.recentTopicsUsed.filter(tg => tg.id === topic.id).length === 0) {
-                    state.recentTopicsUsed.push(topic);
-                }
+                locRecentTopics = locRecentTopics.filter(tg => tg.id !== topic.id)
+                // add as the first element of the array
+                locRecentTopics.unshift(topic);
             }
+            state.recentTopicsUsed = locRecentTopics;
         }
     }
 });

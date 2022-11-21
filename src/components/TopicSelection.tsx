@@ -67,16 +67,21 @@ const TopicSelection = forwardRef(({props}: {props: TopicSelectionProps}, ref) =
                 <Col><Button disabled={topicsPendingAdd.length === 0} type="primary" onClick={handleAddPendingTopics}>Add Selected</Button></Col>
             </Row>
             {newTopicInputVisible && (
-                <Input
-                    ref={newTopicInputRef}
-                    type="text"
-                    size="small"
-                    style={{width: 78}}
-                    value={newTopicInputValue}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setNewTopicInputValue(e.target.value)}
-                    onBlur={handleEnterNewTopic}
-                    onPressEnter={handleEnterNewTopic}
-                />
+                <Row>
+                    <Col>
+                        <Input
+                            ref={newTopicInputRef}
+                            type="text"
+                            size="small"
+                            style={{width: '100%'}}
+                            value={newTopicInputValue}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => setNewTopicInputValue(e.target.value)}
+                            onBlur={handleEnterNewTopic}
+                            onPressEnter={handleEnterNewTopic}
+                        />
+                    </Col>
+                </Row>
+
             )}
             {!newTopicInputVisible && (
                 <Tag onClick={() => {
