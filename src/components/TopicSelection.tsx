@@ -63,6 +63,11 @@ const TopicSelection = forwardRef(({props}: {props: TopicSelectionProps}, ref) =
 
     return (
         <>
+            {topicsPendingAdd.length > 0 && topicsPendingAdd.map(topic =>
+                <Row key={topic.id} style={{marginBottom: "5px"}}>
+                    <Col style={{fontStyle: "italic"}}>{topic.name}</Col>
+                </Row>
+            )}
             <Row style={{marginBottom: "5px"}}>
                 <Col><Button disabled={topicsPendingAdd.length === 0} type="primary" onClick={handleAddPendingTopics}>Add Selected</Button></Col>
             </Row>
