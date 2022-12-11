@@ -1,6 +1,6 @@
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
-import {Button, Col, Dropdown, Menu, Row, Select, Space} from "antd";
+import {Button, Col, Dropdown, Menu, notification, Row, Select, Space} from "antd";
 import {useEffect, useState} from "react";
 import memoryService from "../services/memory-service";
 import {Passage} from "../model/passage";
@@ -24,24 +24,40 @@ const ReadChapter = () => {
     const dispatcher = useDispatch();
     const navigate = useNavigate();
     const chapterConfig = useSelector((state: AppState) => state.chapterSelection);
+    const prefs = useSelector((state: AppState) => state.userPreferences);
+    const user = useSelector((state: AppState) => state.user);
     const {Option} = Select;
     const [currPassage, setCurrPassage] = useState<Passage>(null);
     const [currFormattedPassageText, setCurrFormattedPassageText] = useState(null);
     const [chapterIdString, setChapterIdString] = useState(null);
 
     useEffect(() => {
-        const callServer = async () => {
+        (async () => {
+            if (!chapterConfig) {
+                return;
+            }
             const chapterResponse = await memoryService.getChapter(chapterConfig.book, chapterConfig.chapter, chapterConfig.translation);
-            (chapterResponse.data as Passage).translationId = (chapterResponse.data as Passage).translationName = chapterConfig.translation;
+            const psg: Passage = chapterResponse.data as Passage;
+            psg.translationId = psg.translationName = chapterConfig.translation;
+            const translFromPrefs = PassageUtils.getPreferredTranslationFromPrefs(prefs, chapterConfig.translation);
+            if (chapterConfig.translation !== translFromPrefs) {
+                // update the preferred translation in prefs
+                memoryService.updatePreference(user, "preferred_translation", chapterConfig.translation).then(resp => {
+                    if (resp.data === "success") {
+                        // the preference was successfully updated, so update it in the preferences in the store
+                        dispatcher(stateActions.updatePreference({key: "preferred_translation", value: chapterConfig.translation}));
+                    } else {
+                        // the response was error
+                        notification.warning({message: "Unable to update preferred translation to '" + chapterConfig.translation + "'!", placement: "topLeft"});
+                    }
+                });
+            }
             // console.log("Here is the chapter received back:");
             // console.log(chapterResponse.data);
-            setCurrPassage(chapterResponse.data as Passage);
-            setCurrFormattedPassageText(PassageUtils.getFormattedPassageText(chapterResponse.data, true));
+            setCurrPassage(psg);
+            setCurrFormattedPassageText(PassageUtils.getFormattedPassageText(psg, true));
             setChapterIdString(chapterConfig.book + "-" + chapterConfig.chapter + "-" + chapterConfig.translation);
-        };
-        if (chapterConfig) {
-            callServer();
-        }
+        })();
     }, [chapterConfig]);
 
     useEffect(() => {
@@ -59,7 +75,7 @@ const ReadChapter = () => {
             // scroll to verse
             const element = document.getElementById("" + chapterConfig.verse);
             if (element) {
-                const topPos = element.getBoundingClientRect().top + window.pageYOffset;
+                const topPos = element.getBoundingClientRect().top + window.scrollY;
                 window.scrollTo({
                     top: topPos, // scroll so that the element is at the top of the view
                     behavior: 'smooth' // smooth scroll

@@ -206,6 +206,20 @@ const state = createSlice({
                 locRecentTopics.unshift(topic);
             }
             state.recentTopicsUsed = locRecentTopics;
+        },
+        updatePreference(state, action) {
+            const pref = action.payload;
+            let found: boolean = false;
+            for (let prefObj of state.userPreferences) {
+                if (prefObj.key === pref.key) {
+                    prefObj.value = pref.value;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                state.userPreferences.push({key: pref.key, value: pref.value});
+            }
         }
     }
 });

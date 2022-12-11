@@ -54,6 +54,10 @@ class MemoryService {
         return MemoryService.buildAxios().get("/bible-app/server/get_preferences.php?user=" + user);
     }
 
+    public updatePreference(user: string, prefNm: string, prefVal: string) {
+        return MemoryService.buildAxios().post("/bible-app/server/update_preference.php", {user: user, prefNm: prefNm, prefVal: prefVal});
+    }
+
     public getQuoteList(userName: string) {
         return MemoryService.buildAxios().get<Quote[]>("/bible-app/server/get_quote_list.php?user=" + userName);
     }
