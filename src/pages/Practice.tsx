@@ -205,7 +205,7 @@ const Practice = () => {
 
     return (
         <>
-            {busy.state && <SpinnerTimer message={busy.message} />}
+
             <Row justify="center">
                 <h1>Memory Verses</h1>
             </Row>
@@ -271,6 +271,7 @@ const Practice = () => {
                         </Col>
                     </Space>
                 </Row>
+                {busy.state && <Row justify="center"><SpinnerTimer message={busy.message} /></Row>}
                 {showPsgRef && memPassageList && memPassageList.length > currentIndex && memPassageList[currentIndex] &&
                     <SwitchTransition mode="out-in">
                         <CSSTransition
@@ -280,11 +281,12 @@ const Practice = () => {
                             }}
                             key={currentIndex + "-psg-ref"}
                         >
-                            <p key={currentIndex + "-psg-ref"} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(memPassageList[currentIndex], currentIndex, memPassageList.length, Constants.translationsShortNms.filter(t => t.code === memPassageList[currentIndex].translationName).map(t => t.translationName)[0], false, false, memPassageList[currentIndex].passageRefAppendLetter)}}/>
+                            <p
+                                key={currentIndex + "-psg-ref"} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(memPassageList[currentIndex], currentIndex, memPassageList.length, Constants.translationsShortNms.filter(t => t.code === memPassageList[currentIndex].translationName).map(t => t.translationName)[0], false, false, memPassageList[currentIndex].passageRefAppendLetter)}}/>
                         </CSSTransition>
                     </SwitchTransition>
                 }
-                {!showPsgRef && memPassageList && memPassageList.length > currentIndex && memPassageList[currentIndex] && memPassageList[currentIndex].verses && memPassageList[currentIndex].verses.length &&
+                {!showPsgRef && memPassageList && memPassageList.length > currentIndex && memPassageList[currentIndex] && memPassageList[currentIndex].verses && memPassageList[currentIndex].verses.length > 0 &&
                     <SwitchTransition mode="out-in">
                         <CSSTransition
                             classNames="fade"
