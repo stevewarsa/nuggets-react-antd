@@ -9,15 +9,15 @@ import {Topic} from "../model/topic";
 
 class MemoryService {
     public getMemoryPsgList(user: string) {
-        return MemoryService.buildAxios().get("/bible-app/server/get_mempsg_list.php?user=" + user);
+        return MemoryService.buildAxios().get<Passage[]>("/bible-app/server/get_mempsg_list.php?user=" + user);
     }
 
     public getPassage(passage: Passage, user: string) {
-        return MemoryService.buildAxios().get("/bible-app/server/get_passage_text.php?user=" + user + "&translation=" + passage.translationName + "&book=" + passage.bookName + "&chapter=" + passage.chapter + "&start=" + passage.startVerse + "&end=" + passage.endVerse);
+        return MemoryService.buildAxios().get<Passage>("/bible-app/server/get_passage_text.php?user=" + user + "&translation=" + passage.translationName + "&book=" + passage.bookName + "&chapter=" + passage.chapter + "&start=" + passage.startVerse + "&end=" + passage.endVerse);
     }
 
     public getMemoryPassageTextOverrides(user: string) {
-        return MemoryService.buildAxios().get("/bible-app/server/get_mempsg_text_overrides.php?user=" + user);
+        return MemoryService.buildAxios().get<Passage[]>("/bible-app/server/get_mempsg_text_overrides.php?user=" + user);
     }
 
     public updateLastViewed(userName: string, passageId: number, lastViewedNum: number, lastViewedString: string) {

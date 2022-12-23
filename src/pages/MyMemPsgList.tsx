@@ -31,9 +31,9 @@ const MyMemPsgList = () => {
     useEffect(() => {
         (async () => {
             setBusy({state: true, message: "Loading memory passages from server..."});
-            const passages = await getMemPassages(user, true);
-            setMemPassageList(passages);
-            setFilteredMemPassageList(passages);
+            const resp = await getMemPassages(user, true);
+            setMemPassageList(resp.passages);
+            setFilteredMemPassageList(resp.passages);
             setBusy({state: false, message: ""});
         })();
     }, [memTextOverrides, user]);

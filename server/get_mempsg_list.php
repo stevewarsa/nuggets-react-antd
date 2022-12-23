@@ -1,7 +1,4 @@
 <?php
-
-
-//header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json; charset=utf8');
 
 include_once('./Book.php');
@@ -48,6 +45,4 @@ while ($row = $results->fetchArray()) {
 $db->close();
 
 print_r(json_encode($psgArray));
-
-?>
 

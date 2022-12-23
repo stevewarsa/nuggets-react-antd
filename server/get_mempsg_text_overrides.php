@@ -1,6 +1,4 @@
 <?php
-
-//header('Access-Control-Allow-Origin: *');
 include_once('./Passage.php');
 
 $user = $_GET['user'];
@@ -18,11 +16,7 @@ while ($row = $results->fetchArray()) {
     $versePart = new VersePart();
     $versePart->verseNumber = $row["verse_num"];
     $versePart->verseText = $row["override_text"];
-    if ($row["words_of_christ"] == "Y") {
-        $versePart->wordsOfChrist = TRUE;
-    } else {
-        $versePart->wordsOfChrist = FALSE;
-    }
+    $versePart->wordsOfChrist = $row["words_of_christ"];
     $verse->addVersePart($versePart);
 	array_push($psgArray, $passage);
 }
@@ -31,4 +25,3 @@ $statement->close();
 $db->close();
 header('Content-Type: application/json; charset=utf8');
 print_r(json_encode($psgArray));
-?>

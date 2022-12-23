@@ -7,30 +7,30 @@ import {Quote} from "../model/quote";
 import {Topic} from "../model/topic";
 
 const useMemoryPassages = () => {
-    const memTextOverrides = useSelector((state: AppState) => state.memTextOverrides);
     const practiceConfig = useSelector((state: AppState) => state.practiceConfig);
     const allTags: Topic[] = useSelector((appState: AppState) => appState.topicList);
 
-    const getMemPassages = async (user: string, sort: boolean) => {
-        const locMemoryPassagesData: any = await memoryService.getMemoryPsgList(user);
-        if (memTextOverrides && memTextOverrides.length > 0) {
-            locMemoryPassagesData.data.forEach(psg => {
-                const foundOverride = memTextOverrides.find(o => o.passageId === psg.passageId);
+    const getMemPassages = async (user: string, sort: boolean): Promise<{ passages: Passage[], overrides: Passage[] }> => {
+        const locMemoryPassagesResponse: any = await memoryService.getMemoryPsgList(user);
+        const locMemoryTextOverridesResponse: any = await memoryService.getMemoryPassageTextOverrides(user);
+        if (locMemoryTextOverridesResponse.data && locMemoryTextOverridesResponse.data.length > 0) {
+            locMemoryPassagesResponse.data.forEach(psg => {
+                const foundOverride = locMemoryTextOverridesResponse.data.find(o => o.passageId === psg.passageId);
                 if (foundOverride) {
                     psg.passageRefAppendLetter = foundOverride.passageRefAppendLetter;
                 }
             });
         }
         if (sort) {
-            let tempPassages: Passage[] = PassageUtils.sortAccordingToPracticeConfig(practiceConfig.passageDisplayOrder, locMemoryPassagesData.data);
+            let tempPassages: Passage[] = PassageUtils.sortAccordingToPracticeConfig(practiceConfig.passageDisplayOrder, locMemoryPassagesResponse.data);
             // if user is practicing by frequency, make it more challenging by randomizing
             // the passages within each frequency group
             if (practiceConfig.passageDisplayOrder === PassageUtils.BY_FREQ) {
                 tempPassages = PassageUtils.sortWithinFrequencyGroups(tempPassages, PassageUtils.BY_LAST_PRACTICED);
             }
-            return tempPassages;
+            return {passages: tempPassages, overrides: locMemoryTextOverridesResponse.data};
         } else {
-            return locMemoryPassagesData.data;
+            return {passages: locMemoryPassagesResponse.data, overrides: locMemoryTextOverridesResponse.data};
         }
     };
 
