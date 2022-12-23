@@ -240,7 +240,7 @@ const Practice = () => {
                     </Row>
                 </>
             }
-            <Swipe tolerance={60} onSwipeLeft={() => navigate(false)} onSwipeRight={() => navigate(true)}>
+            <Swipe tolerance={60} onSwipeLeft={() => navigate(true)} onSwipeRight={() => navigate(false)}>
                 <Row style={{marginBottom: "10px"}} justify="center" align="middle">
                     <Col>{currIdx + 1} of {memPsgList.length}</Col>
                     <Col style={{marginLeft: "5px"}}>
