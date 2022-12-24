@@ -16,7 +16,6 @@ const MyMemPsgList = () => {
     const [translation, setTranslation] = useState("niv");
     const {getMemPassages} = useMemoryPassages();
     const user = useSelector((state: AppState) => state.user);
-    const memTextOverrides = useSelector((state: AppState) => state.memTextOverrides);
     const [memPassageList, setMemPassageList] = useState<Passage[]>([]);
     const [filteredMemPassageList, setFilteredMemPassageList] = useState<Passage[]>([]);
     const [busy, setBusy] = useState({state: false, message: ""});
@@ -36,7 +35,7 @@ const MyMemPsgList = () => {
             setFilteredMemPassageList(resp.passages);
             setBusy({state: false, message: ""});
         })();
-    }, [memTextOverrides, user]);
+    }, [user]);
 
     const doPassageFilter = (evt) => {
         setFilter(evt.target.value);

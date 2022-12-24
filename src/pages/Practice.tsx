@@ -8,9 +8,10 @@ import {PassageUtils} from "../helpers/passage-utils";
 import {notification, Button, Col, Dropdown, Menu, Popover, Row, Space} from "antd";
 import {
     ArrowLeftOutlined,
-    ArrowRightOutlined, ArrowUpOutlined,
+    ArrowRightOutlined,
     CheckSquareOutlined,
-    CopyOutlined, EditOutlined,
+    CopyOutlined,
+    EditOutlined,
     InfoCircleOutlined,
     LinkOutlined,
     MoreOutlined,
@@ -59,11 +60,12 @@ const Practice = () => {
 
     const [busy, setBusy] = useState({state: false, message: ""});
     const [memPsgList, setMemPsgList] = useState<Passage[]>([]);
-    const [versesByPsgId, setVersesByPsgId] = useState<{[psgId: number]: Verse[]}>()
+    const [versesByPsgId, setVersesByPsgId] = useState<{[psgId: number]: Verse[]}>();
     const [overrides, setOverrides] = useState<Passage[]>([]);
     const [currIdx, setCurrIdx] = useState(-1);
     const [currPsgRef, setCurrPsgRef] = useState<string>("");
     const [currPsgTxt, setCurrPsgTxt] = useState<string>("");
+    const [currPassage, setCurrPassage] = useState<Passage>(null);
     const [showingQuestion, setShowingQuestion] = useState(true);
     const [showPsgRef, setShowPsgRef] = useState(practiceConfig.practiceMode === PassageUtils.BY_REF);
     const [infoVisible, setInfoVisible] = useState(false);
@@ -117,6 +119,31 @@ const Practice = () => {
         }
     }, [currIdx]);
 
+    useEffect(() => {
+        console.log("useEffect[versesByPsgId] - versesByPsgId: ", versesByPsgId);
+    }, [versesByPsgId]);
+
+    const successfulUpdateFinished = () => {
+        console.log("Practice.successfulUpdateFinished - clearing versesByPsgId...");
+        setVersesByPsgId({});
+        console.log("Practice.successfulUpdateFinished - versesByPsgId cleared.");
+        setEditing(false);
+        setBusy({state: true, message: "Loading memory passages from DB..."});
+        console.log("Practice.successfulUpdateFinished - Loading memory passages from DB...");
+        getMemPassages(user, true).then(resp => {
+            if (resp.passages) {
+                console.log("Practice.successfulUpdateFinished - finished successfully loading memory passages from DB. Here are the overrides:", resp.overrides);
+                setMemPsgList(resp.passages);
+                setOverrides(resp.overrides);
+                setCurrIdx(0);
+            } else {
+                console.log("Practice.successfulUpdateFinished - Unable to reload memory passages!");
+                notification.error({message: "Unable to reload memory passages!", placement: "bottomRight"});
+            }
+            setBusy({state: false, message: ""});
+        });
+    };
+
     // the purpose of this method is to reinitialize some flags and other values for the UI, then to set the current index
     const navigate = (next: boolean) => {
         // set defaults for navigating to previous passage
@@ -137,38 +164,42 @@ const Practice = () => {
     };
 
     // purpose of this method is to populate the currPsgRef and currPsgTxt
-    const populateVerses = (copyToClipboard: boolean) => {
+    const populateVerses = async (copyToClipboard: boolean) => {
+        console.log("Practice.populateVerses - entering...");
         const currPsg: Passage = {...memPsgList[currIdx]};
         if (versesByPsgId && versesByPsgId[currPsg.passageId] && versesByPsgId[currPsg.passageId].length > 0) {
             // we've already looked up the verses for this passage, just populate them
+            console.log("Practice.populateVerses - verses already exist...");
             currPsg.verses = versesByPsgId[currPsg.passageId];
             convertPassageToString(currPsg);
+            setCurrPassage(currPsg);
         } else {
             const override = overrides.find(p => p.passageId === currPsg.passageId);
             if (override) {
                 // this is an override, so we don't need to call the server, just update the verses from the override
+                console.log("Practice.populateVerses - verses do not exist, populating override...");
                 currPsg.verses = override.verses;
                 convertPassageToString(currPsg);
+                setCurrPassage(currPsg);
             } else {
                 // this is not an override, so call server to get verses
-                setBusy({
-                    state: true,
-                    message: "Getting psg " + (currIdx + 1) + " (psg id " +
-                        currPsg.passageId + ")..."
+                console.log("Practice.populateVerses - verses do not exist, Getting psg " + (currIdx + 1) + " (psg id " + currPsg.passageId + ")...");
+                setBusy({state: true, message: "Getting psg " + (currIdx + 1) + " (psg id " + currPsg.passageId + ")..."});
+                const resp = await memoryService.getPassage(currPsg, user);
+                console.log("Practice.populateVerses - back from getting passage from server: ", resp.data);
+                currPsg.verses = resp.data.verses;
+                setVersesByPsgId(prev => {
+                    const locVbyPsgId = {...prev};
+                    locVbyPsgId[currPsg.passageId] = currPsg.verses;
+                    return locVbyPsgId;
                 });
-                memoryService.getPassage(currPsg, user).then(resp => {
-                    const psg: Passage = resp.data;
-                    setVersesByPsgId(prev => {
-                        const locVbyPsgId = {...prev};
-                        locVbyPsgId[currPsg.passageId] = psg.verses;
-                        return locVbyPsgId;
-                    });
-                    convertPassageToString(psg);
-                    if (copyToClipboard) {
-                        handleClipboard(psg);
-                    }
-                    setBusy({state: false, message: ""});
-                });
+                convertPassageToString(currPsg);
+                setCurrPassage(currPsg);
+                if (copyToClipboard) {
+                    console.log("Practice.populateVerses - copying passage to clipboard...");
+                    handleClipboard(currPsg);
+                }
+                setBusy({state: false, message: ""});
             }
         }
     };
@@ -210,6 +241,7 @@ const Practice = () => {
             let clipboardContent = PassageUtils.getPassageForClipboard(currPassage, true);
             if (StringUtils.isEmpty(clipboardContent)) {
                 populateVerses(true);
+                console.log("Practice.handleMenuClick - clipboard content is empty");
             } else {
                 notification.info({message: PassageUtils.copyPassageToClipboard(currPassage, true) + " copied!", placement: "bottomRight"});
             }
@@ -218,28 +250,19 @@ const Practice = () => {
             PassageUtils.openInterlinearLink(currPassage);
         } else if (key === "3") {
             // Edit
-            populateVerses(false);
-            setBusy({state: false, message: ""});
-            setEditing(true);
-            dispatcher(stateActions.setEditPassageActive(true));
+            console.log("Practice.handleMenuClick - user selected edit, calling populateVerses...  CurrPassage: ", currPassage);
+            populateVerses(false).then(() => {
+                console.log("Practice.handleMenuClick - back from calling populateVerses. Setting editing to true.  CurrPassage: ", currPassage);
+                setBusy({state: false, message: ""});
+                setEditing(true);
+            });
         }
     };
-
     return (
         <>
             <Row justify="center">
                 <h1>Memory Verses</h1>
             </Row>
-            {editing &&
-                <>
-                    <EditPassage passage={memPsgList[currIdx]} />
-                    <Row justify="center">
-                        <Col>
-                            <Button icon={<ArrowUpOutlined />} onClick={() => setEditing(false)}/>
-                        </Col>
-                    </Row>
-                </>
-            }
             <Swipe tolerance={60} onSwipeLeft={() => navigate(true)} onSwipeRight={() => navigate(false)}>
                 <Row style={{marginBottom: "10px"}} justify="center" align="middle">
                     <Col>{currIdx + 1} of {memPsgList.length}</Col>
@@ -325,6 +348,8 @@ const Practice = () => {
                     </SwitchTransition>
                 }
             </Swipe>
+            {currPassage && currPassage.passageId > 0 && currPassage.verses && currPassage.verses.length > 0 &&
+                <EditPassage props={{passage: currPassage, visible: editing, setVisibleFunction: successfulUpdateFinished}} />}
         </>
     );
 };

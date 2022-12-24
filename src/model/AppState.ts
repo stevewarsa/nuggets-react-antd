@@ -8,7 +8,6 @@ import {Topic} from "./topic";
 export interface AppState {
     practiceConfig: PracticeConfig;
     memPassageList: Passage[];
-    memTextOverrides: Passage[];
     selectedMenuKey: number;
     chapterSelection: {book: string, chapter: number, translation: string, verse?: number};
     maxChaptersByBook: {bookName: string, maxChapter: number}[];
@@ -25,7 +24,6 @@ export interface AppState {
     userPreferences: any[];
     maxVerseByBookChapter: {[translation: string]: []};
     currentQuotesIndex: number;
-    editPassageActive: boolean;
     currentQuoteTagsFiltered: string[];
     recentTopicsUsed: Topic[];
 }

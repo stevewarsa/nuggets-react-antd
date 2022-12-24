@@ -10,7 +10,6 @@ import {notification} from "antd";
 const initialState: AppState = {
     practiceConfig: {},
     memPassageList: [],
-    memTextOverrides: [],
     selectedMenuKey: 1,
     chapterSelection: null,
     verseSelectionRequest: null,
@@ -23,7 +22,6 @@ const initialState: AppState = {
     userPreferences: null,
     maxVerseByBookChapter: {},
     currentQuotesIndex: 0,
-    editPassageActive: false,
     topicList: [],
     allQuotes: [],
     filteredQuotes: null,
@@ -57,9 +55,6 @@ const state = createSlice({
         },
         setSelectedMenuItem(state, action) {
             state.selectedMenuKey = action.payload;
-        },
-        setMemoryTextOverrides(state, action) {
-            state.memTextOverrides = action.payload;
         },
         setChapterSelection(state, action) {
             state.chapterSelection = action.payload;
@@ -121,9 +116,6 @@ const state = createSlice({
         },
         setCurrentQuotesIndex(state, action) {
             state.currentQuotesIndex = action.payload;
-        },
-        setEditPassageActive(state, action) {
-            state.editPassageActive = action.payload;
         },
         setTopicList(state, action) {
             state.topicList = action.payload;
