@@ -119,10 +119,6 @@ const Practice = () => {
         }
     }, [currIdx]);
 
-    useEffect(() => {
-        console.log("useEffect[versesByPsgId] - versesByPsgId: ", versesByPsgId);
-    }, [versesByPsgId]);
-
     const successfulUpdateFinished = () => {
         console.log("Practice.successfulUpdateFinished - clearing versesByPsgId...");
         setVersesByPsgId({});
@@ -195,12 +191,12 @@ const Practice = () => {
                 });
                 convertPassageToString(currPsg);
                 setCurrPassage(currPsg);
-                if (copyToClipboard) {
-                    console.log("Practice.populateVerses - copying passage to clipboard...");
-                    handleClipboard(currPsg);
-                }
                 setBusy({state: false, message: ""});
             }
+        }
+        if (copyToClipboard) {
+            console.log("Practice.populateVerses - copying passage to clipboard...");
+            handleClipboard(currPsg);
         }
     };
 
@@ -316,28 +312,28 @@ const Practice = () => {
                     </Space>
                 </Row>
                 {busy.state && <Row justify="center"><SpinnerTimer message={busy.message} /></Row>}
-                {showPsgRef && !StringUtils.isEmpty(currPsgRef) &&
+                {showPsgRef && currPassage && !StringUtils.isEmpty(currPsgRef) &&
                     <SwitchTransition mode="out-in">
                         <CSSTransition
                             classNames="fade"
                             addEndListener={(node, done) => {
                                 node.addEventListener("transitionend", done, false);
                             }}
-                            key={currIdx + "-psg-ref"}
+                            key={currPassage.passageId}
                         >
                             <p
                                 key={currIdx + "-psg-ref"} className="nugget-view" dangerouslySetInnerHTML={{__html: currPsgRef}}/>
                         </CSSTransition>
                     </SwitchTransition>
                 }
-                {!showPsgRef && !StringUtils.isEmpty(currPsgTxt) &&
+                {!showPsgRef && currPassage && !StringUtils.isEmpty(currPsgTxt) &&
                     <SwitchTransition mode="out-in">
                         <CSSTransition
                             classNames="fade"
                             addEndListener={(node, done) => {
                                 node.addEventListener("transitionend", done, false);
                             }}
-                            key={currIdx + "-psg-text"}
+                            key={currPassage.passageId}
                         >
                             <p
                                 key={currIdx + "-psg-text"}

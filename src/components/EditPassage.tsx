@@ -1,6 +1,6 @@
 import {notification, Button, Card, Col, Row, Select, Modal} from "antd";
 import {Constants} from "../model/constants";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Passage} from "../model/passage";
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
@@ -12,7 +12,6 @@ import {stateActions} from "../store";
 import {UpdatePassageParam} from "../model/update-passage-param";
 import SpinnerTimer from "./SpinnerTimer";
 
-let initialMount = true;
 interface EditPassageProps {
     passage: Passage;
     visible: boolean;
@@ -45,16 +44,6 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
         }
         setFrequencies(freqDep);
     }, []);
-
-    useEffect(() => {
-        if (!initialMount) {
-            console.log("useEffect[translation, startVerse, endVerse] - calling server to get passage text ...");
-            getPassageText();
-        } else {
-            initialMount = false;
-            console.log("Initial mount...");
-        }
-    }, [translation, startVerse, endVerse]);
 
     useEffect(() => {
         setEditPassageVisible(props.visible);
@@ -97,7 +86,6 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
     }
 
     const changePassageText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        //console.log("changePassageText - text changed! Here is the text: ", e.target.value);
         setCurrPassageText(e.target.value);
         if (!StringUtils.isEmpty(e.target.value) && StringUtils.isEmpty(appendLetter)) {
             setAppendLetter("a");
@@ -113,12 +101,6 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
             console.log("changeTranslation - translation changed!");
             setTranslation(value);
         }
-    };
-
-    const getPassageText = async () => {
-        const psg: Passage = {...props.passage, translationName: translation, translationId: translation, startVerse: startVerse, endVerse: endVerse};
-        const passageTextResponse = await memoryService.getPassage(psg, user);
-        populateCurrentPassageTextFromPassage(passageTextResponse.data);
     };
 
     const changeStartVerse = (value) => {

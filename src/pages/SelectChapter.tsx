@@ -33,12 +33,21 @@ const SelectChapter = () => {
         }
     }, []);
 
+    useEffect(() => {
+        if (book !== "N/A") {
+            populateChapters(book);
+        }
+        setTranslation(chapterConfig.translation);
+    }, [chapterConfig]);
+
     const populateChapters = (selectedBookName) => {
         const maxChapter = maxChaptersByBook.filter(m => m.bookName === selectedBookName)[0].maxChapter;
         if (maxChapter > 0) {
             let chapters = Array.from({length: maxChapter}, (e, i) => i + 1);
             setBookChapters(chapters);
-            setChapter(1);
+            if (chapter === "N/A" || parseInt(chapter.toString()) > maxChapter) {
+                setChapter(1);
+            }
         }
     }
 
