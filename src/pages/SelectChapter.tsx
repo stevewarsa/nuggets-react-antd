@@ -7,6 +7,7 @@ import {stateActions} from "../store";
 import {useNavigate} from "react-router-dom";
 import {AppState} from "../model/AppState";
 import {PassageUtils} from "../helpers/passage-utils";
+import {StringUtils} from "../helpers/string.utils";
 
 const SelectChapter = () => {
     const dispatcher = useDispatch();
@@ -34,6 +35,9 @@ const SelectChapter = () => {
     }, []);
 
     useEffect(() => {
+        if (chapterConfig === null || StringUtils.isEmpty(chapterConfig.translation)) {
+            return;
+        }
         if (book !== "N/A") {
             populateChapters(book);
         }
