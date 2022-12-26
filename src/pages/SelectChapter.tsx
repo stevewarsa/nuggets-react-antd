@@ -56,24 +56,19 @@ const SelectChapter = () => {
     }
 
     const handleBookChange = (value) => {
-        // console.log(`selected book ${value}`);
         setBook(value);
         populateChapters(value);
     };
 
     const handleChapterChange = (value) => {
-        // console.log(`selected chapter ${value}`);
         setChapter(value);
     };
 
     const handleTranslationChange = (value) => {
-        // console.log(`selected translation ${value}`);
         setTranslation(value);
     };
 
     const handleReadChapter = () => {
-        // console.log("handleReadChapter - here are the selections:");
-        // console.log("book: " + book + ", chapter: " + chapter + ", translation: " + translation);
         dispatcher(stateActions.setChapterSelection({book: book, chapter: chapter, translation: translation}));
         navigate("/readChapter");
     };

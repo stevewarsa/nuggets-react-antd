@@ -118,18 +118,18 @@ const SearchQuotes = () => {
                         <Input autoFocus value={searchString} placeholder="Enter Search" onChange={handleTableFilter}/>
                     </Col>
                 </Row>
-                {paginationInfo && <Row justify="center">
+                {paginationInfo && paginationInfo.totalRows > 0 && <Row justify="center">
                     <Col>Pg {paginationInfo.currentPage} of {paginationInfo.totalPages} ({paginationInfo.totalRows} matches)</Col>
                 </Row>}
                 <Row justify="center">
-                    <Col style={{marginRight: "5px"}}><Button disabled={paginationInfo?.currentPage === 1} icon={<DoubleLeftOutlined />} onClick={onBtFirst}/></Col>
-                    <Col style={{marginRight: "5px"}}><Button disabled={paginationInfo?.currentPage === 1} icon={<LeftOutlined />} onClick={onBtPrevious}/></Col>
-                    <Col style={{marginRight: "5px"}}><Button disabled={paginationInfo?.currentPage === paginationInfo?.totalPages} icon={<RightOutlined />} onClick={onBtNext}/></Col>
-                    <Col style={{marginRight: "5px"}}><Button disabled={paginationInfo?.currentPage === paginationInfo?.totalPages} icon={<DoubleRightOutlined />} onClick={onBtLast}/></Col>
+                    <Col style={{marginRight: "5px"}}><Button disabled={!paginationInfo || paginationInfo.totalRows === 0 || paginationInfo.currentPage === 1} icon={<DoubleLeftOutlined />} onClick={onBtFirst}/></Col>
+                    <Col style={{marginRight: "5px"}}><Button disabled={!paginationInfo || paginationInfo.totalRows === 0 || paginationInfo.currentPage === 1} icon={<LeftOutlined />} onClick={onBtPrevious}/></Col>
+                    <Col style={{marginRight: "5px"}}><Button disabled={!paginationInfo || paginationInfo.totalRows === 0 || paginationInfo.currentPage === paginationInfo.totalPages} icon={<RightOutlined />} onClick={onBtNext}/></Col>
+                    <Col style={{marginRight: "5px"}}><Button disabled={!paginationInfo || paginationInfo.totalRows === 0 || paginationInfo.currentPage === paginationInfo.totalPages} icon={<DoubleRightOutlined />} onClick={onBtLast}/></Col>
                 </Row>
                 <Row justify="center">
                     <Col>
-                        <Button disabled={paginationInfo?.totalRows === filteredQuotes?.length} type="primary" onClick={handleFilterToCurrent}>Browse Current Result</Button>
+                        <Button disabled={!paginationInfo || paginationInfo.totalRows === 0} type="primary" onClick={handleFilterToCurrent}>Browse Current Result</Button>
                     </Col>
                 </Row>
                 <div style={{ width: "100%", height: "100%" }}>
