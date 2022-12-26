@@ -2,7 +2,6 @@
 /** @noinspection SqlNoDataSourceInspection */
 
 
-//header('Access-Control-Allow-Origin: *');
 $user = $_GET['user'];
 error_log("Opening database db/memory_" . $user . ".db");
 $db = new SQLite3('db/memory_' . $user . '.db');
@@ -20,4 +19,3 @@ while ($row = $results->fetchArray()) {
 $db->close();
 $responseJson = json_encode($arrayName);
 print_r($responseJson);
-?>

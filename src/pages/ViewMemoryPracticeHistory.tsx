@@ -5,6 +5,7 @@ import {StringUtils} from "../helpers/string.utils";
 import memoryService from "../services/memory-service";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {Col, Row} from "antd";
+import {DateUtils} from "../helpers/date.utils";
 
 const ViewMemoryPracticeHistory = () => {
     const user = useSelector((state: AppState) => state.user);
@@ -39,7 +40,7 @@ const ViewMemoryPracticeHistory = () => {
                 {historyRecs && historyRecs.length > 0 && historyRecs.map((rec, index) =>
                 <Row justify="center" key={index + "-" + rec.passageId + " " + rec.dateViewedLong + "-row"}>
                     <Col span={6} style={{marginRight: "5px"}} key={index + "-" + rec.passageId + " " + rec.dateViewedLong + "-col1"}>{rec.passageId}</Col>
-                    <Col span={12} key={index + "-" + rec.passageId + " " + rec.dateViewedLong + "-col2"}>{rec.dateViewedStr}</Col>
+                    <Col span={12} key={index + "-" + rec.passageId + " " + rec.dateViewedLong + "-col2"}>{DateUtils.formatDateTime(new Date(parseInt(rec.dateViewedLong)), "MM-dd-yyyy HH:mm:ss")}</Col>
                 </Row>
                 )}
             </>
