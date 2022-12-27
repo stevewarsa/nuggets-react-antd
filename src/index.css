@@ -86,3 +86,10 @@ code {
   font-size: 18px !important;
   cursor: pointer;
 }
+
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: xx-large;
+}

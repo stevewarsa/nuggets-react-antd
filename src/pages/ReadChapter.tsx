@@ -10,7 +10,8 @@ import {
     ArrowRightOutlined,
     CopyOutlined,
     LinkOutlined,
-    MoreOutlined, SubnodeOutlined
+    MoreOutlined,
+    SubnodeOutlined
 } from "@ant-design/icons";
 import {PassageUtils} from "../helpers/passage-utils";
 import {Constants} from "../model/constants";
@@ -30,6 +31,7 @@ const ReadChapter = () => {
     const [currPassage, setCurrPassage] = useState<Passage>(null);
     const [currFormattedPassageText, setCurrFormattedPassageText] = useState(null);
     const [chapterIdString, setChapterIdString] = useState(null);
+    const [showButton, setShowButton] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -52,8 +54,6 @@ const ReadChapter = () => {
                     }
                 });
             }
-            // console.log("Here is the chapter received back:");
-            // console.log(chapterResponse.data);
             setCurrPassage(psg);
             setCurrFormattedPassageText(PassageUtils.getFormattedPassageText(psg, true));
             setChapterIdString(chapterConfig.book + "-" + chapterConfig.chapter + "-" + chapterConfig.translation);
@@ -83,6 +83,24 @@ const ReadChapter = () => {
             }
         }
     }, [currFormattedPassageText, chapterConfig]);
+
+    useEffect(() => {
+        window.addEventListener("scroll", () => {
+            if (window.scrollY > 300) {
+                setShowButton(true);
+            } else {
+                setShowButton(false);
+            }
+        });
+    }, []);
+
+    // This function will scroll the window to the top
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // for smoothly scrolling
+        });
+    };
 
     const handleNext = () => {
         dispatcher(stateActions.nextChapter())
@@ -170,6 +188,12 @@ const ReadChapter = () => {
                     )
                 }
             </Swipe>
+            {showButton && (
+                <button onClick={scrollToTop} className="back-to-top">
+                    &#8679;
+                </button>
+            )}
+            {/* &#8679; is used to create the upward arrow */}
         </>
     );
 };
