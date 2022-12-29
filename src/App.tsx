@@ -1,4 +1,4 @@
-import {Route, Routes} from "react-router-dom";
+import {Route, Routes, useSearchParams} from "react-router-dom";
 import 'antd/dist/antd.css';
 import MainMenu from "./pages/MainMenu";
 import {Col, Layout, Row} from "antd";
@@ -32,6 +32,7 @@ import GoToPassageByRef from "./pages/GoToPassageByRef";
 
 const App = () => {
     const dispatcher = useDispatch();
+    const [searchParams] = useSearchParams();
     const [busy, setBusy] = useState({state: false, message: ""});
     const {getTopicList} = useMemoryPassages();
     const user = useSelector((state: AppState) => state.user);
@@ -45,6 +46,10 @@ const App = () => {
             dispatcher(stateActions.setMaxChaptersByBook(locMaxChaptersByBook.data));
             const allUsers = await memoryService.getAllUsers();
             dispatcher(stateActions.setAllUsers(allUsers.data));
+            const queryParamMap: {[key: string]: string} = {};
+            searchParams.forEach((value, key) => queryParamMap[key] = value);
+            console.log("App.useEffect[] - here is the queryParamMap: ", queryParamMap);
+            dispatcher(stateActions.setQueryParams(queryParamMap));
             setBusy({state: false, message: ""});
         })();
     }, []);

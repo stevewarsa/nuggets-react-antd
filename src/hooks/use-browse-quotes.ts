@@ -44,6 +44,8 @@ const useBrowseQuotes = () => {
     }, [currentIndex]);
 
     useEffect(() => {
+        // console.log("useBrowseQuotes.useEffect[filteredQuotes, allQuotes] - here are the filtered quotes:", filteredQuotes);
+        // console.log("useBrowseQuotes.useEffect[filteredQuotes, allQuotes] - here are all quotes:", allQuotes);
         if (filteredQuotes && allQuotes) {
             setIsFiltered(filteredQuotes.length < allQuotes.length);
         }

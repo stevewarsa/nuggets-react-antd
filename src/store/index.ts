@@ -26,7 +26,8 @@ const initialState: AppState = {
     allQuotes: [],
     filteredQuotes: null,
     currentQuoteTagsFiltered: [],
-    recentTopicsUsed: []
+    recentTopicsUsed: [],
+    queryParams: {}
 } as AppState;
 
 const state = createSlice({
@@ -212,6 +213,9 @@ const state = createSlice({
             if (!found) {
                 state.userPreferences.push({key: pref.key, value: pref.value});
             }
+        },
+        setQueryParams(state, action) {
+            state.queryParams = action.payload;
         }
     }
 });

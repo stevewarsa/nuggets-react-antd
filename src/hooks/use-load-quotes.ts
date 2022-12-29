@@ -5,12 +5,28 @@ import {StringUtils} from "../helpers/string.utils";
 import {PassageUtils} from "../helpers/passage-utils";
 import {stateActions} from "../store";
 import useMemoryPassages from "./use-memory-passages";
+import {Topic} from "../model/topic";
+import memoryService from "../services/memory-service";
+import {useEffect} from "react";
 
 const useLoadQuotes = () => {
     const dispatcher = useDispatch();
     const user = useSelector((state: AppState) => state.user);
     const allQuotes = useSelector((appState: AppState) => appState.allQuotes);
+    const queryParamMap = useSelector((appState: AppState) => appState.queryParams);
     const {getQuoteList} = useMemoryPassages();
+
+    useEffect( () => {
+        console.log("useLoadQuotes.useEffect[queryParamMap, allQuotes] - entering... here's allQuotes:", allQuotes);
+        if (allQuotes && allQuotes.length > 0) {
+            (async () => {
+                const topicListResponse = await memoryService.getTopicList(user);
+                const topics: Topic[] = topicListResponse.data;
+                console.log("useLoadQuotes.useEffect[queryParamMap, allQuotes] - attempting to filter category - here's the query map: ", queryParamMap);
+                handleFilterCategory(topics, allQuotes);
+            })();
+        }
+    }, [queryParamMap, allQuotes]);
 
     const doQuotesLoad = () => {
         if (!allQuotes || allQuotes.length === 0) {
@@ -25,6 +41,24 @@ const useLoadQuotes = () => {
             })();
         }
     };
+
+    const handleFilterCategory = (topics: Topic[], dedupedQuotes: Quote[]) => {
+        if (queryParamMap && queryParamMap["cat"] && !StringUtils.isEmpty(queryParamMap["cat"])) {
+            // there was a category passed in so, filter by it
+            console.log("useLoadQuotes.handleFilterCategory - param 'cat' exists:", queryParamMap["cat"]);
+            console.log("useLoadQuotes.handleFilterCategory - finding topic matching '" + queryParamMap["cat"] + "', here are the topics:", topics);
+            const filterTopic = topics.find(tpc => tpc.name === queryParamMap["cat"]);
+            if (filterTopic) {
+                console.log("useLoadQuotes.handleFilterCategory - found filter topic:", filterTopic);
+                const quotesFilteredToTopic: Quote[] = dedupedQuotes.filter((qt: Quote) => qt.tagIds.includes(filterTopic.id));
+                if (quotesFilteredToTopic.length > 0) {
+                    dispatcher(stateActions.setFilteredQuotes(quotesFilteredToTopic));
+                }
+            } else {
+                console.log("useLoadQuotes.handleFilterCategory - unable to find filter topic:", queryParamMap["cat"]);
+            }
+        }
+    }
 
     return {
         doQuotesLoad: doQuotesLoad
