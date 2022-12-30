@@ -102,11 +102,12 @@ const Practice = () => {
         if (currIdx === -1) {
             return;
         }
-        console.log("Practice.navigate - memPassageList[" + currIdx + "] (currPsg): ", memPsgList[currIdx]);
+        console.log("Practice.useEffect[currIdx] - memPassageList[" + currIdx + "] (currPsg): ", memPsgList[currIdx]);
         if (practiceConfig.practiceMode !== PassageUtils.BY_REF) {
             // we are showing the passage text, so need to load it if it is not already loaded
             populateVerses(false);
         } else {
+            console.log("Practice.useEffect[currIdx] - converting passage ref to string... showPsgRef=" + showPsgRef + ", currPassage: ", currPassage);
             convertPsgRefToString(memPsgList[currIdx]);
         }
         dispatcher(stateActions.setChapterSelection({chapter: memPsgList[currIdx].chapter, book: memPsgList[currIdx].bookName, translation: memPsgList[currIdx].translationName}));
@@ -215,7 +216,9 @@ const Practice = () => {
             false,
             false,
             psg.passageRefAppendLetter);
+        console.log("Practice.convertPsgRefToString - setting curr psg ref to '" + locPsgRef + "'");
         setCurrPsgRef(locPsgRef);
+        setCurrPassage(psg);
     };
 
     const handleToggleAnswer = () => {
