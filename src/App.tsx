@@ -110,7 +110,7 @@ const App = () => {
                     }
                     <Row justify="center">
                         <Col>
-                            Bible Nuggets ©{new Date().getFullYear()} Created by Steve Warsa
+                            Bible Nuggets {new Date().getFullYear()} Created by the Web Master
                         </Col>
                     </Row>
                 </Footer>
