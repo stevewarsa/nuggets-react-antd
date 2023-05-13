@@ -93,3 +93,9 @@ code {
   right: 20px;
   font-size: xx-large;
 }
+.floating-copy {
+  position: fixed;
+  bottom: 20px;
+  right: 60px;
+  font-size: xx-large;
+}

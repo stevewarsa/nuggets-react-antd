@@ -134,7 +134,10 @@ const BrowseNuggets = () => {
                 dispatcher(stateActions.setVerseSelectionRequest({
                     passage: currentPassage,
                     actionToPerform: "copy",
-                    backToPath: "/browseNuggets"
+                    backToPath: "/browseNuggets",
+                    selectVerses: true,
+                    startIndexToSelect: 0,
+                    endIndexToSelect: currentPassage.verses.length - 1
                 } as VerseSelectionRequest));
                 navigate("/selectVerses");
             }

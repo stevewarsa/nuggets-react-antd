@@ -9,6 +9,7 @@ import copy from "copy-to-clipboard";
 import {stateActions} from "../store";
 import useMemoryPassages from "../hooks/use-memory-passages";
 import SpinnerTimer from "../components/SpinnerTimer";
+import {VerseSelectionRequest} from "../model/verse-selection-request";
 
 const SelectVerses = () => {
     const navigate = useNavigate();
@@ -21,13 +22,26 @@ const SelectVerses = () => {
 
     useEffect(() => {
         if (verseSelectionRequest) {
+            console.log("SelectVerses.useEffect[verseSelectionRequest] - verseSelectionRequest:", verseSelectionRequest);
             const selectedVerses = PassageUtils.getFormattedVersesAsArray(verseSelectionRequest.passage, []);
-            for (let i = 0; i < selectedVerses.length; i++) {
-                selectedVerses[i].selected = i === 0 || i === (selectedVerses.length - 1);
+            if (verseSelectionRequest.selectVerses) {
+                for (let i = 0; i < selectedVerses.length; i++) {
+                    if (startEndIndexPopulated(verseSelectionRequest)) {
+                        selectedVerses[i].selected = verseSelectionRequest.startIndexToSelect === i ||
+                            verseSelectionRequest.endIndexToSelect === i;
+                    } else {
+                        selectedVerses[i].selected = i === 0 || i === (selectedVerses.length - 1);
+                    }
+                }
             }
             setLocVerses(selectedVerses);
         }
     }, [verseSelectionRequest]);
+
+    const startEndIndexPopulated = (verseSelectionRequest: VerseSelectionRequest) => {
+        return verseSelectionRequest.hasOwnProperty("startIndexToSelect") && verseSelectionRequest.startIndexToSelect >= 0 &&
+            verseSelectionRequest.hasOwnProperty("endIndexToSelect") && verseSelectionRequest.endIndexToSelect >= 0;
+    };
 
     const handleSubmit = async () => {
         // console.log("Handle submit - selected verses:");

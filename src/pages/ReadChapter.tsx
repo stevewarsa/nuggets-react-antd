@@ -32,6 +32,7 @@ const ReadChapter = () => {
     const [currFormattedPassageText, setCurrFormattedPassageText] = useState(null);
     const [chapterIdString, setChapterIdString] = useState(null);
     const [showButton, setShowButton] = useState(false);
+    const [currentScrollPercent, setCurrentScrollPercent] = useState(0.0);
 
     useEffect(() => {
         (async () => {
@@ -91,6 +92,11 @@ const ReadChapter = () => {
             } else {
                 setShowButton(false);
             }
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight;
+            const clientHeight = document.documentElement.clientHeight;
+            const scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100;
+            setCurrentScrollPercent(scrollPercentage);
         });
     }, []);
 
@@ -101,7 +107,6 @@ const ReadChapter = () => {
             behavior: 'smooth' // for smoothly scrolling
         });
     };
-
     const handleNext = () => {
         dispatcher(stateActions.nextChapter())
     };
@@ -113,13 +118,30 @@ const ReadChapter = () => {
     const handleMenuClick = ({key}) => {
         if (key === "1") {
             // copy
-            dispatcher(stateActions.setVerseSelectionRequest({passage: currPassage, actionToPerform: "copy", backToPath: "/readChapter"} as VerseSelectionRequest));
+            // first, figure out which verses to select based on how far down we're scrolled
+            let startIndex = 0;
+            let endIndex = currPassage.verses.length - 1;
+            let selectVersesFlag = false;
+            if (currentScrollPercent > 5 && currentScrollPercent < 90) {
+                // we're not at the beginning, and we're not at the end, so try to select the approximate
+                //  verse range based on the percentage of scroll
+                const targetVerseIndex = (currentScrollPercent / 100.0) *  parseFloat("" + (currPassage.verses.length - 1));
+                const targetVerseInt = Math.floor(targetVerseIndex);
+                console.log("ReadChapter: currentScrollPercent=" + currentScrollPercent + ", targetVerseIndex=" + targetVerseIndex + ", targetVerseInt=" + targetVerseInt + ", currPassage.verses.length - 1=" + (currPassage.verses.length - 1))
+                if (targetVerseInt > 0 && targetVerseInt < currPassage.verses.length - 2) {
+                    startIndex = targetVerseInt;
+                    endIndex = targetVerseInt + 2;
+                    selectVersesFlag = true;
+                }
+            }
+            scrollToTop();
+            dispatcher(stateActions.setVerseSelectionRequest({passage: currPassage, actionToPerform: "copy", backToPath: "/readChapter", selectVerses: selectVersesFlag, startIndexToSelect: startIndex, endIndexToSelect: endIndex} as VerseSelectionRequest));
             navigate("/selectVerses");
         } else if (key === "2") {
             // interlinear link
             PassageUtils.openInterlinearLink(currPassage);
         } else if (key === "3") {
-            dispatcher(stateActions.setVerseSelectionRequest({passage: currPassage, actionToPerform: "add-to-memory", backToPath: "/practiceSetup"} as VerseSelectionRequest));
+            dispatcher(stateActions.setVerseSelectionRequest({passage: currPassage, actionToPerform: "add-to-memory", backToPath: "/practiceSetup", selectVerses: false} as VerseSelectionRequest));
             navigate("/selectVerses");
         }
     };
@@ -189,9 +211,14 @@ const ReadChapter = () => {
                 }
             </Swipe>
             {showButton && (
-                <button onClick={scrollToTop} className="back-to-top">
-                    &#8679;
-                </button>
+                <>
+                    <button onClick={scrollToTop} className="back-to-top">
+                        &#8679;
+                    </button>
+                    <button onClick={() => handleMenuClick({key: "1"})} className="floating-copy">
+                        <CopyOutlined/>
+                    </button>
+                </>
             )}
             {/* &#8679; is used to create the upward arrow */}
         </>
