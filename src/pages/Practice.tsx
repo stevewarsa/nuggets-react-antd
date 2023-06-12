@@ -11,7 +11,7 @@ import {
     ArrowRightOutlined,
     CheckSquareOutlined,
     CopyOutlined,
-    EditOutlined,
+    EditOutlined, FileSearchOutlined,
     InfoCircleOutlined,
     LinkOutlined,
     MoreOutlined,
@@ -26,6 +26,7 @@ import {CSSTransition, SwitchTransition} from "react-transition-group";
 import useMemoryPassages from "../hooks/use-memory-passages";
 import EditPassage from "../components/EditPassage";
 import {Verse} from "../model/verse";
+import {useNavigate} from "react-router-dom";
 
 const handleClipboard = (psg: Passage) => {
     const clipboardContent = PassageUtils.getPassageForClipboard(psg, true);
@@ -53,6 +54,7 @@ const getFrequency = (psg: Passage) => {
 
 const Practice = () => {
     const dispatcher = useDispatch();
+    const navigate = useNavigate();
     const {getMemPassages} = useMemoryPassages();
 
     const practiceConfig = useSelector((state: AppState) => state.practiceConfig);
@@ -90,7 +92,7 @@ const Practice = () => {
     // once the memory passages are loaded, navigate to the first passage
     useEffect(() => {
         if (memPsgList && memPsgList.length > 0) {
-            navigate(true);
+            doNavigate(true);
         }
     }, [memPsgList]);
 
@@ -142,7 +144,7 @@ const Practice = () => {
     };
 
     // the purpose of this method is to reinitialize some flags and other values for the UI, then to set the current index
-    const navigate = (next: boolean) => {
+    const doNavigate = (next: boolean) => {
         // set defaults for navigating to previous passage
         setShowingQuestion(true);
         // if user pressed the answer button, show passage ref has been changed to what it was originally,
@@ -255,14 +257,28 @@ const Practice = () => {
                 setBusy({state: false, message: ""});
                 setEditing(true);
             });
+        } else if (key === "4") {
+            // View Chapter
+            handleGoToPassage();
         }
     };
+
+    const handleGoToPassage = () => {
+        dispatcher(stateActions.setChapterSelection({
+            book: currPassage.bookName,
+            chapter: currPassage.chapter,
+            verse: currPassage.startVerse,
+            translation: StringUtils.isEmpty(currPassage.translationName) ? "niv" : currPassage.translationName
+        }));
+        navigate("/readChapter");
+    };
+
     return (
         <>
             <Row justify="center">
                 <h1>Memory Verses</h1>
             </Row>
-            <Swipe tolerance={60} onSwipeLeft={() => navigate(true)} onSwipeRight={() => navigate(false)}>
+            <Swipe tolerance={60} onSwipeLeft={() => doNavigate(true)} onSwipeRight={() => doNavigate(false)}>
                 <Row style={{marginBottom: "10px"}} justify="center" align="middle">
                     <Col>{currIdx + 1} of {memPsgList.length}</Col>
                     <Col style={{marginLeft: "5px"}}>
@@ -287,8 +303,8 @@ const Practice = () => {
                 <Row justify="center" style={{marginBottom: "10px"}}>
                     <Space>
                         <Col span={6}><Button onClick={handleToggleAnswer} className="button" icon={showingQuestion ? <QuestionCircleOutlined className="icon" /> : <CheckSquareOutlined className="icon" />}/></Col>
-                        <Col span={6}><Button className="button" icon={<ArrowLeftOutlined className="icon"/>} onClick={() => navigate(false)}/></Col>
-                        <Col span={6}><Button className="button" icon={<ArrowRightOutlined className="icon"/>} onClick={() => navigate(true)}/></Col>
+                        <Col span={6}><Button className="button" icon={<ArrowLeftOutlined className="icon"/>} onClick={() => doNavigate(false)}/></Col>
+                        <Col span={6}><Button className="button" icon={<ArrowRightOutlined className="icon"/>} onClick={() => doNavigate(true)}/></Col>
                         <Col span={6}>
                             <Dropdown className="button" placement="bottomRight" trigger={["click"]} overlay={
                                 <Menu onClick={handleMenuClick}>
@@ -300,6 +316,9 @@ const Practice = () => {
                                     </Menu.Item>
                                     <Menu.Item key="3" icon={<EditOutlined />}>
                                         Edit...
+                                    </Menu.Item>
+                                    <Menu.Item key="4" icon={<FileSearchOutlined />}>
+                                        View Chapter...
                                     </Menu.Item>
                                 </Menu>
                             }>
