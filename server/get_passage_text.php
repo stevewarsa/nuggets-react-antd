@@ -51,12 +51,26 @@ while ($row = $results->fetchArray()) {
     $versePart->verseNumber = $currentVerse;
     $versePart->versePartId = $row["verse_part_id"];
     $versePart->verseText = $row["verse_text"];
-    $versePart->wordsOfChrist = $row["is_words_of_christ"];
+
+    if ($row["is_words_of_christ"] == "Y") {
+
+        $versePart->wordsOfChrist = TRUE;
+
+    } else {
+
+        $versePart->wordsOfChrist = FALSE;
+
+    }
 
     $verse->addVersePart($versePart);
-    $passage->bookName = $row["book_name"];
+
 }
 $statement->close();
 $db->close();
 header('Content-Type: application/json; charset=utf8');
-print_r(json_encode($passage));
+
+print_r(json_encode(objectToArray($passage)));
+
+
+
+?>

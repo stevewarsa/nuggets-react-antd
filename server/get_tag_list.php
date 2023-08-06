@@ -19,7 +19,6 @@ if (isset($_REQUEST['tagId'])) {
         $passage->chapter = $row['chapter'];
         $passage->startVerse = $row['start_verse'];
         $passage->endVerse = $row['end_verse'];
-        $passage->bookName = $row['book_name'];
         array_push($arrayName, $passage);
     }
     $statement->close();

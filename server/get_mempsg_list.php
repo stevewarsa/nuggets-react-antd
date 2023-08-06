@@ -1,4 +1,7 @@
 <?php
+
+
+//header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json; charset=utf8');
 
 include_once('./Book.php');
@@ -19,8 +22,8 @@ $db->close();
 
 $user = $_GET['user'];
 $db = new SQLite3('db/memory_' . $user . '.db');
-$queued = $_GET['queued'];
-if (isset($queued)) {
+if (array_key_exists('queued', $_GET)) {
+    $queued = $_GET['queued'];
 	$results = $db->query("select p.passage_id, book_id, chapter, start_verse, end_verse, m.preferred_translation_cd, frequency_days, last_viewed_str, last_viewed_num from passage p, memory_passage m where m.passage_id = p.passage_id and queued = '" . $queued . "'");
 } else {
 	$results = $db->query("select p.passage_id, book_id, chapter, start_verse, end_verse, m.preferred_translation_cd, frequency_days, last_viewed_str, last_viewed_num from passage p, memory_passage m where m.passage_id = p.passage_id and queued = 'N'");
@@ -45,4 +48,6 @@ while ($row = $results->fetchArray()) {
 $db->close();
 
 print_r(json_encode($psgArray));
+
+?>
 
