@@ -98,7 +98,7 @@ const SelectVerses = () => {
             {locVerses && locVerses.map(v => (
                 <Row key={v.verseNum}>
                     <Col span={2}>
-                        <Checkbox onClick={() => handleSelectVerse(v)} checked={v.selected} />
+                        <Checkbox style={{marginLeft: "10px"}} onClick={() => handleSelectVerse(v)} checked={v.selected} />
                     </Col>
                     <Col span={2}>
                         {v.verseNum + ". "}
