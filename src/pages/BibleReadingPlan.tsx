@@ -124,7 +124,7 @@ const BibleReadingPlan = () => {
                         <Divider/>
                         <h3>Reading History</h3>
                         {allReadingPlanProgress.map(p =>
-                            <Card style={{cursor: "pointer"}} onClick={() => goToChapter(p)} key={p.dateRead + "row" + p.chapter} size="small"
+                            <Card style={{cursor: "pointer"}} onClick={() => goToChapter(p)} key={p.dateRead + "_" + p.chapter + "_" + p.bookName} size="small"
                                   title={p.dayOfWeek + " " + p.dateRead}>
                                 <p key={p.dateRead + "col1" + p.chapter}>{Constants.bookAbbrev[p.bookName][1] + " " + p.chapter}</p>
                             </Card>
