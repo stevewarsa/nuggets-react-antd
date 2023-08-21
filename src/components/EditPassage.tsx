@@ -22,6 +22,7 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
     const dispatcher = useDispatch();
     const user = useSelector((state: AppState) => state.user);
     const {Option} = Select;
+    const [psgTextChanged, setPsgTextChanged] = useState(false);
     const [startVerse, setStartVerse] = useState(props.passage.startVerse);
     const [frequency, setFrequency] = useState(props.passage.frequencyDays);
     const [endVerse, setEndVerse] = useState(props.passage.endVerse);
@@ -94,6 +95,7 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
         if (StringUtils.isEmpty(e.target.value)) {
             setAppendLetter(undefined);
         }
+        setPsgTextChanged(false);
     };
 
     const changeTranslation = (value) => {
@@ -134,7 +136,7 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
         const updateParam: UpdatePassageParam = new UpdatePassageParam();
         updateParam.passageRefAppendLetter = appendLetter;
         updateParam.user = user;
-        updateParam.newText = currPassageText;
+        updateParam.newText = psgTextChanged ? currPassageText : null;
         updateParam.passage = {...props.passage,
             translationName: translation,
             translationId: translation,
