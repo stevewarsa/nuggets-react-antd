@@ -8,6 +8,7 @@ import {Col, Input, Row} from "antd";
 import {PassageUtils} from "../helpers/passage-utils";
 import {stateActions} from "../store";
 import {useNavigate} from "react-router-dom";
+import {PracticeConfig} from "../model/PracticeConfig";
 
 const MyMemPsgList = () => {
     const dispatcher = useDispatch();
@@ -20,6 +21,8 @@ const MyMemPsgList = () => {
     const [filteredMemPassageList, setFilteredMemPassageList] = useState<Passage[]>([]);
     const [busy, setBusy] = useState({state: false, message: ""});
     const [filter, setFilter] = useState<string>(undefined);
+    const [practiceMode, setPracticeMode] = useState(PassageUtils.BY_REF);
+    const [passageDisplayOrder, setPassageDisplayOrder] = useState(PassageUtils.BY_FREQ);
 
     useEffect(() => {
         if (prefs) {
@@ -43,8 +46,10 @@ const MyMemPsgList = () => {
     };
 
     const handlePsgClick = (psg: Passage) => {
-        dispatcher(stateActions.setChapterSelection({book: psg.bookName, chapter: psg.chapter, translation: translation}));
-        navigate("/readChapter");
+        dispatcher(stateActions.setPracticeConfig({practiceMode: practiceMode, passageDisplayOrder: passageDisplayOrder, startAtPassageId: psg.passageId} as PracticeConfig));
+        navigate("/practice");
+        // dispatcher(stateActions.setChapterSelection({book: psg.bookName, chapter: psg.chapter, translation: translation}));
+        // navigate("/readChapter");
     };
 
     return <>

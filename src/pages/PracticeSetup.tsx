@@ -25,7 +25,7 @@ const PracticeSetup = () => {
 
     const handleStart = async () => {
         // console.log("Handle Start - user: " + user);
-        dispatcher(stateActions.setPracticeConfig({practiceMode: practiceMode, passageDisplayOrder: passageDisplayOrder} as PracticeConfig));
+        dispatcher(stateActions.setPracticeConfig({practiceMode: practiceMode, passageDisplayOrder: passageDisplayOrder, startAtPassageId: -1} as PracticeConfig));
         navigate("/practice");
     }
 

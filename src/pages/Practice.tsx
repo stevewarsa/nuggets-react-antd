@@ -72,6 +72,7 @@ const Practice = () => {
     const [showPsgRef, setShowPsgRef] = useState(practiceConfig.practiceMode === PassageUtils.BY_REF);
     const [infoVisible, setInfoVisible] = useState(false);
     const [editing, setEditing] = useState(false);
+    const [startAtPassage, setStartAtPassage] = useState(practiceConfig.startAtPassageId);
 
     // grab the memory verses from the server based on the practice config...
     useEffect(() => {
@@ -92,7 +93,16 @@ const Practice = () => {
     // once the memory passages are loaded, navigate to the first passage
     useEffect(() => {
         if (memPsgList && memPsgList.length > 0) {
-            doNavigate(true);
+            console.log("Practice.useEffect[memPsgList] - startAtPassage = " + startAtPassage);
+            const foundPassageIndex = memPsgList.findIndex(psg => psg.passageId === startAtPassage);
+            console.log("Practice.useEffect[memPsgList] - foundPassageIndex = " + foundPassageIndex);
+            if (foundPassageIndex >= 0) {
+                doNavigate(true, foundPassageIndex);
+                setStartAtPassage(-1);
+            } else {
+                doNavigate(true, -1);
+            }
+
         }
     }, [memPsgList]);
 
@@ -144,7 +154,7 @@ const Practice = () => {
     };
 
     // the purpose of this method is to reinitialize some flags and other values for the UI, then to set the current index
-    const doNavigate = (next: boolean) => {
+    const doNavigate = (next: boolean, toIndex: number) => {
         // set defaults for navigating to previous passage
         setShowingQuestion(true);
         // if user pressed the answer button, show passage ref has been changed to what it was originally,
@@ -153,13 +163,17 @@ const Practice = () => {
         setEditing(false);
         setCurrPsgTxt("");
         setCurrPsgRef("");
-        let navigateToIndex;
-        if (next) {
-            navigateToIndex = currIdx === (memPsgList.length - 1) ? 0 : currIdx + 1;
+        if (toIndex != -1) {
+            setCurrIdx(toIndex);
         } else {
-            navigateToIndex = currIdx === 0 ? memPsgList.length - 1 : currIdx - 1;
+            let navigateToIndex;
+            if (next) {
+                navigateToIndex = currIdx === (memPsgList.length - 1) ? 0 : currIdx + 1;
+            } else {
+                navigateToIndex = currIdx === 0 ? memPsgList.length - 1 : currIdx - 1;
+            }
+            setCurrIdx(navigateToIndex);
         }
-        setCurrIdx(navigateToIndex);
     };
 
     // purpose of this method is to populate the currPsgRef and currPsgTxt
@@ -278,7 +292,7 @@ const Practice = () => {
             <Row justify="center">
                 <h1>Memory Verses</h1>
             </Row>
-            <Swipe tolerance={60} onSwipeLeft={() => doNavigate(true)} onSwipeRight={() => doNavigate(false)}>
+            <Swipe tolerance={60} onSwipeLeft={() => doNavigate(true, -1)} onSwipeRight={() => doNavigate(false, -1)}>
                 <Row style={{marginBottom: "10px"}} justify="center" align="middle">
                     <Col>{currIdx + 1} of {memPsgList.length}</Col>
                     <Col style={{marginLeft: "5px"}}>
@@ -303,8 +317,8 @@ const Practice = () => {
                 <Row justify="center" style={{marginBottom: "10px"}}>
                     <Space>
                         <Col span={6}><Button onClick={handleToggleAnswer} className="button" icon={showingQuestion ? <QuestionCircleOutlined className="icon" /> : <CheckSquareOutlined className="icon" />}/></Col>
-                        <Col span={6}><Button className="button" icon={<ArrowLeftOutlined className="icon"/>} onClick={() => doNavigate(false)}/></Col>
-                        <Col span={6}><Button className="button" icon={<ArrowRightOutlined className="icon"/>} onClick={() => doNavigate(true)}/></Col>
+                        <Col span={6}><Button className="button" icon={<ArrowLeftOutlined className="icon"/>} onClick={() => doNavigate(false, -1)}/></Col>
+                        <Col span={6}><Button className="button" icon={<ArrowRightOutlined className="icon"/>} onClick={() => doNavigate(true, -1)}/></Col>
                         <Col span={6}>
                             <Dropdown className="button" placement="bottomRight" trigger={["click"]} overlay={
                                 <Menu onClick={handleMenuClick}>
