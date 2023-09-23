@@ -16,7 +16,7 @@ const Login = () => {
     const location = useLocation();
     const allUsers = useSelector((appState: AppState) => appState.allUsers);
     const {Option} = Select;
-    const [initVals, setInitVals] = useState({username: "", remember: false, selectUserName: "N/A"});
+    const [initVals, setInitVals] = useState({username: "", remember: false, selectUserName: "N/A", copyUserName: "N/A"});
     const [form] = Form.useForm();
     const [busy, setBusy] = useState({state: false, message: ""});
     const isMounted = useIsMounted();
@@ -42,7 +42,6 @@ const Login = () => {
             // log 'em right in...
             dispatcher(stateActions.setUser(userName));
             redirectAfterLogin();
-            return;
         }
     }, [dispatcher, navigate, isMounted, redirectAfterLogin]);
 
@@ -51,10 +50,14 @@ const Login = () => {
     }, [initVals, form]);
 
     const onFinish = async () => {
+        console.log("onFinish - initVals: ", initVals);
         setBusy({state: true, message: "Logging in..."});
-        //console.log('Success:', initVals);
         const user = StringUtils.isEmpty(initVals.username) ? initVals.selectUserName : initVals.username;
-        const response = await memoryService.doLogin(user);
+        let copyUser = null;
+        if (initVals.selectUserName === "N/A" && initVals.copyUserName !== "N/A") {
+            copyUser = initVals.copyUserName;
+        }
+        const response = await memoryService.doLogin(user, copyUser);
         if (response.data === "success") {
             if (initVals.remember) {
                 // write cookie so they won't have to login next time
@@ -77,6 +80,12 @@ const Login = () => {
     const handleUserSelectionChange = (value) => {
         setInitVals(prev => {
             return {...prev, selectUserName: value};
+        });
+    };
+
+    const handleCopyUserSelectionChange = (value) => {
+        setInitVals(prev => {
+            return {...prev, copyUserName: value};
         });
     };
 
@@ -108,10 +117,23 @@ const Login = () => {
             >
                 {(!initVals.selectUserName || initVals.selectUserName === "N/A") &&
                     <Form.Item
-                        label="Username"
+                        label="User Name"
                         name="username"
                     >
                         <Input autoFocus value={initVals.username} onChange={handleUserName}/>
+                    </Form.Item>
+                }
+
+                {!StringUtils.isEmpty(initVals.username) &&
+                    <Form.Item
+                        label="Copy User"
+                        name="copyUserName"
+                    >
+                        <Select size="large" value={initVals.copyUserName} onChange={handleCopyUserSelectionChange}>
+                            <Option key="N/A" value="N/A">--Select User--</Option>
+                            {allUsers.map(user => <Option key={user.userName}
+                                                          value={user.userName}>{user.userName}</Option>)}
+                        </Select>
                     </Form.Item>
                 }
 

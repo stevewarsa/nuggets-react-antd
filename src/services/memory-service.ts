@@ -6,6 +6,7 @@ import {MemUser} from "../model/mem-user";
 import axiosRetry from "axios-retry";
 import {UpdatePassageParam} from "../model/update-passage-param";
 import {Topic} from "../model/topic";
+import {StringUtils} from "../helpers/string.utils";
 
 class MemoryService {
     public getMemoryPsgList(user: string) {
@@ -109,8 +110,8 @@ class MemoryService {
         return MemoryService.buildAxios().post<any[]>("/bible-app/server/get_email_mappings.php", param);
     }
 
-    public doLogin(userName: string) {
-        return MemoryService.buildAxios().get<string>("/bible-app/server/nuggets_login.php?user=" + userName);
+    public doLogin(userName: string, copyUser: string) {
+        return MemoryService.buildAxios().get<string>("/bible-app/server/nuggets_login.php?user=" + userName + (StringUtils.isEmpty(copyUser) ? "" :  "&copyUser=" + copyUser));
     }
 
     public searchBible(searchParam: any) {
