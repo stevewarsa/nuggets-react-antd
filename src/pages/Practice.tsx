@@ -7,8 +7,9 @@ import {Passage} from "../model/passage";
 import {PassageUtils} from "../helpers/passage-utils";
 import {notification, Button, Col, Dropdown, Menu, Popover, Row, Space} from "antd";
 import {
+    ArrowDownOutlined,
     ArrowLeftOutlined,
-    ArrowRightOutlined,
+    ArrowRightOutlined, ArrowUpOutlined,
     CheckSquareOutlined,
     CopyOutlined,
     EditOutlined, FileSearchOutlined,
@@ -27,6 +28,7 @@ import useMemoryPassages from "../hooks/use-memory-passages";
 import EditPassage from "../components/EditPassage";
 import {Verse} from "../model/verse";
 import {useNavigate} from "react-router-dom";
+import {UpdatePassageParam} from "../model/update-passage-param";
 
 const handleClipboard = (psg: Passage) => {
     const clipboardContent = PassageUtils.getPassageForClipboard(psg, true);
@@ -132,7 +134,7 @@ const Practice = () => {
         }
     }, [currIdx]);
 
-    const successfulUpdateFinished = () => {
+    const successfulUpdateFinished = (index: number) => {
         console.log("Practice.successfulUpdateFinished - clearing versesByPsgId...");
         setVersesByPsgId({});
         console.log("Practice.successfulUpdateFinished - versesByPsgId cleared.");
@@ -144,7 +146,7 @@ const Practice = () => {
                 console.log("Practice.successfulUpdateFinished - finished successfully loading memory passages from DB. Here are the overrides:", resp.overrides);
                 setMemPsgList(resp.passages);
                 setOverrides(resp.overrides);
-                setCurrIdx(0);
+                setCurrIdx(index);
             } else {
                 console.log("Practice.successfulUpdateFinished - Unable to reload memory passages!");
                 notification.error({message: "Unable to reload memory passages!", placement: "bottomRight"});
@@ -274,7 +276,44 @@ const Practice = () => {
         } else if (key === "4") {
             // View Chapter
             handleGoToPassage();
+        } else if (key === "5") {
+            // Move up
+            handleMoveUp();
+        } else if (key === "6") {
+            // Move up
+            handleMoveDown();
         }
+    };
+
+    const handleMoveUp = () => {
+        updateFrequency(currPassage.frequencyDays - 1);
+    };
+
+    const handleMoveDown = () => {
+        updateFrequency(currPassage.frequencyDays + 1);
+    };
+
+    const updateFrequency = (newFrequency: number) => {
+        const updateParam: UpdatePassageParam = new UpdatePassageParam();
+        updateParam.passageRefAppendLetter = currPassage.passageRefAppendLetter;
+        updateParam.user = user;
+        updateParam.newText = null;
+        updateParam.passage = {...currPassage,
+            frequencyDays: newFrequency
+        };
+        console.log("Practice.updateFrequency - here is the param that will be sent:", updateParam);
+        setBusy({state: true, message: "Updating frequency..."});
+        memoryService.updatePassage(updateParam).then(resp => {
+            if (resp.data === "success") {
+                console.log('Update memory passage was successful!');
+                notification.success({message: "Frequency has been updated!", placement: "bottomRight"});
+            } else {
+                notification.error({message: "Error updating passage: " + resp.data, placement: "top"});
+            }
+            setBusy({state: false, message: ""});
+            successfulUpdateFinished(currIdx);
+        });
+
     };
 
     const handleGoToPassage = () => {
@@ -334,6 +373,16 @@ const Practice = () => {
                                     <Menu.Item key="4" icon={<FileSearchOutlined />}>
                                         View Chapter...
                                     </Menu.Item>
+                                    {currPassage?.frequencyDays > 1 &&
+                                    <Menu.Item key="5" icon={<ArrowUpOutlined />}>
+                                        Move Up...
+                                    </Menu.Item>
+                                    }
+                                    {currPassage?.frequencyDays < 5 &&
+                                    <Menu.Item key="6" icon={<ArrowDownOutlined />}>
+                                        Move Down...
+                                    </Menu.Item>
+                                    }
                                 </Menu>
                             }>
                                 <MoreOutlined className="icon-dropdown" style={{
@@ -381,7 +430,7 @@ const Practice = () => {
                 }
             </Swipe>
             {currPassage && currPassage.passageId > 0 && currPassage.verses && currPassage.verses.length > 0 &&
-                <EditPassage props={{passage: currPassage, visible: editing, setVisibleFunction: successfulUpdateFinished}} />}
+                <EditPassage props={{passage: currPassage, visible: editing, setVisibleFunction: () => successfulUpdateFinished(0)}} />}
         </>
     );
 };
