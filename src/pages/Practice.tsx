@@ -74,6 +74,7 @@ const Practice = () => {
     const [showPsgRef, setShowPsgRef] = useState(practiceConfig.practiceMode === PassageUtils.BY_REF);
     const [infoVisible, setInfoVisible] = useState(false);
     const [editing, setEditing] = useState(false);
+    const [isMemPassageListGetFromServer, setIsMemPassageListGetFromServer] = useState(false);
     const [startAtPassage, setStartAtPassage] = useState(practiceConfig.startAtPassageId);
 
     // grab the memory verses from the server based on the practice config...
@@ -82,6 +83,7 @@ const Practice = () => {
         console.log("Practice.useEffect[practiceConfig] - invoking getMemPassages... practiceConfig: ", practiceConfig);
         getMemPassages(user, true).then(resp => {
             const memPsgList: Passage[] = resp.passages;
+            setIsMemPassageListGetFromServer(true);
             setMemPsgList(memPsgList);
             const memPsgTxtOverrideList: Passage[] = resp.overrides;
             if (memPsgTxtOverrideList) {
@@ -94,7 +96,7 @@ const Practice = () => {
 
     // once the memory passages are loaded, navigate to the first passage
     useEffect(() => {
-        if (memPsgList && memPsgList.length > 0) {
+        if (memPsgList && memPsgList.length > 0 && isMemPassageListGetFromServer) {
             console.log("Practice.useEffect[memPsgList] - startAtPassage = " + startAtPassage);
             const foundPassageIndex = memPsgList.findIndex(psg => psg.passageId === startAtPassage);
             console.log("Practice.useEffect[memPsgList] - foundPassageIndex = " + foundPassageIndex);
@@ -307,11 +309,17 @@ const Practice = () => {
             if (resp.data === "success") {
                 console.log('Update memory passage was successful!');
                 notification.success({message: "Frequency has been updated!", placement: "bottomRight"});
+                const updatedMemPsgList = [...memPsgList];
+                const index = updatedMemPsgList.findIndex(item => item.passageId === updateParam.passage.passageId);
+                if (index !== -1) {
+                    updatedMemPsgList[index].frequencyDays = updateParam.passage.frequencyDays;
+                    setIsMemPassageListGetFromServer(false);
+                    setMemPsgList(updatedMemPsgList);
+                }
             } else {
                 notification.error({message: "Error updating passage: " + resp.data, placement: "top"});
             }
             setBusy({state: false, message: ""});
-            successfulUpdateFinished(currIdx);
         });
 
     };
