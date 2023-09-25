@@ -3,7 +3,7 @@
 header("Content-Type: application/json; charset=utf8");
 
 $user = $_GET["user"];
-$copyUser = $_GET["copyUser"];
+$copyUser = isset($_GET["copyUser"]) ? $_GET["copyUser"] : null;
 
 error_log("[nuggets_login.php] User " . $user . " is logging into Nuggets...");
 $loginMessage = "success";
