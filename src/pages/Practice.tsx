@@ -5,14 +5,16 @@ import memoryService from "../services/memory-service";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {Passage} from "../model/passage";
 import {PassageUtils} from "../helpers/passage-utils";
-import {notification, Button, Col, Dropdown, Menu, Popover, Row, Space} from "antd";
+import {notification, Button, Col, Dropdown, Menu, Popover, Row, Space, Modal, MenuProps} from "antd";
 import {
     ArrowDownOutlined,
     ArrowLeftOutlined,
-    ArrowRightOutlined, ArrowUpOutlined,
+    ArrowRightOutlined,
+    ArrowUpOutlined,
     CheckSquareOutlined,
     CopyOutlined,
-    EditOutlined, FileSearchOutlined,
+    EditOutlined,
+    FileSearchOutlined,
     InfoCircleOutlined,
     LinkOutlined,
     MoreOutlined,
@@ -46,12 +48,40 @@ const getFrequency = (psg: Passage) => {
     if (!psg) {
         return "N/A";
     } else {
-        if (psg.frequencyDays === -1) {
-            return "Every Time";
-        } else {
-            return psg.frequencyDays.toString();
-        }
+        return psg.frequencyDays.toString();
     }
+};
+let MORE_MENU_ITEMS: MenuProps["items"] = [
+    {
+        label: "Copy",
+        key: "1",
+        icon: <CopyOutlined/>,
+    },
+    {
+        label: "Interlinear View...",
+        key: "2",
+        icon: <LinkOutlined />,
+    },
+    {
+        label: "Edit...",
+        key: "3",
+        icon: <EditOutlined />,
+    },
+    {
+        label: "View Chapter...",
+        key: "4",
+        icon: <FileSearchOutlined />,
+    }
+];
+const moveUp = {
+    label: "Move Up...",
+    key: "5",
+    icon: <ArrowUpOutlined />,
+};
+const moveDown = {
+    label: "Move Down...",
+    key: "6",
+    icon: <ArrowDownOutlined />,
 };
 
 const Practice = () => {
@@ -76,6 +106,7 @@ const Practice = () => {
     const [editing, setEditing] = useState(false);
     const [isMemPassageListGetFromServer, setIsMemPassageListGetFromServer] = useState(false);
     const [startAtPassage, setStartAtPassage] = useState(practiceConfig.startAtPassageId);
+    const [moreMenuItems, setMoreMenuItems] = useState(MORE_MENU_ITEMS)
 
     // grab the memory verses from the server based on the practice config...
     useEffect(() => {
@@ -135,6 +166,44 @@ const Practice = () => {
             memoryService.updateLastViewed(user, memPsgList[currIdx].passageId, dtNum, formattedDateTime);
         }
     }, [currIdx]);
+
+    useEffect(() => {
+        const hasMoveUp = moreMenuItems.find(menu => menu.key === "5");
+        const hasMoveDown = moreMenuItems.find(menu => menu.key === "6");
+        console.log("Practice.useEffect[currPassage] - currIdx=" + currIdx);
+        console.log("Practice.useEffect[currPassage] - hasMoveUp: ", hasMoveUp);
+        console.log("Practice.useEffect[currPassage] - hasMoveDown: ", hasMoveDown);
+        console.log("Practice.useEffect[currPassage] - currPassage: ", currPassage);
+        let updatedArray = false;
+        let locMoreMenuItems = [...moreMenuItems];
+        if (currPassage?.frequencyDays > 1 && hasMoveUp === undefined) {
+            console.log("Practice.useEffect[currPassage] - Adding moveUp menu...");
+            locMoreMenuItems.push(moveUp);
+            updatedArray = true;
+            console.log("Practice.useEffect[currPassage] - moreMenuItems: ", locMoreMenuItems);
+        }
+        if (currPassage?.frequencyDays < 5 && hasMoveDown === undefined) {
+            console.log("Practice.useEffect[currPassage] - Adding moveDown menu...");
+            locMoreMenuItems.push(moveDown);
+            updatedArray = true;
+            console.log("Practice.useEffect[currPassage] - moreMenuItems: ", locMoreMenuItems);
+        }
+        if (hasMoveUp !== undefined && currPassage?.frequencyDays === 1) {
+            console.log("Practice.useEffect[currPassage] - Removing moveUp menu...");
+            locMoreMenuItems = locMoreMenuItems.filter(menu => menu.key != "5");
+            updatedArray = true;
+            console.log("Practice.useEffect[currPassage] - moreMenuItems: ", locMoreMenuItems);
+        }
+        if (hasMoveDown !== undefined && currPassage?.frequencyDays === 5) {
+            console.log("Practice.useEffect[currPassage] - Removing moveDown menu...");
+            locMoreMenuItems = locMoreMenuItems.filter(menu => menu.key != "6");
+            updatedArray = true;
+            console.log("Practice.useEffect[currPassage] - moreMenuItems: ", locMoreMenuItems);
+        }
+        if (updatedArray) {
+            setMoreMenuItems(locMoreMenuItems);
+        }
+    }, [currPassage]);
 
     const successfulUpdateFinished = (index: number) => {
         console.log("Practice.successfulUpdateFinished - clearing versesByPsgId...");
@@ -288,7 +357,24 @@ const Practice = () => {
     };
 
     const handleMoveUp = () => {
-        updateFrequency(currPassage.frequencyDays - 1);
+        const targetBox = currPassage.frequencyDays - 1;
+        if (currPassage.frequencyDays === 2) {
+            updateFrequency(targetBox)
+        } else {
+            Modal.confirm({
+                title: "Select Target Box",
+                content: "Would you like to move this to Box 1 or move up one to " + targetBox + "?",
+                okText: "Box 1",
+                cancelText: "Box " + targetBox,
+                closable: true,
+                onOk() {
+                    updateFrequency(1);
+                },
+                onCancel() {
+                    updateFrequency(targetBox);
+                },
+            });
+        }
     };
 
     const handleMoveDown = () => {
@@ -308,7 +394,7 @@ const Practice = () => {
         memoryService.updatePassage(updateParam).then(resp => {
             if (resp.data === "success") {
                 console.log('Update memory passage was successful!');
-                notification.success({message: "Frequency has been updated!", placement: "bottomRight"});
+                notification.success({message: "Box has been updated!", placement: "bottomRight"});
                 const updatedMemPsgList = [...memPsgList];
                 const index = updatedMemPsgList.findIndex(item => item.passageId === updateParam.passage.passageId);
                 if (index !== -1) {
@@ -334,6 +420,7 @@ const Practice = () => {
         navigate("/readChapter");
     };
 
+
     return (
         <>
             <Row justify="center">
@@ -347,7 +434,7 @@ const Practice = () => {
                             content={
                                 <>
                                     <ul>
-                                        <li>Frequency: {getFrequency(memPsgList[currIdx])}</li>
+                                        <li>Box: {getFrequency(memPsgList[currIdx])}</li>
                                         <li>Last Practiced: {memPsgList[currIdx]?.last_viewed_str}</li>
                                     </ul>
                                     <Button type="link" onClick={() => setInfoVisible(false)}>Close</Button>
@@ -368,29 +455,7 @@ const Practice = () => {
                         <Col span={6}><Button className="button" icon={<ArrowRightOutlined className="icon"/>} onClick={() => doNavigate(true, -1)}/></Col>
                         <Col span={6}>
                             <Dropdown className="button" placement="bottomRight" trigger={["click"]} overlay={
-                                <Menu onClick={handleMenuClick}>
-                                    <Menu.Item key="1" icon={<CopyOutlined/>}>
-                                        Copy
-                                    </Menu.Item>
-                                    <Menu.Item key="2" icon={<LinkOutlined />}>
-                                        Interlinear View
-                                    </Menu.Item>
-                                    <Menu.Item key="3" icon={<EditOutlined />}>
-                                        Edit...
-                                    </Menu.Item>
-                                    <Menu.Item key="4" icon={<FileSearchOutlined />}>
-                                        View Chapter...
-                                    </Menu.Item>
-                                    {currPassage?.frequencyDays > 1 &&
-                                    <Menu.Item key="5" icon={<ArrowUpOutlined />}>
-                                        Move Up...
-                                    </Menu.Item>
-                                    }
-                                    {currPassage?.frequencyDays < 5 &&
-                                    <Menu.Item key="6" icon={<ArrowDownOutlined />}>
-                                        Move Down...
-                                    </Menu.Item>
-                                    }
+                                <Menu onClick={handleMenuClick} items={moreMenuItems}>
                                 </Menu>
                             }>
                                 <MoreOutlined className="icon-dropdown" style={{
