@@ -30,6 +30,7 @@ import TopNav from "./components/TopNav";
 import useMemoryPassages from "./hooks/use-memory-passages";
 import GoToPassageByRef from "./pages/GoToPassageByRef";
 import MyMemPsgListInOrder from "./pages/MyMemPsgListInOrder";
+import MemoryPassagesByBox from "./pages/MemoryPassagesByBox";
 
 const App = () => {
     const dispatcher = useDispatch();
@@ -85,6 +86,7 @@ const App = () => {
                             <Route path="/about" element={<About/>}/>
                             <Route path="/practiceSetup" element={<PracticeSetup/>}/>
                             <Route path="/practiceHist" element={<ViewMemoryPracticeHistory/>}/>
+                            <Route path="/passagesByBox" element={<MemoryPassagesByBox/>}/>
                             <Route path="/practice" element={<Practice/>}/>
                             <Route path="/selectChapter" element={<SelectChapter/>}/>
                             <Route path="/readChapter" element={<ReadChapter/>}/>

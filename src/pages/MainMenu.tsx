@@ -156,6 +156,11 @@ const MainMenu = () => {
                     key: "5.4",
                     label: "My Mem Passages In Order",
                     action: "/myMemPsgListInOrder"
+                },
+                {
+                    key: "5.5",
+                    label: "Mem Passages By Box",
+                    action: "/passagesByBox"
                 }
             ]
         },
