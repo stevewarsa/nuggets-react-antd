@@ -40,7 +40,7 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
         // populate the frequency dropdown values (only one time - no dependencies)
         const freqDep: {freqLabel: string, freqValue: number}[] = [];
         freqDep.push({freqValue: -1, freqLabel: "Every Time"});
-        for (let i = 1; i <= 500; i++) {
+        for (let i = 1; i <= 5; i++) {
             freqDep.push({freqLabel: i + "", freqValue: i});
         }
         setFrequencies(freqDep);
@@ -211,7 +211,7 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
                         </Row>
                     }
                     <Row align="middle" style={{marginBottom: "4px"}}>
-                        <Col span={12}>Frequency:</Col>
+                        <Col span={12}>Box:</Col>
                         <Col span={12}>
                             <Select style={{width: "100%"}} size="large" value={frequency} onChange={changeFrequency}>
                                 {frequencies.map(freq => (

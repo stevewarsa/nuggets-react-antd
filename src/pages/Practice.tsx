@@ -5,12 +5,12 @@ import memoryService from "../services/memory-service";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {Passage} from "../model/passage";
 import {PassageUtils} from "../helpers/passage-utils";
-import {notification, Button, Col, Dropdown, Menu, Popover, Row, Space, Modal, MenuProps} from "antd";
+import {notification, Button, Col, Dropdown, Menu, Popover, Row, Space, Modal, MenuProps, Avatar} from "antd";
 import {
     ArrowDownOutlined,
     ArrowLeftOutlined,
     ArrowRightOutlined,
-    ArrowUpOutlined,
+    ArrowUpOutlined, BorderOutlined,
     CheckSquareOutlined,
     CopyOutlined,
     EditOutlined,
@@ -18,7 +18,7 @@ import {
     InfoCircleOutlined,
     LinkOutlined,
     MoreOutlined,
-    QuestionCircleOutlined
+    QuestionCircleOutlined,
 } from "@ant-design/icons";
 import {Constants} from "../model/constants";
 import Swipe from "react-easy-swipe";
@@ -44,7 +44,7 @@ const handleClipboard = (psg: Passage) => {
     }
 }
 
-const getFrequency = (psg: Passage) => {
+const getBox = (psg: Passage) => {
     if (!psg) {
         return "N/A";
     } else {
@@ -359,7 +359,7 @@ const Practice = () => {
     const handleMoveUp = () => {
         const targetBox = currPassage.frequencyDays - 1;
         if (currPassage.frequencyDays === 2) {
-            updateFrequency(targetBox)
+            updateBox(targetBox)
         } else {
             Modal.confirm({
                 title: "Select Target Box",
@@ -368,29 +368,29 @@ const Practice = () => {
                 cancelText: "Box " + targetBox,
                 closable: true,
                 onOk() {
-                    updateFrequency(1);
+                    updateBox(1);
                 },
                 onCancel() {
-                    updateFrequency(targetBox);
+                    updateBox(targetBox);
                 },
             });
         }
     };
 
     const handleMoveDown = () => {
-        updateFrequency(currPassage.frequencyDays + 1);
+        updateBox(currPassage.frequencyDays + 1);
     };
 
-    const updateFrequency = (newFrequency: number) => {
+    const updateBox = (newBox: number) => {
         const updateParam: UpdatePassageParam = new UpdatePassageParam();
         updateParam.passageRefAppendLetter = currPassage.passageRefAppendLetter;
         updateParam.user = user;
         updateParam.newText = null;
         updateParam.passage = {...currPassage,
-            frequencyDays: newFrequency
+            frequencyDays: newBox
         };
-        console.log("Practice.updateFrequency - here is the param that will be sent:", updateParam);
-        setBusy({state: true, message: "Updating frequency..."});
+        console.log("Practice.updateBox - here is the param that will be sent:", updateParam);
+        setBusy({state: true, message: "Updating box..."});
         memoryService.updatePassage(updateParam).then(resp => {
             if (resp.data === "success") {
                 console.log('Update memory passage was successful!');
@@ -434,7 +434,7 @@ const Practice = () => {
                             content={
                                 <>
                                     <ul>
-                                        <li>Box: {getFrequency(memPsgList[currIdx])}</li>
+                                        <li>Box: {getBox(memPsgList[currIdx])}</li>
                                         <li>Last Practiced: {memPsgList[currIdx]?.last_viewed_str}</li>
                                     </ul>
                                     <Button type="link" onClick={() => setInfoVisible(false)}>Close</Button>
@@ -448,7 +448,7 @@ const Practice = () => {
                         </Popover>
                     </Col>
                 </Row>
-                <Row justify="center" style={{marginBottom: "10px"}}>
+                <Row justify="center" style={{marginBottom: "3px"}}>
                     <Space>
                         <Col span={6}><Button onClick={handleToggleAnswer} className="button" icon={showingQuestion ? <QuestionCircleOutlined className="icon" /> : <CheckSquareOutlined className="icon" />}/></Col>
                         <Col span={6}><Button className="button" icon={<ArrowLeftOutlined className="icon"/>} onClick={() => doNavigate(false, -1)}/></Col>
@@ -468,6 +468,16 @@ const Practice = () => {
                             </Dropdown>
                         </Col>
                     </Space>
+                </Row>
+                <Row justify="center" style={{marginBottom: "10px"}}>
+                    <Col><Button onClick={handleMoveUp} className="button" icon={<ArrowUpOutlined className="icon" />}/></Col>
+                    <Col style={{marginLeft: "3px", marginRight: "3px"}}>
+                        <div style={{ textAlign: 'center'}}>
+                            <Avatar icon={<BorderOutlined style={{color: "red"}} />}/>
+                            <div style={{textAlign: 'center'}}><h1 style={{color: "red", fontWeight: "bolder"}}>{getBox(memPsgList[currIdx])}</h1></div>
+                        </div>
+                    </Col>
+                    <Col><Button onClick={handleMoveDown} className="button" icon={<ArrowDownOutlined className="icon" />}/></Col>
                 </Row>
                 {busy.state && <Row justify="center"><SpinnerTimer message={busy.message} /></Row>}
                 {showPsgRef && currPassage && !StringUtils.isEmpty(currPsgRef) &&
