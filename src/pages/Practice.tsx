@@ -18,7 +18,7 @@ import {
     InfoCircleOutlined,
     LinkOutlined,
     MoreOutlined,
-    QuestionCircleOutlined,
+    QuestionCircleOutlined, StopOutlined,
 } from "@ant-design/icons";
 import {Constants} from "../model/constants";
 import Swipe from "react-easy-swipe";
@@ -470,14 +470,14 @@ const Practice = () => {
                     </Space>
                 </Row>
                 <Row justify="center" style={{marginBottom: "10px"}}>
-                    <Col><Button onClick={handleMoveUp} className="button" icon={<ArrowUpOutlined className="icon" />}/></Col>
+                    <Col>{memPsgList[currIdx]?.frequencyDays === 1 ? <Button style={{color: "red"}} disabled={true} className="button" icon={<StopOutlined className="icon" />}/> : <Button onClick={handleMoveUp} className="button" icon={<ArrowUpOutlined className="icon" />}/>}</Col>
                     <Col style={{marginLeft: "3px", marginRight: "3px"}}>
                         <div style={{ textAlign: 'center'}}>
                             <Avatar icon={<BorderOutlined style={{color: "red"}} />}/>
-                            <div style={{textAlign: 'center'}}><h1 style={{color: "red", fontWeight: "bolder"}}>{getBox(memPsgList[currIdx])}</h1></div>
+                            <div style={{textAlign: 'center'}}><h1 style={{color: "red", fontWeight: "bolder"}}>{memPsgList[currIdx]?.frequencyDays}</h1></div>
                         </div>
                     </Col>
-                    <Col><Button onClick={handleMoveDown} className="button" icon={<ArrowDownOutlined className="icon" />}/></Col>
+                    <Col>{memPsgList[currIdx]?.frequencyDays === 5 ? <Button style={{color: "red"}} disabled={true} className="button" icon={<StopOutlined className="icon" />}/> : <Button onClick={handleMoveDown} className="button" icon={<ArrowDownOutlined className="icon" />}/>}</Col>
                 </Row>
                 {busy.state && <Row justify="center"><SpinnerTimer message={busy.message} /></Row>}
                 {showPsgRef && currPassage && !StringUtils.isEmpty(currPsgRef) &&
