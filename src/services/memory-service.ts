@@ -134,6 +134,10 @@ class MemoryService {
         return MemoryService.buildAxios().post<string>("/bible-app/server/send_quote_to_user.php", param);
     }
 
+    public sendResults(param: {emailTo: string, searchResults: string[][], searchParam:{book: string, translation: string, testament: string, searchPhrase: string, user: string}}) {
+        return MemoryService.buildAxios().post<string>("/bible-app/server/send_search_results.php", param);
+    }
+
     public updateQuote(quote: Quote, currentUser: string) {
         let param = {user: currentUser, quote: quote};
         return MemoryService.buildAxios().post<string>("/bible-app/server/update_quote.php", param);

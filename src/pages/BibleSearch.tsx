@@ -1,10 +1,10 @@
-import {Button, Col, Divider, Input, Radio, Row, Select} from "antd";
+import {Button, Col, Divider, Input, Modal, Radio, Row, Select} from "antd";
 import React, {useEffect, useState} from "react";
 import {Constants} from "../model/constants";
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import {PassageUtils} from "../helpers/passage-utils";
-import {SearchOutlined} from "@ant-design/icons";
+import {MailOutlined, SearchOutlined} from "@ant-design/icons";
 import memoryService from "../services/memory-service";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {Passage} from "../model/passage";
@@ -68,6 +68,41 @@ const BibleSearch = () => {
     const handleGoToPassage = (psg: Passage) => {
         dispatcher(stateActions.setChapterSelection({book: psg.bookName, chapter: psg.chapter, translation: psg.translationId, verse: psg.startVerse}));
         navigate("/readChapter");
+    };
+
+    const handleMailResults = async () => {
+        const formattedSearchResults: string[][] = [];
+        for (const psg of searchResults.results) {
+            const psgString = PassageUtils.getPassageStringNoIndex(psg,true, false);
+            const formattedPsgText = PassageUtils.getFormattedPassageTextHighlight(psg, searchPhrase, false);
+            formattedSearchResults.push([psgString, formattedPsgText]);
+        }
+        const param: {emailTo: string, searchResults: string[][], searchParam:{book: string, translation: string, testament: string, searchPhrase: string, user: string}} = {
+            emailTo: "steve_warsa@yahoo.com",
+            searchResults: formattedSearchResults,
+            searchParam: {
+                book: book,
+                translation: translation,
+                testament: searchScope,
+                searchPhrase: searchPhrase,
+                user: user
+            }
+        };
+        setSearching({state: true, message: "Sending search results..."});
+        const sendResult = await memoryService.sendResults(param);
+        console.log("Here is the result from the sendResults call: " + sendResult.data);
+        if (sendResult.data === "success") {
+            Modal.info({
+                title: "Sent Results",
+                content: "The search results have been sent to " + param.emailTo,
+            });
+        } else {
+            Modal.error({
+                title: "Error Sending Results",
+                content: "The search results error'd out while to " + param.emailTo + ".  Message: " + sendResult.data,
+            });
+        }
+        setSearching({state: false, message: ""});
     };
 
     if (searching.state) {
@@ -142,7 +177,14 @@ const BibleSearch = () => {
                         <Divider/>
                         {(!searchResults.results || searchResults.results.length === 0) && <Row><p>No matches</p></Row>}
                         {searchResults.results && searchResults.results.length > 0 &&
-                            <Row><p style={{fontWeight: "bold"}}>({searchResults.results.length} matches)</p></Row>}
+                            <>
+                            <Row><p style={{fontWeight: "bold"}}>({searchResults.results.length} matches)</p></Row>
+                            <Row>
+                                <Col>
+                                    <Button icon={<MailOutlined/>} onClick={handleMailResults}>E-Mail Results</Button>
+                                </Col>
+                            </Row>
+                            </>}
                         {searchResults.results && searchResults.results.length > 0 && searchResults.results.map((psg: Passage) => {
                                 const psgString = PassageUtils.getPassageStringNoIndex(psg,true, false);
                                 const formattedPsgText = PassageUtils.getFormattedPassageTextHighlight(psg, searchPhrase, false);
