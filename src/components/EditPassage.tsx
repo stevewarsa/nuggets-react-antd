@@ -26,7 +26,7 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
     const [startVerse, setStartVerse] = useState(props.passage.startVerse);
     const [frequency, setFrequency] = useState(props.passage.frequencyDays);
     const [endVerse, setEndVerse] = useState(props.passage.endVerse);
-    const [appendLetter, setAppendLetter] = useState(props.passage.passageRefAppendLetter);
+    const [appendLetter, setAppendLetter] = useState(props.passage.passageRefAppendLetter ? props.passage.passageRefAppendLetter : undefined);
     const [translation, setTranslation] = useState(props.passage.translationName);
     let maxVerseByBookChapterMap = useSelector((appState: AppState) => appState.maxVerseByBookChapter);
     const [maxVerse, setMaxVerse] = useState(props.passage.endVerse);
@@ -44,6 +44,7 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
             freqDep.push({freqLabel: i + "", freqValue: i});
         }
         setFrequencies(freqDep);
+        setEditPassageVisible(true);
     }, []);
 
     useEffect(() => {
@@ -51,10 +52,10 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
     }, [props.visible]);
 
     useEffect(() => {
-        console.log("useEffect - maxVerseByBookChapter:", maxVerseByBookChapterMap);
-        console.log("useEffect - passage:", props.passage);
-        if (!maxVerseByBookChapterMap || !maxVerseByBookChapterMap.hasOwnProperty(translation)) {
-            console.log("useEffect - maxVerseByBookChapter not populated yet, calling server to populate, then returning");
+    }, [editPassageVisible]);
+
+    useEffect(() => {
+        if (!maxVerseByBookChapterMap?.hasOwnProperty(translation)) {
             (async () => {
                 const locMaxVerseByBookChapter = await memoryService.getMaxVerseByBookChapter(translation);
                 dispatcher(stateActions.setMaxVerseByBookChapter({maxVerseByBookChapter: locMaxVerseByBookChapter.data, translation: translation}));
@@ -62,14 +63,11 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
             return;
         }
         if (!props.passage || props.passage.passageId === -1 || !props.passage.verses || props.passage.verses.length === 0) {
-            console.log("useEffect - passage not populated yet, returning");
             return;
         }
         const locMaxVerseByBookChapter = maxVerseByBookChapterMap[translation];
         const maxChapVerseForBook = locMaxVerseByBookChapter[props.passage.bookName];
-        console.log("useEffect - maxChapVerseForBook:", maxChapVerseForBook);
         const maxVerseForChap = maxChapVerseForBook.find((chapAndVerse: number[]) => chapAndVerse[0] === props.passage.chapter);
-        console.log("useEffect - maxVerseForChap:", maxVerseForChap);
         setMaxVerse(maxVerseForChap[1]);
         setStartVerse(props.passage.startVerse);
         setEndVerse(props.passage.endVerse);
@@ -87,6 +85,7 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
     }
 
     const changePassageText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setPsgTextChanged(currPassageText !== e.target.value);
         setCurrPassageText(e.target.value);
         if (!StringUtils.isEmpty(e.target.value) && StringUtils.isEmpty(appendLetter)) {
             setAppendLetter("a");
@@ -95,26 +94,33 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
         if (StringUtils.isEmpty(e.target.value)) {
             setAppendLetter(undefined);
         }
-        setPsgTextChanged(false);
     };
 
-    const changeTranslation = (value) => {
+    const changeTranslation = (value: string) => {
         if (value !== translation) {
-            console.log("changeTranslation - translation changed!");
             setTranslation(value);
+            const locPassage = {...props.passage}
+            locPassage.translationId = value;
+            locPassage.translationName = value;
+            (async () => {
+                const resp = await memoryService.getPassage(locPassage, user);
+                locPassage.verses = resp.data.verses;
+                populateCurrentPassageTextFromPassage(locPassage);
+                // When only the translation changed, we need to make sure this text from a different translation
+                // is not submitted as "override" text, since the user hasn't modified the text manually
+                setPsgTextChanged(false);
+            })();
         }
     };
 
     const changeStartVerse = (value) => {
         if (parseInt(value) !== startVerse) {
-            console.log("changeStartVerse - startVerse changed!");
             setStartVerse(parseInt(value));
         }
     };
 
     const changeEndVerse = (value) => {
         if (parseInt(value) !== endVerse) {
-            console.log("changeEndVerse - endVerse changed!");
             setEndVerse(parseInt(value));
         }
     };
@@ -127,7 +133,6 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
 
     const changeFrequency = (value) => {
         if (parseInt(value) !== frequency) {
-            console.log("changeFrequency - frequency changed!");
             setFrequency(parseInt(value));
         }
     }
@@ -144,14 +149,12 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
             endVerse: endVerse,
             frequencyDays: frequency
         };
-        console.log("submitChanges - here is the param that will be sent:", updateParam);
         setBusy({state: true, message: "Updating passage..."});
         memoryService.updatePassage(updateParam).then(resp => {
             if (resp.data === "success") {
-                console.log('Update memory passage was successful!');
                 notification.success({message: "Passage has been updated!", placement: "bottomRight"});
                 setEditPassageVisible(false);
-                props.setVisibleFunction();
+                props.setVisibleFunction(false);
             } else {
                 notification.error({message: "Error updating passage: " + resp.data, placement: "top"});
             }
@@ -163,7 +166,10 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
         return <SpinnerTimer message={busy.message} />;
     } else {
         return (
-            <Modal title="Edit Quote" footer={null} open={editPassageVisible} onCancel={() => setEditPassageVisible(false)}>
+            <Modal title="Edit Passage" footer={null} open={editPassageVisible} onCancel={() => {
+                setEditPassageVisible(false);
+                props.setVisibleFunction(true);
+            }}>
                 <Card bordered={true}>
                     <Row style={{marginBottom: "4px"}}>
                         <Col span={24}>
@@ -196,20 +202,18 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
                             </Select>
                         </Col>
                     </Row>
-                    {appendLetter && !StringUtils.isEmpty(appendLetter) &&
-                        <Row style={{marginBottom: "4px"}}>
-                            <Col span={6}>Append Letter:</Col>
-                            <Col span={4}>
-                                <Select style={{width: "100%"}} size="small" value={appendLetter}
-                                        onChange={changPassageAppendLetter}>
-                                    <Option value={undefined}>{"--No Append Letter--"}</Option>
-                                    {["a", "b", "c"].map(letter => (
-                                        <Option key={letter} value={letter}>{letter}</Option>
-                                    ))}
-                                </Select>
-                            </Col>
-                        </Row>
-                    }
+                    <Row style={{marginBottom: "4px"}}>
+                        <Col span={6}>Append Letter:</Col>
+                        <Col span={18}>
+                            <Select style={{width: "100%"}} size="small" value={appendLetter}
+                                    onChange={changPassageAppendLetter}>
+                                <Option value={undefined}>{"--No Append Letter--"}</Option>
+                                {["a", "b", "c"].map(letter => (
+                                    <Option key={letter} value={letter}>{letter}</Option>
+                                ))}
+                            </Select>
+                        </Col>
+                    </Row>
                     <Row align="middle" style={{marginBottom: "4px"}}>
                         <Col span={12}>Box:</Col>
                         <Col span={12}>
