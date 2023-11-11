@@ -29,7 +29,7 @@ const EditQuote = ({props}: {props: EditQuoteProps}) => {
             <Row style={{marginBottom: "5px"}}>
                 <Col style={{width: "100%"}}>
                     <TextArea
-                        style={{marginLeft: "5px", marginRight: "5px"}}
+                        style={{marginLeft: "5px", marginRight: "5px", fontSize: "24px", fontWeight: "bolder"}}
                         autoSize
                         value={quoteForEdit}
                         onChange={handleQuoteForEdit}/>
