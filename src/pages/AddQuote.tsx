@@ -55,7 +55,13 @@ const AddQuote = () => {
                 <h2><PlusCircleOutlined/> Add Quote</h2>
                 <Row style={{marginBottom: "5px"}}>
                     <Col span={24}>
-                        <TextArea disabled={user === Constants.GUEST_USER} autoSize={{ minRows: 5, maxRows: 10 }} style={{width: "100%"}} autoFocus value={quote} onChange={handleInput}/>
+                        <TextArea
+                            disabled={user === Constants.GUEST_USER}
+                            autoSize={{ minRows: 5, maxRows: 10 }}
+                            style={{width: "100%", fontSize: "24px", fontWeight: "bolder"}}
+                            autoFocus
+                            value={quote}
+                            onChange={handleInput}/>
                     </Col>
                 </Row>
                 <Row>
