@@ -42,7 +42,7 @@ while ($row = $results->fetchArray()) {
 $queue = $_GET['queue'];
 
 // finally insert this newly created passage into the memory passages
-$statement = $db->prepare("insert into memory_passage (passage_id, queued, preferred_translation_cd, frequency_days) values(:passage_id,:queue,:translation,-1)");
+$statement = $db->prepare("insert into memory_passage (passage_id, queued, preferred_translation_cd, frequency_days) values(:passage_id,:queue,:translation,1)");
 
 $statement->bindValue(':passage_id', $passageId);
 $statement->bindValue(':translation', $translation);
