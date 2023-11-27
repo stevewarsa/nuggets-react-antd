@@ -58,7 +58,7 @@ const AddQuote = () => {
                         <TextArea
                             disabled={user === Constants.GUEST_USER}
                             autoSize={{ minRows: 5, maxRows: 10 }}
-                            style={{width: "100%", fontSize: "24px", fontWeight: "bolder"}}
+                            style={{width: "100%", fontSize: "1.71rem", fontWeight: "bolder"}}
                             autoFocus
                             value={quote}
                             onChange={handleInput}/>

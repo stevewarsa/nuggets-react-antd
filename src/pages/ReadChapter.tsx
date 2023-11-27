@@ -185,7 +185,7 @@ const ReadChapter = () => {
                                     borderStyle: "solid",
                                     borderWidth: "thin",
                                     borderColor: "gray",
-                                    padding: "7px",
+                                    padding: "0.5rem",
                                     backgroundColor: "white"
                                 }} />
                             </Dropdown>
@@ -202,8 +202,8 @@ const ReadChapter = () => {
                             key={currFormattedPassageText}
                         >
                             <>
-                                <p key={"psg-ref-" + chapterIdString} className="nugget-view" dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(currPassage, -1, 0, Constants.translationsShortNms.filter(t => t.code === currPassage.bookName).map(t => t.translationName)[0], false, false, null)}}/>
-                                <p key={"psg-text-" + chapterIdString} style={{marginTop: "10px"}} className="nugget-view" dangerouslySetInnerHTML={{__html: currFormattedPassageText}}/>
+                                <p key={"psg-ref-" + chapterIdString} className="nugget-view" style={{marginTop: "1rem"}} dangerouslySetInnerHTML={{__html: PassageUtils.getPassageString(currPassage, -1, 0, Constants.translationsShortNms.filter(t => t.code === currPassage.bookName).map(t => t.translationName)[0], false, false, null)}}/>
+                                <p key={"psg-text-" + chapterIdString} style={{marginTop: "1rem"}} className="nugget-view" dangerouslySetInnerHTML={{__html: currFormattedPassageText}}/>
                             </>
                         </CSSTransition>
                     </SwitchTransition>

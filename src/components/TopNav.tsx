@@ -104,7 +104,7 @@ const TopNav = () => {
                 <Button className={styles.menubtn} type="primary" shape="circle" icon={<MenuOutlined />} onClick={showDrawer}>
 
                 </Button>
-                <Drawer title={<Image src="goldnuggeticon.png" width={65} height={65} alt="logo" />} placement="right" onClose={onClose} open={state.visible}>
+                <Drawer style={{width: "140%"}} title={<Image src="goldnuggeticon.png" width={65} height={65} alt="logo" />} placement="right" onClose={onClose} open={state.visible}>
                     <div style={{display:'flex', flexDirection:"column", backgroundColor: "white"}}>
                         {menuItems.map((item: {key: number, label: string}) => (
                             <Button key={item.key} type="text" onClick={() => handleMenuItem(item)}>{item.label}</Button>

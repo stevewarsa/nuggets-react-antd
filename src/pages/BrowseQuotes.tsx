@@ -110,7 +110,7 @@ const BrowseQuotes = () => {
                                           onChange={(activeKeyString: string[]) => setAssociatedTopicsOpen(activeKeyString.length > 0)}>
                                     <Panel
                                         header={"Associated Topics (" + filteredQuotes[currentIndex].tags.length + ")"}
-                                        key="1" style={{fontWeight: "bolder", fontSize: "18px"}}>
+                                        key="1" style={{fontWeight: "bolder", fontSize: "1.28rem"}}>
                                         {filteredQuotes[currentIndex] && filteredQuotes[currentIndex].tags.map(topic => (
                                             <Tag closable
                                                  onClose={e => {
@@ -134,7 +134,7 @@ const BrowseQuotes = () => {
                                           onChange={(activeKeyString: string[]) => setCurrentTopicsFilteredOpen(activeKeyString.length > 0)}>
                                     <Panel
                                         header={"Current Topics Filtered (" + currentQuoteTagsFiltered.length + ")"}
-                                        key="1" style={{fontWeight: "bolder", fontSize: "18px"}}>
+                                        key="1" style={{fontWeight: "bolder", fontSize: "1.28rem"}}>
                                         {currentQuoteTagsFiltered.map(topic => (
                                             <Tag
                                                  key={topic}

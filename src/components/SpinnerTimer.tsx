@@ -6,7 +6,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 const SpinnerTimer = ({message}: {message:string}) => {
     const [seconds, setSeconds] = useState(0);
     const isMounted = useIsMounted();
-    const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+    const antIcon = <LoadingOutlined style={{ fontSize: "1.71rem" }} spin />;
     setTimeout(() => {
         // SW [11/11/2021 5:53 AM] Make sure this component is still mounted before doing the state update
         // otherwise will get the following message:

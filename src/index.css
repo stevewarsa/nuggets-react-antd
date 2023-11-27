@@ -1,5 +1,5 @@
 body {
-  margin: 5px;
+  margin: 0.25rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -42,25 +42,25 @@ code {
 }
 
 .nugget-view {
-  font-weight: bold;
-  line-height: 1.25em;
-  font-size: 2.3em;
+  font-weight: bolder;
+  line-height: 1.15em;
+  font-size: 1.8rem;
   height: 100%;
   text-align: center;
 }
 
 .button {
-  font-size: 48px !important;
+  font-size: 2.5rem !important;
   width: fit-content !important;
   height: fit-content !important;
 }
 
 .icon {
   font-size: inherit !important;
-  padding: 7px;
+  padding: 0.5rem;
 }
 .icon-dropdown {
-  font-size: 52px !important;
+  font-size: 2.5rem !important;
 }
 .fade-enter {
   opacity: 0;
@@ -81,21 +81,21 @@ code {
 }
 
 .topic {
-  margin-bottom: 15px !important;
+  margin-bottom: 1rem !important;
   font-weight: bold !important;
-  font-size: 18px !important;
+  font-size: 1.3rem !important;
   cursor: pointer;
 }
 
 .back-to-top {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 2rem;
+  right: 1.5rem;
   font-size: xx-large;
 }
 .floating-copy {
   position: fixed;
-  bottom: 20px;
-  right: 60px;
+  bottom: 2rem;
+  right: 4.3rem;
   font-size: xx-large;
 }

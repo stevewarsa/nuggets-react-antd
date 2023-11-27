@@ -26,17 +26,17 @@ const EditQuote = ({props}: {props: EditQuoteProps}) => {
 
     return (
         <Modal title="Edit Quote" open={editQuoteVisible} onOk={handleUpdateQuote} onCancel={handleUpdateQuoteCancel}>
-            <Row style={{marginBottom: "5px"}}>
+            <Row style={{marginBottom: "0.36rem"}}>
                 <Col style={{width: "100%"}}>
                     <TextArea
-                        style={{marginLeft: "5px", marginRight: "5px", fontSize: "24px", fontWeight: "bolder"}}
+                        style={{marginLeft: "0.36rem", marginRight: "0.36rem", fontSize: "1.71rem", fontWeight: "bolder"}}
                         autoSize
                         value={quoteForEdit}
                         onChange={handleQuoteForEdit}/>
                 </Col>
             </Row>
             <Row>
-                <Col style={{width: "100%", marginLeft: "5px", marginRight: "5px"}}>
+                <Col style={{width: "100%", marginLeft: "0.36rem", marginRight: "0.36rem"}}>
                     <Button type="primary" onClick={handleRemoveLineFeedsAndExtraSpaces}>Remove Line Feeds</Button>
                 </Col>
             </Row>

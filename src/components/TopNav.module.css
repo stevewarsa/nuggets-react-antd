@@ -1,23 +1,23 @@
 @media (min-width: 750px) {
     .menubtn {
-        margin-top: 20px;
+        margin-top: 1.42rem;
         display: none;
     }
     .bigmenu {
-        margin-top: 10px;
-        right: 10px;
+        margin-top: 0.71rem;
+        right: 0.71rem;
     }
 }
 
 @media (max-width: 750px) {
     .bigmenu {
-        margin-top: 10px;
+        margin-top: 0.71rem;
         display: none;
     }
     .menubtn {
         position: absolute;
-        margin-top: 20px;
-        right: 20px;
+        margin-top: 1.42rem;
+        right: 1.42rem;
     }
 }
 

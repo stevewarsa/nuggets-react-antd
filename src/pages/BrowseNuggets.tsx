@@ -274,7 +274,7 @@ const BrowseNuggets = () => {
                                       onChange={(activeKeyString: string[]) => setAssociatedTopicsOpen(activeKeyString.length > 0)}>
                                 <Panel
                                     header={"Associated Topics (" + currentPassage.topics.length + ")"}
-                                    key="1" style={{fontWeight: "bolder", fontSize: "18px"}}>
+                                    key="1" style={{fontWeight: "bolder", fontSize: "1.28rem"}}>
                                     {currentPassage.topics.map(topic => (
                                         <Tag closable
                                              onClose={e => {
