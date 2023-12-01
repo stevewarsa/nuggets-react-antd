@@ -1,5 +1,4 @@
 import {Route, Routes, useSearchParams} from "react-router-dom";
-import 'antd/dist/antd.css';
 import MainMenu from "./pages/MainMenu";
 import {Col, Layout, Row} from "antd";
 import About from "./pages/About";

@@ -56,7 +56,7 @@ const TopicList = () => {
                 </Row>
             ))
             }
-            {!filteredTopicList || filteredTopicList.length === 0 && <Row justify="center" align="middle"><Col>No topics configured</Col></Row>}
+            {(!filteredTopicList || filteredTopicList.length === 0) && <Row justify="center" align="middle"><Col>No topics configured</Col></Row>}
         </>
         );
 };

@@ -176,11 +176,11 @@ const Practice = () => {
             updatedArray = true;
         }
         if (hasMoveUp !== undefined && currPassage?.frequencyDays === 1) {
-            locMoreMenuItems = locMoreMenuItems.filter(menu => menu.key != "5");
+            locMoreMenuItems = locMoreMenuItems.filter(menu => menu.key !== "5");
             updatedArray = true;
         }
         if (hasMoveDown !== undefined && currPassage?.frequencyDays === 5) {
-            locMoreMenuItems = locMoreMenuItems.filter(menu => menu.key != "6");
+            locMoreMenuItems = locMoreMenuItems.filter(menu => menu.key !== "6");
             updatedArray = true;
         }
         if (updatedArray) {
@@ -219,7 +219,7 @@ const Practice = () => {
         setEditing(false);
         setCurrPsgTxt("");
         setCurrPsgRef("");
-        if (toIndex != -1) {
+        if (toIndex !== -1) {
             setCurrIdx(toIndex);
         } else {
             let navigateToIndex;

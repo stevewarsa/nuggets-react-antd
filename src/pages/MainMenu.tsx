@@ -8,7 +8,6 @@ import {
     SketchOutlined
 } from "@ant-design/icons";
 import {Collapse, List, notification, Space} from "antd";
-import 'antd/dist/antd.css';
 import {useNavigate} from "react-router-dom";
 import memoryService from "../services/memory-service";
 import {useSelector} from "react-redux";

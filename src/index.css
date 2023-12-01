@@ -42,8 +42,8 @@ code {
 }
 
 .nugget-view {
-  font-weight: bolder;
-  line-height: 1.15em;
+  font-weight: bold;
+  line-height: 1.25em;
   font-size: 1.8rem;
   height: 100%;
   text-align: center;

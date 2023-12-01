@@ -49,7 +49,7 @@ const MyMemPsgListInOrder = () => {
                 </Row>
             ))
             }
-            {!memPassageList || memPassageList.length === 0 && <Row justify="center" align="middle"><Col>No memory passages configured</Col></Row>}
+            {(!memPassageList || memPassageList.length === 0) && <Row justify="center" align="middle"><Col>No memory passages configured</Col></Row>}
         </>
     );
 }

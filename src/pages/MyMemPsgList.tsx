@@ -73,7 +73,7 @@ const MyMemPsgList = () => {
             </Row>
         ))
         }
-        {!filteredMemPassageList || filteredMemPassageList.length === 0 && <Row justify="center" align="middle"><Col>No memory passages configured</Col></Row>}
+        {(!filteredMemPassageList || filteredMemPassageList.length === 0) && <Row justify="center" align="middle"><Col>No memory passages configured</Col></Row>}
     </>;
 };
 
