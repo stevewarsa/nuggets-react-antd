@@ -39,7 +39,7 @@ const PracticeSetup = () => {
     if (memPassagesExist) {
         return (
             <>
-                <Row style={{marginBottom: '5px'}}>
+                <Row style={{marginBottom: '5px', justifyContent: "left"}}>
                     <h3>Practice Mode:</h3>
                 </Row>
                 <Row style={{marginBottom: '20px'}}>
