@@ -50,7 +50,7 @@ code {
 }
 
 .button {
-  font-size: 2.5rem !important;
+  font-size: 1.5rem !important;
   width: fit-content !important;
   height: fit-content !important;
 }
@@ -60,7 +60,7 @@ code {
   padding: 0.5rem;
 }
 .icon-dropdown {
-  font-size: 2.5rem !important;
+  font-size: 1.5rem !important;
 }
 .fade-enter {
   opacity: 0;

@@ -5,7 +5,7 @@ import memoryService from "../services/memory-service";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {Passage} from "../model/passage";
 import {PassageUtils} from "../helpers/passage-utils";
-import {notification, Button, Col, Dropdown, Menu, Popover, Row, Space, Modal, MenuProps, Avatar} from "antd";
+import {notification, Button, Col, Dropdown, Popover, Row, Space, Modal, MenuProps, Avatar} from "antd";
 import {
     ArrowDownOutlined,
     ArrowLeftOutlined,
@@ -299,7 +299,7 @@ const Practice = () => {
         setShowPsgRef(prev => !prev);
     };
 
-    const handleMenuClick = async ({key}) => {
+    const handleMenuClick = ({key}) => {
         let currPassage = memPsgList[currIdx];
         if (key === "1") {
             // copy
@@ -395,9 +395,6 @@ const Practice = () => {
 
     return (
         <>
-            <Row justify="center">
-                <h1>Memory Verses</h1>
-            </Row>
             <Swipe tolerance={60} onSwipeLeft={() => doNavigate(true, -1)} onSwipeRight={() => doNavigate(false, -1)}>
                 <Row style={{marginBottom: "10px"}} justify="center" align="middle">
                     <Col>{currIdx + 1} of {memPsgList.length}</Col>
@@ -423,13 +420,18 @@ const Practice = () => {
                 <Row justify="center" style={{marginBottom: "3px"}}>
                     <Space>
                         <Col span={6}><Button onClick={handleToggleAnswer} className="button" icon={showingQuestion ? <QuestionCircleOutlined className="icon" /> : <CheckSquareOutlined className="icon" />}/></Col>
+                        <Col>{memPsgList[currIdx]?.frequencyDays === 1 ? <Button style={{color: "red"}} disabled={true} className="button" icon={<StopOutlined className="icon" />}/> : <Button onClick={handleMoveUp} className="button" icon={<ArrowUpOutlined className="icon" />}/>}</Col>
                         <Col span={6}><Button className="button" icon={<ArrowLeftOutlined className="icon"/>} onClick={() => doNavigate(false, -1)}/></Col>
+                        <Col style={{marginLeft: "3px", marginRight: "3px"}}>
+                            <div style={{ textAlign: 'center'}}>
+                                <Avatar icon={<BorderOutlined style={{color: "red"}} />}/><br/>
+                                <span style={{color: "red", fontWeight: "bolder", fontSize: "1.25rem"}}>{memPsgList[currIdx]?.frequencyDays}</span>
+                            </div>
+                        </Col>
                         <Col span={6}><Button className="button" icon={<ArrowRightOutlined className="icon"/>} onClick={() => doNavigate(true, -1)}/></Col>
+                        <Col>{memPsgList[currIdx]?.frequencyDays === 5 ? <Button style={{color: "red"}} disabled={true} className="button" icon={<StopOutlined className="icon" />}/> : <Button onClick={handleMoveDown} className="button" icon={<ArrowDownOutlined className="icon" />}/>}</Col>
                         <Col span={6}>
-                            <Dropdown className="button" placement="bottomRight" trigger={["click"]} overlay={
-                                <Menu onClick={handleMenuClick} items={moreMenuItems}>
-                                </Menu>
-                            }>
+                            <Dropdown className="button" placement="bottomRight" trigger={["click"]} menu={{items: moreMenuItems, onClick: handleMenuClick}}>
                                 <MoreOutlined className="icon-dropdown" style={{
                                     borderStyle: "solid",
                                     borderWidth: "thin",
@@ -440,16 +442,6 @@ const Practice = () => {
                             </Dropdown>
                         </Col>
                     </Space>
-                </Row>
-                <Row justify="center" style={{marginBottom: "10px"}}>
-                    <Col>{memPsgList[currIdx]?.frequencyDays === 1 ? <Button style={{color: "red"}} disabled={true} className="button" icon={<StopOutlined className="icon" />}/> : <Button onClick={handleMoveUp} className="button" icon={<ArrowUpOutlined className="icon" />}/>}</Col>
-                    <Col style={{marginLeft: "3px", marginRight: "3px"}}>
-                        <div style={{ textAlign: 'center'}}>
-                            <Avatar icon={<BorderOutlined style={{color: "red"}} />}/>
-                            <div style={{textAlign: 'center'}}><h1 style={{color: "red", fontWeight: "bolder"}}>{memPsgList[currIdx]?.frequencyDays}</h1></div>
-                        </div>
-                    </Col>
-                    <Col>{memPsgList[currIdx]?.frequencyDays === 5 ? <Button style={{color: "red"}} disabled={true} className="button" icon={<StopOutlined className="icon" />}/> : <Button onClick={handleMoveDown} className="button" icon={<ArrowDownOutlined className="icon" />}/>}</Col>
                 </Row>
                 {busy.state && <Row justify="center"><SpinnerTimer message={busy.message} /></Row>}
                 {showPsgRef && currPassage && !StringUtils.isEmpty(currPsgRef) &&
