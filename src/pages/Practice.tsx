@@ -422,7 +422,7 @@ const Practice = () => {
                         <Col span={6}><Button onClick={handleToggleAnswer} className="button" icon={showingQuestion ? <QuestionCircleOutlined className="icon" /> : <CheckSquareOutlined className="icon" />}/></Col>
                         <Col>{memPsgList[currIdx]?.frequencyDays === 1 ? <Button style={{color: "red"}} disabled={true} className="button" icon={<StopOutlined className="icon" />}/> : <Button onClick={handleMoveUp} className="button" icon={<ArrowUpOutlined className="icon" />}/>}</Col>
                         <Col span={6}><Button className="button" icon={<ArrowLeftOutlined className="icon"/>} onClick={() => doNavigate(false, -1)}/></Col>
-                        <Col style={{marginLeft: "3px", marginRight: "3px"}}>
+                        <Col>
                             <div style={{ textAlign: 'center'}}>
                                 <Avatar icon={<BorderOutlined style={{color: "red"}} />}/><br/>
                                 <span style={{color: "red", fontWeight: "bolder", fontSize: "1.25rem"}}>{memPsgList[currIdx]?.frequencyDays}</span>
