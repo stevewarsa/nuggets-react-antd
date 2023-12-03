@@ -17,4 +17,5 @@ export class Passage {
     passageRefAppendLetter: string;
     verses: Verse[];
     topics: Topic[];
+    explanation:string = "";
 }

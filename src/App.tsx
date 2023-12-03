@@ -30,6 +30,7 @@ import useMemoryPassages from "./hooks/use-memory-passages";
 import GoToPassageByRef from "./pages/GoToPassageByRef";
 import MyMemPsgListInOrder from "./pages/MyMemPsgListInOrder";
 import MemoryPassagesByBox from "./pages/MemoryPassagesByBox";
+import EnterExplanation from "./pages/EnterExplanation";
 
 const App = () => {
     const dispatcher = useDispatch();
@@ -100,6 +101,7 @@ const App = () => {
                             <Route path="/myMemPsgListInOrder" element={<MyMemPsgListInOrder/>}/>
                             <Route path="/topicList" element={<TopicList/>}/>
                             <Route path="/goToPassage" element={<GoToPassageByRef/>}/>
+                            <Route path="/enterExplanation" element={<EnterExplanation/>}/>
                         </Route>
                     </Routes>
                 </Content>

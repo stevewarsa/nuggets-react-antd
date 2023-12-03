@@ -11,7 +11,7 @@ import {
     ArrowLeftOutlined,
     ArrowRightOutlined,
     ArrowUpOutlined, BorderOutlined,
-    CheckSquareOutlined,
+    CheckSquareOutlined, CommentOutlined,
     CopyOutlined,
     EditOutlined,
     FileSearchOutlined,
@@ -29,7 +29,7 @@ import {CSSTransition, SwitchTransition} from "react-transition-group";
 import useMemoryPassages from "../hooks/use-memory-passages";
 import EditPassage from "../components/EditPassage";
 import {Verse} from "../model/verse";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {UpdatePassageParam} from "../model/update-passage-param";
 
 const handleClipboard = (psg: Passage) => {
@@ -71,6 +71,11 @@ let MORE_MENU_ITEMS: MenuProps["items"] = [
         label: "View Chapter...",
         key: "4",
         icon: <FileSearchOutlined />,
+    },
+    {
+        label: "Explanation...",
+        key: "7",
+        icon: <CommentOutlined />,
     }
 ];
 const moveUp = {
@@ -88,7 +93,7 @@ const Practice = () => {
     const dispatcher = useDispatch();
     const navigate = useNavigate();
     const {getMemPassages} = useMemoryPassages();
-
+    const location = useLocation();
     const practiceConfig = useSelector((state: AppState) => state.practiceConfig);
     const user = useSelector((state: AppState) => state.user);
 
@@ -106,7 +111,7 @@ const Practice = () => {
     const [editing, setEditing] = useState(false);
     const [isMemPassageListGetFromServer, setIsMemPassageListGetFromServer] = useState(false);
     const [startAtPassage, setStartAtPassage] = useState(practiceConfig.startAtPassageId);
-    const [moreMenuItems, setMoreMenuItems] = useState(MORE_MENU_ITEMS)
+    const [moreMenuItems, setMoreMenuItems] = useState(MORE_MENU_ITEMS);
 
     // grab the memory verses from the server based on the practice config...
     useEffect(() => {
@@ -152,6 +157,7 @@ const Practice = () => {
         } else {
             convertPsgRefToString(memPsgList[currIdx]);
         }
+        console.log("Practice.useEffect[currIdx] - memory verse being shown is:", memPsgList[currIdx]);
         dispatcher(stateActions.setChapterSelection({chapter: memPsgList[currIdx].chapter, book: memPsgList[currIdx].bookName, translation: memPsgList[currIdx].translationName}));
         if (user !== Constants.GUEST_USER) {
             const dt = new Date();
@@ -220,6 +226,17 @@ const Practice = () => {
         setCurrPsgTxt("");
         setCurrPsgRef("");
         if (toIndex !== -1) {
+            const locPsg = location.state as Passage;
+            if (locPsg) {
+                // a passage is being passed in from navigate method, so update it in the list
+                const locPsgRef = PassageUtils.getPassageStringNoIndex(
+                    locPsg,
+                    Constants.translationsShortNms.filter(t => t.code === locPsg.translationName).map(t => t.translationName)[0],
+                    true,
+                    locPsg.passageRefAppendLetter);
+                console.log("Practice.doNavigate - passage " + locPsgRef + " is being passed in from navigate method, so update it in the list");
+                submitUpdatedPassage(locPsg, toIndex);
+            }
             setCurrIdx(toIndex);
         } else {
             let navigateToIndex;
@@ -230,6 +247,24 @@ const Practice = () => {
             }
             setCurrIdx(navigateToIndex);
         }
+    };
+
+    const submitUpdatedPassage = (passage: Passage, index: number) => {
+        const updateParam: UpdatePassageParam = new UpdatePassageParam();
+        updateParam.passageRefAppendLetter = passage.passageRefAppendLetter;
+        updateParam.user = user;
+        updateParam.newText = null;
+        updateParam.passage = passage;
+        setBusy({state: true, message: "Updating passage..."});
+        memoryService.updatePassage(updateParam).then(resp => {
+            if (resp.data === "success") {
+                notification.success({message: "Passage has been updated!", placement: "bottomRight"});
+                successfulUpdateFinished(index);
+            } else {
+                notification.error({message: "Error updating passage: " + resp.data, placement: "top"});
+            }
+            setBusy({state: false, message: ""});
+        });
     };
 
     // purpose of this method is to populate the currPsgRef and currPsgTxt
@@ -327,6 +362,26 @@ const Practice = () => {
         } else if (key === "6") {
             // Move up
             handleMoveDown();
+        } else if (key === "7") {
+            // Enter Explanation
+            const currPsg: Passage = {...memPsgList[currIdx]};
+            if (showPsgRef) {
+                const override = overrides.find(p => p.passageId === currPsg.passageId);
+                if (override) {
+                    // this is an override, so we don't need to call the server, just update the verses from the override
+                    currPsg.verses = override.verses;
+                    navigate("/enterExplanation", {state: currPsg});
+                } else {
+                    setBusy({state: true, message: "Loading passage text for " + currPsgRef + " from server..."});
+                    memoryService.getPassage(currPsg, user).then(resp => {
+                        setBusy({state: false, message: ""});
+                        currPsg.verses = resp.data.verses;
+                        navigate("/enterExplanation", {state: currPsg});
+                    });
+                }
+            } else {
+                navigate("/enterExplanation", {state: currPassage});
+            }
         }
     };
 
@@ -420,16 +475,16 @@ const Practice = () => {
                 <Row justify="center" style={{marginBottom: "3px"}}>
                     <Space>
                         <Col span={6}><Button onClick={handleToggleAnswer} className="button" icon={showingQuestion ? <QuestionCircleOutlined className="icon" /> : <CheckSquareOutlined className="icon" />}/></Col>
-                        <Col>{memPsgList[currIdx]?.frequencyDays === 1 ? <Button style={{color: "red"}} disabled={true} className="button" icon={<StopOutlined className="icon" />}/> : <Button onClick={handleMoveUp} className="button" icon={<ArrowUpOutlined className="icon" />}/>}</Col>
                         <Col span={6}><Button className="button" icon={<ArrowLeftOutlined className="icon"/>} onClick={() => doNavigate(false, -1)}/></Col>
+                        <Col>{memPsgList[currIdx]?.frequencyDays === 1 ? <Button style={{color: "red"}} disabled={true} className="button" icon={<StopOutlined className="icon" />}/> : <Button onClick={handleMoveUp} className="button" icon={<ArrowUpOutlined className="icon" />}/>}</Col>
                         <Col>
                             <div style={{ textAlign: 'center'}}>
                                 <Avatar icon={<BorderOutlined style={{color: "red"}} />}/><br/>
                                 <span style={{color: "red", fontWeight: "bolder", fontSize: "1.25rem"}}>{memPsgList[currIdx]?.frequencyDays}</span>
                             </div>
                         </Col>
-                        <Col span={6}><Button className="button" icon={<ArrowRightOutlined className="icon"/>} onClick={() => doNavigate(true, -1)}/></Col>
                         <Col>{memPsgList[currIdx]?.frequencyDays === 5 ? <Button style={{color: "red"}} disabled={true} className="button" icon={<StopOutlined className="icon" />}/> : <Button onClick={handleMoveDown} className="button" icon={<ArrowDownOutlined className="icon" />}/>}</Col>
+                        <Col span={6}><Button className="button" icon={<ArrowRightOutlined className="icon"/>} onClick={() => doNavigate(true, -1)}/></Col>
                         <Col span={6}>
                             <Dropdown className="button" placement="bottomRight" trigger={["click"]} menu={{items: moreMenuItems, onClick: handleMenuClick}}>
                                 <MoreOutlined className="icon-dropdown" style={{
