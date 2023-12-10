@@ -17,16 +17,26 @@ $newText = $input->newText;
 $passageRefAppendLetter = $input->passageRefAppendLetter;
 $explanation = $input->passage->explanation;
 
-// update this passage 
+// update this passage
 $db = new SQLite3('db/memory_' . $user . '.db');
 if (isset($explanation)) {
     error_log("update_passage.php - explanation is set to " . $explanation . ".  First trying to update it...");
-    /** @noinspection SqlResolve */
-    $statement = $db->prepare('update passage_explanation set explanation = :explanation where passage_id = :passage_id');
-    $statement->bindValue(':explanation', $explanation);
-    $statement->bindValue(':passage_id', $passageId);
-    $statement->execute();
-    $statement->close();
+    try {
+        /** @noinspection SqlResolve */
+        $statement = $db->prepare('update passage_explanation set explanation = :explanation where passage_id = :passage_id');
+        $statement->bindValue(':explanation', $explanation);
+        $statement->bindValue(':passage_id', $passageId);
+        $statement->execute();
+    } catch (PDOException $pdoException) {
+        // Handle PDOException, which is specific to database operations
+        error_log("update_passage.php - An error occurred while updating the explanation - PDOException: " . $pdoException->getMessage());
+    } catch (Exception $e) {
+        error_log("update_passage.php - An error occurred while updating the explanation: " . $e->getMessage());
+    } finally {
+        if (isset($statement)) {
+            $statement->close();
+        }
+    }
     // now see if any rows were updated
     if ($db->changes() < 1) {
         error_log("update_passage.php - explanation is set to " . $explanation . ". Didn't update, so now inserting...");
@@ -36,10 +46,15 @@ if (isset($explanation)) {
             $statement->bindValue(':passage_id', $passageId);
             $statement->bindValue(':explanation', $explanation);
             $statement->execute();
-            $statement->close();
+        } catch (PDOException $pdoException) {
+            // Handle PDOException, which is specific to database operations
+            error_log("update_passage.php - An error occurred while inserting the explanation - PDOException: " . $pdoException->getMessage());
         } catch (Exception $e) {
-            $statement->close();
             error_log("update_passage.php - An error occurred while inserting the explanation: " . $e->getMessage());
+        } finally {
+            if (isset($statement)) {
+                $statement->close();
+            }
         }
     }
 }
