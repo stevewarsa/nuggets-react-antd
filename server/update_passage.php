@@ -19,6 +19,11 @@ $explanation = $input->passage->explanation;
 
 // update this passage
 $db = new SQLite3('db/memory_' . $user . '.db');
+// Adding this busy timeout per the 2nd answer in this post: https://stackoverflow.com/questions/57795998/catch-up-sqlite-error-database-is-locked
+// What was happening, was that when I sent in a very large explanation, I would get the message that the database is locked
+// when trying to do the insert.  I'm assuming the problem was that it was still trying to roll back the update or do
+// some other cleanup... Either way, that error was being echo'd out to the caller and not being caught in the try/catch block
+$db->busyTimeout(250);
 if (isset($explanation)) {
     error_log("update_passage.php - explanation is set to " . $explanation . ".  First trying to update it...");
     try {
