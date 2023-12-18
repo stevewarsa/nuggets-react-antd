@@ -1,11 +1,11 @@
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import memoryService from "../services/memory-service";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {Passage} from "../model/passage";
 import {PassageUtils} from "../helpers/passage-utils";
-import {notification, Button, Col, Dropdown, Popover, Row, Space, Modal, MenuProps, Avatar} from "antd";
+import {notification, Button, Col, Dropdown, Popover, Row, Space, Modal, MenuProps, Avatar, Select} from "antd";
 import {
     ArrowDownOutlined,
     ArrowLeftOutlined,
@@ -88,6 +88,7 @@ const moveDown = {
     key: "6",
     icon: <ArrowDownOutlined />,
 };
+const {Option} = Select;
 
 const Practice = () => {
     const dispatcher = useDispatch();
@@ -112,6 +113,7 @@ const Practice = () => {
     const [isMemPassageListGetFromServer, setIsMemPassageListGetFromServer] = useState(false);
     const [startAtPassage, setStartAtPassage] = useState(practiceConfig.startAtPassageId);
     const [moreMenuItems, setMoreMenuItems] = useState(MORE_MENU_ITEMS);
+    const [explanationVisible, setExplanationVisible] = useState<boolean>(false);
 
     // grab the memory verses from the server based on the practice config...
     useEffect(() => {
@@ -448,6 +450,10 @@ const Practice = () => {
     };
 
 
+    const showExplanation = () => {
+
+    };
+
     return (
         <>
             <Swipe tolerance={60} onSwipeLeft={() => doNavigate(true, -1)} onSwipeRight={() => doNavigate(false, -1)}>
@@ -498,6 +504,22 @@ const Practice = () => {
                         </Col>
                     </Space>
                 </Row>
+                {currPassage?.explanation !== null && currPassage?.explanation?.trim() !== "" &&
+                    <>
+                        <Row justify="center">
+                            <Col>
+                                <Button type="link" onClick={() => setExplanationVisible(true)}>Explanation</Button>
+                            </Col>
+                        </Row>
+                        <Modal footer={null} title="Explanation" open={explanationVisible} onCancel={() => setExplanationVisible(false)}>
+                            <Row>
+                                <Col span={24}>
+                                    {currPassage?.explanation}
+                                </Col>
+                            </Row>
+                        </Modal>
+                    </>
+                }
                 {busy.state && <Row justify="center"><SpinnerTimer message={busy.message} /></Row>}
                 {showPsgRef && currPassage && !StringUtils.isEmpty(currPsgRef) &&
                     <SwitchTransition mode="out-in">
