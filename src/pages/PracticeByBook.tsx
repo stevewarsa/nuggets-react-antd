@@ -1,4 +1,4 @@
-import {Row, Tree} from "antd";
+import {Col, Modal, Row, Tree} from "antd";
 import {useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import React, {useEffect, useState} from "react";
@@ -8,6 +8,7 @@ import useMemoryPassages from "../hooks/use-memory-passages";
 import {Passage} from "../model/passage";
 import {PassageUtils} from "../helpers/passage-utils";
 import SpinnerTimer from "../components/SpinnerTimer";
+import memoryService from "../services/memory-service";
 
 
 const PracticeByBook = () => {
@@ -19,6 +20,8 @@ const PracticeByBook = () => {
     const [busy, setBusy] = useState({state: false, message: ""});
     const [overrides, setOverrides] = useState<Passage[]>([]);
     const [memPsgs, setMemPsgs] = useState<Passage[]>([]);
+    const [psgTxtVisible, setPsgTxtVisible] = useState<boolean>(false);
+    const [psgTxt, setPsgTxt] = useState<string>("N/A");
 
     useEffect(() => {
         console.log("PracticeByBook.useEffect[] - loading tree...");
@@ -68,6 +71,24 @@ const PracticeByBook = () => {
 
     const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
         console.log('selected', selectedKeys, info);
+        const keyParts = (info.node.key + "").split("-");
+        const passageId = parseInt(keyParts[2]);
+        const currPsg= memPsgs.find(p => p.passageId === passageId);
+        const override = overrides.find(p => p.passageId === currPsg.passageId);
+        if (override) {
+            // this is an override, so we don't need to call the server, just update the verses from the override
+            currPsg.verses = override.verses;
+            setPsgTxt(PassageUtils.getPassageForClipboard(currPsg, false));
+            setPsgTxtVisible(true);
+        } else {
+            setBusy({state: true, message: "Loading memory passage text from DB..."});
+            memoryService.getPassage(currPsg, user).then(resp => {
+                currPsg.verses = resp.data.verses;
+                setPsgTxt(PassageUtils.getPassageForClipboard(currPsg, false));
+                setPsgTxtVisible(true);
+                setBusy({state: false, message: ""});
+            });
+        }
     };
 
     return (
@@ -75,6 +96,13 @@ const PracticeByBook = () => {
             <Row justify="center"><h1>Practice By Book</h1></Row>
             {busy.state && <Row justify="center"><SpinnerTimer message={busy.message} /></Row>}
             <Row><Tree treeData={treeData} onSelect={onSelect} /></Row>
+            <Modal footer={null} title="Passage Text" open={psgTxtVisible} onCancel={() => setPsgTxtVisible(false)}>
+                <Row>
+                    <Col span={24}>
+                        {psgTxt}
+                    </Col>
+                </Row>
+            </Modal>
         </>
     );
 };
