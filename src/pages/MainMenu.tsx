@@ -230,6 +230,11 @@ const MainMenu = () => {
                                 key: "5.5",
                                 label: "Mem Passages By Box",
                                 action: "/passagesByBox"
+                            },
+                            {
+                                key: "5.6",
+                                label: "Practice By Book",
+                                action: "/practiceByBook"
                             }
                         ]}
                         renderItem={item => (

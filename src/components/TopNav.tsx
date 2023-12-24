@@ -17,6 +17,10 @@ const menuItems: MenuProps['items'] = [
         label: "Practice Setup"
     },
     {
+        key: 13,
+        label: "Practice By Book"
+    },
+    {
         key: 10,
         label: "Bible Reading Plan"
     },
@@ -60,7 +64,8 @@ const menuPaths: {[key: number]: string} = {
     8: "/about",
     10: "/bibleReadingPlan",
     11: "/browseQuotes",
-    12: "/goToPassage"
+    12: "/goToPassage",
+    13: "/practiceByBook"
 };
 
 const TopNav = () => {

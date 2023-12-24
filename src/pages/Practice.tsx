@@ -449,11 +449,6 @@ const Practice = () => {
         navigate("/readChapter");
     };
 
-
-    const showExplanation = () => {
-
-    };
-
     return (
         <>
             <Swipe tolerance={60} onSwipeLeft={() => doNavigate(true, -1)} onSwipeRight={() => doNavigate(false, -1)}>
