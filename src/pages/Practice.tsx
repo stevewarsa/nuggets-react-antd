@@ -5,7 +5,7 @@ import memoryService from "../services/memory-service";
 import SpinnerTimer from "../components/SpinnerTimer";
 import {Passage} from "../model/passage";
 import {PassageUtils} from "../helpers/passage-utils";
-import {notification, Button, Col, Dropdown, Popover, Row, Space, Modal, MenuProps, Avatar, Select} from "antd";
+import {notification, Button, Col, Dropdown, Popover, Row, Space, Modal, MenuProps, Avatar, Input} from "antd";
 import {
     ArrowDownOutlined,
     ArrowLeftOutlined,
@@ -88,7 +88,6 @@ const moveDown = {
     key: "6",
     icon: <ArrowDownOutlined />,
 };
-const {Option} = Select;
 
 const Practice = () => {
     const dispatcher = useDispatch();
@@ -114,6 +113,9 @@ const Practice = () => {
     const [startAtPassage, setStartAtPassage] = useState(practiceConfig.startAtPassageId);
     const [moreMenuItems, setMoreMenuItems] = useState(MORE_MENU_ITEMS);
     const [explanationVisible, setExplanationVisible] = useState<boolean>(false);
+    const [editExplanationVisible, setEditExplanationVisible] = useState<boolean>(false);
+    const [explanation, setExplanation] = useState<string>("");
+    const { TextArea } = Input;
 
     // grab the memory verses from the server based on the practice config...
     useEffect(() => {
@@ -272,9 +274,15 @@ const Practice = () => {
     // purpose of this method is to populate the currPsgRef and currPsgTxt
     const populateVerses = async (copyToClipboard: boolean) => {
         const currPsg: Passage = {...memPsgList[currIdx]};
+        const locPsgRef = PassageUtils.getPassageStringNoIndex(
+            currPsg,
+            Constants.translationsShortNms.filter(t => t.code === currPsg.translationName).map(t => t.translationName)[0],
+            true,
+            currPsg.passageRefAppendLetter);
         if (versesByPsgId && versesByPsgId[currPsg.passageId]?.length > 0) {
             // we've already looked up the verses for this passage, just populate them
             currPsg.verses = versesByPsgId[currPsg.passageId];
+            console.log("Practice.populateVerses - we've already looked up the verses for " + locPsgRef + ", just populate them:", currPsg);
             convertPassageToString(currPsg);
             setCurrPassage(currPsg);
         } else {
@@ -284,6 +292,7 @@ const Practice = () => {
                 currPsg.verses = override.verses;
                 convertPassageToString(currPsg);
                 setCurrPassage(currPsg);
+                console.log("Practice.populateVerses - " + locPsgRef + " has an override, so populated them:", currPsg);
             } else {
                 // this is not an override, so call server to get verses
                 setBusy({state: true, message: "Getting psg " + (currIdx + 1) + " (psg id " + currPsg.passageId + ")..."});
@@ -294,6 +303,7 @@ const Practice = () => {
                     locVbyPsgId[currPsg.passageId] = currPsg.verses;
                     return locVbyPsgId;
                 });
+                console.log("Practice.populateVerses - " + locPsgRef + " had to look up from server:", currPsg);
                 convertPassageToString(currPsg);
                 setCurrPassage(currPsg);
                 setBusy({state: false, message: ""});
@@ -366,27 +376,54 @@ const Practice = () => {
             handleMoveDown();
         } else if (key === "7") {
             // Enter Explanation
-            const currPsg: Passage = {...memPsgList[currIdx]};
-            if (showPsgRef) {
-                const override = overrides.find(p => p.passageId === currPsg.passageId);
-                if (override) {
-                    // this is an override, so we don't need to call the server, just update the verses from the override
-                    currPsg.verses = override.verses;
-                    navigate("/enterExplanation", {state: currPsg});
-                } else {
-                    setBusy({state: true, message: "Loading passage text for " + currPsgRef + " from server..."});
-                    memoryService.getPassage(currPsg, user).then(resp => {
-                        setBusy({state: false, message: ""});
-                        currPsg.verses = resp.data.verses;
-                        navigate("/enterExplanation", {state: currPsg});
-                    });
-                }
-            } else {
-                navigate("/enterExplanation", {state: currPassage});
-            }
+            setBusy({state: true, message: "Populating verses..."});
+            populateVerses(false).then(() => {
+                console.log("Practice.handleMenuClick['7'] - verses should be populated for ", memPsgList[currIdx]);
+                const locPsg: Passage = {...memPsgList[currIdx]};
+                const locPsgRef = PassageUtils.getPassageStringNoIndex(
+                    locPsg,
+                    Constants.translationsShortNms.filter(t => t.code === locPsg.translationName).map(t => t.translationName)[0],
+                    true,
+                    locPsg.passageRefAppendLetter);
+                console.log("Practice.handleMenuClick['7'] - setting CurrPsgRef to ", locPsgRef);
+                setCurrPsgRef(locPsgRef);
+                setExplanation(locPsg.explanation);
+                setBusy({state: false, message: ""});
+                setEditExplanationVisible(true);
+            });
         }
     };
 
+    const handleExplanationInput = (evt) => {
+        setExplanation(evt.target.value);
+    };
+    const handleAddExplanation = async () => {
+        const locPsg: Passage = {...currPassage};
+        locPsg.explanation = explanation;
+        const updateParam: UpdatePassageParam = new UpdatePassageParam();
+        updateParam.passageRefAppendLetter = currPassage.passageRefAppendLetter;
+        updateParam.user = user;
+        updateParam.newText = null;
+        updateParam.passage = locPsg;
+        setBusy({state: true, message: "Updating explanation..."});
+        memoryService.updatePassage(updateParam).then(resp => {
+            if (resp.data === "success") {
+                notification.success({message: "Explanation has been updated!", placement: "bottomRight"});
+                const updatedMemPsgList = [...memPsgList];
+                const index = updatedMemPsgList.findIndex(item => item.passageId === updateParam.passage.passageId);
+                if (index !== -1) {
+                    updatedMemPsgList[index].explanation = updateParam.passage.explanation;
+                    setIsMemPassageListGetFromServer(false);
+                    setMemPsgList(updatedMemPsgList);
+                    setCurrPassage(updatedMemPsgList[index]);
+                }
+            } else {
+                notification.error({message: "Error updating passage: " + resp.data, placement: "top"});
+            }
+            setBusy({state: false, message: ""});
+            setEditExplanationVisible(false);
+        });
+    };
     const handleMoveUp = () => {
         const targetBox = currPassage.frequencyDays - 1;
         if (currPassage.frequencyDays === 2) {
@@ -514,6 +551,37 @@ const Practice = () => {
                             </Row>
                         </Modal>
                     </>
+                }
+                {!busy.state && currPassage && editExplanationVisible && currPassage?.passageId > 0 && currPassage?.verses.length > 0 &&
+                <Modal footer={null} title={(currPassage?.explanation !== null && currPassage?.explanation?.trim() !== "" ? "Edit " : "Add ") + "Explanation"} open={editExplanationVisible} onCancel={() => setEditExplanationVisible(false)}>
+                    <>
+                        {currPsgRef && currPsgTxt && <h1 style={{textAlign: "center"}}>{currPsgRef}</h1>}
+                        {currPassage && currPsgTxt &&
+                            <Row style={{marginBottom: "5px"}}>
+                                <Col span={24}>
+                                    <p
+                                        style={{marginTop: "10px"}}
+                                        className="nugget-view"
+                                        dangerouslySetInnerHTML={{__html: currPsgTxt}}/>
+                                </Col>
+                            </Row>
+                        }
+                        <Row style={{marginBottom: "5px"}}>
+                            <Col span={24}>
+                                <TextArea
+                                    disabled={user === Constants.GUEST_USER}
+                                    autoSize={{ minRows: 5, maxRows: 10 }}
+                                    style={{width: "100%", fontSize: "1.71rem", fontWeight: "bolder"}}
+                                    autoFocus
+                                    value={explanation}
+                                    onChange={handleExplanationInput}/>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col><Button disabled={user === Constants.GUEST_USER || !explanation || explanation.trim().length === 0} type="primary" onClick={handleAddExplanation}>Add Explanation</Button></Col>
+                        </Row>
+                    </>
+                </Modal>
                 }
                 {busy.state && <Row justify="center"><SpinnerTimer message={busy.message} /></Row>}
                 {showPsgRef && currPassage && !StringUtils.isEmpty(currPsgRef) &&

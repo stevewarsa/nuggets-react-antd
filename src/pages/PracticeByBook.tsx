@@ -10,6 +10,41 @@ import {PassageUtils} from "../helpers/passage-utils";
 import SpinnerTimer from "../components/SpinnerTimer";
 import memoryService from "../services/memory-service";
 
+const buildTree = (memPsgList: Passage[], maxChaptersByBook: {bookName: string, maxChapter: number}[]) => {
+    const locTreeData: DataNode[] = [];
+    for (let key in Constants.bookAbbrev) {
+        const book = Constants.bookAbbrev[key];
+        const matchingPassagesForBook = memPsgList.filter(psg => psg.bookName === key);
+        if (matchingPassagesForBook?.length === 0) {
+            continue;
+        }
+        const bookNode = {title: book[1] + " (" + matchingPassagesForBook.length + ")", key: key} as DataNode;
+        const maxChap = maxChaptersByBook.find(mx => mx.bookName === key).maxChapter;
+        let chapters = Array.from({length: maxChap}, (e, i) => i + 1);
+        const bookChildren: DataNode[] = [];
+        for (let chapter in chapters) {
+            const matchingPassagesForChapter = memPsgList.filter(psg => psg.chapter === (parseInt(chapter) + 1) && psg.bookName === key);
+            if (matchingPassagesForChapter?.length === 0) {
+                continue;
+            }
+            const chapNode = {
+                title: (parseInt(chapter) + 1) + " (" + matchingPassagesForChapter.length + ")",
+                key: key + "-" + chapter
+            } as DataNode;
+            const chapterChildren: DataNode[] = [];
+            for (let psg of matchingPassagesForChapter) {
+                const psgRef = PassageUtils.getPassageString(psg, 1, matchingPassagesForChapter.length, psg.translationId, true, false);
+                const psgNode = {title: psgRef, key: key + "-" + chapter + "-" + psg.passageId};
+                chapterChildren.push(psgNode);
+            }
+            chapNode.children = chapterChildren;
+            bookChildren.push(chapNode);
+        }
+        bookNode.children = bookChildren;
+        locTreeData.push(bookNode);
+    }
+    return locTreeData;
+}
 
 const PracticeByBook = () => {
     // this (maxChaptersByBook) is loaded in App.tsx and should not change...
@@ -35,36 +70,8 @@ const PracticeByBook = () => {
             if (memPsgTxtOverrideList) {
                 setOverrides(memPsgTxtOverrideList);
             }
-            const locTreeData: DataNode[] = [];
-            for (let key in Constants.bookAbbrev) {
-                const book = Constants.bookAbbrev[key];
-                const matchingPassagesForBook = memPsgList.filter(psg => psg.bookName === key);
-                if (matchingPassagesForBook?.length === 0) {
-                    continue;
-                }
-                const bookNode = {title: book[1] + " (" + matchingPassagesForBook.length + ")", key: key} as DataNode;
-                const maxChap = maxChaptersByBook.find(mx => mx.bookName === key).maxChapter;
-                let chapters = Array.from({length: maxChap}, (e, i) => i + 1);
-                const bookChildren: DataNode[] = [];
-                for (let chapter in chapters) {
-                    const matchingPassagesForChapter = memPsgList.filter(psg => psg.chapter === (parseInt(chapter) + 1) && psg.bookName === key);
-                    if (matchingPassagesForChapter?.length === 0) {
-                        continue;
-                    }
-                    const chapNode = {title: (parseInt(chapter) + 1) + " (" + matchingPassagesForChapter.length + ")", key: key + "-" + chapter} as DataNode;
-                    const chapterChildren: DataNode[] = [];
-                    for (let psg of matchingPassagesForChapter) {
-                        const psgRef = PassageUtils.getPassageString(psg, 1, matchingPassagesForChapter.length, psg.translationId, true, false);
-                        const psgNode = {title: psgRef, key: key + "-" + chapter + "-" + psg.passageId};
-                        chapterChildren.push(psgNode);
-                    }
-                    chapNode.children = chapterChildren;
-                    bookChildren.push(chapNode);
-                }
-                bookNode.children = bookChildren;
-                locTreeData.push(bookNode);
-            }
-            setTreeData(locTreeData);
+
+            setTreeData(buildTree(memPsgList, maxChaptersByBook));
             setBusy({state: false, message: ""});
         });
     }, []);
