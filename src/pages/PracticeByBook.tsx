@@ -22,19 +22,21 @@ const buildTree = (memPsgList: Passage[], maxChaptersByBook: {bookName: string, 
         const maxChap = maxChaptersByBook.find(mx => mx.bookName === key).maxChapter;
         let chapters = Array.from({length: maxChap}, (e, i) => i + 1);
         const bookChildren: DataNode[] = [];
-        for (let chapter in chapters) {
-            const matchingPassagesForChapter = memPsgList.filter(psg => psg.chapter === (parseInt(chapter) + 1) && psg.bookName === key);
+        for (let chapter of chapters) {
+            const matchingPassagesForChapter = memPsgList.filter(psg => psg.chapter === chapter && psg.bookName === key);
             if (matchingPassagesForChapter?.length === 0) {
                 continue;
             }
             const chapNode = {
-                title: (parseInt(chapter) + 1) + " (" + matchingPassagesForChapter.length + ")",
-                key: key + "-" + chapter
+                title: chapter + " (" + matchingPassagesForChapter.length + ")",
+                key: key + "|" + chapter,
+                isLeaf: false
             } as DataNode;
             const chapterChildren: DataNode[] = [];
-            for (let psg of matchingPassagesForChapter) {
-                const psgRef = PassageUtils.getPassageString(psg, 1, matchingPassagesForChapter.length, psg.translationId, true, false);
-                const psgNode = {title: psgRef, key: key + "-" + chapter + "-" + psg.passageId};
+            const sortedPassages = matchingPassagesForChapter.sort((a, b) => a.startVerse - b.startVerse);
+            for (let psg of sortedPassages) {
+                const psgRef = PassageUtils.getPassageString(psg, 1, matchingPassagesForChapter.length, psg.translationId, true, false, psg.passageRefAppendLetter);
+                const psgNode = {title: psgRef, key: key + "|" + chapter + "|" + psg.passageId, isLeaf: true};
                 chapterChildren.push(psgNode);
             }
             chapNode.children = chapterChildren;
@@ -45,6 +47,7 @@ const buildTree = (memPsgList: Passage[], maxChaptersByBook: {bookName: string, 
     }
     return locTreeData;
 }
+const {DirectoryTree} = Tree;
 
 const PracticeByBook = () => {
     // this (maxChaptersByBook) is loaded in App.tsx and should not change...
@@ -78,23 +81,25 @@ const PracticeByBook = () => {
 
     const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
         console.log('selected', selectedKeys, info);
-        const keyParts = (info.node.key + "").split("-");
-        const passageId = parseInt(keyParts[2]);
-        const currPsg= memPsgs.find(p => p.passageId === passageId);
-        const override = overrides.find(p => p.passageId === currPsg.passageId);
-        if (override) {
-            // this is an override, so we don't need to call the server, just update the verses from the override
-            currPsg.verses = override.verses;
-            setPsgTxt(PassageUtils.getPassageForClipboard(currPsg, false));
-            setPsgTxtVisible(true);
-        } else {
-            setBusy({state: true, message: "Loading memory passage text from DB..."});
-            memoryService.getPassage(currPsg, user).then(resp => {
-                currPsg.verses = resp.data.verses;
+        const keyParts = (info.node.key + "").split("|");
+        if (keyParts.length >= 3) {
+            const passageId = parseInt(keyParts[2]);
+            const currPsg = memPsgs.find(p => p.passageId === passageId);
+            const override = overrides.find(p => p.passageId === currPsg.passageId);
+            if (override) {
+                // this is an override, so we don't need to call the server, just update the verses from the override
+                currPsg.verses = override.verses;
                 setPsgTxt(PassageUtils.getPassageForClipboard(currPsg, false));
                 setPsgTxtVisible(true);
-                setBusy({state: false, message: ""});
-            });
+            } else {
+                setBusy({state: true, message: "Loading memory passage text from DB..."});
+                memoryService.getPassage(currPsg, user).then(resp => {
+                    currPsg.verses = resp.data.verses;
+                    setPsgTxt(PassageUtils.getPassageForClipboard(currPsg, false));
+                    setPsgTxtVisible(true);
+                    setBusy({state: false, message: ""});
+                });
+            }
         }
     };
 
@@ -102,7 +107,7 @@ const PracticeByBook = () => {
         <>
             <Row justify="center"><h1>Practice By Book</h1></Row>
             {busy.state && <Row justify="center"><SpinnerTimer message={busy.message} /></Row>}
-            <Row><Tree treeData={treeData} onSelect={onSelect} /></Row>
+            <Row><DirectoryTree treeData={treeData} onSelect={onSelect} /></Row>
             <Modal footer={null} title="Passage Text" open={psgTxtVisible} onCancel={() => setPsgTxtVisible(false)}>
                 <Row>
                     <Col span={24}>

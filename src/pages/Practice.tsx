@@ -115,6 +115,7 @@ const Practice = () => {
     const [explanationVisible, setExplanationVisible] = useState<boolean>(false);
     const [editExplanationVisible, setEditExplanationVisible] = useState<boolean>(false);
     const [explanation, setExplanation] = useState<string>("");
+    const [submitExplanationEnabled, setSubmitExplanationEnabled] = useState<boolean>(false);
     const { TextArea } = Input;
 
     // grab the memory verses from the server based on the practice config...
@@ -376,27 +377,29 @@ const Practice = () => {
             handleMoveDown();
         } else if (key === "7") {
             // Enter Explanation
-            setBusy({state: true, message: "Populating verses..."});
-            populateVerses(false).then(() => {
-                console.log("Practice.handleMenuClick['7'] - verses should be populated for ", memPsgList[currIdx]);
-                const locPsg: Passage = {...memPsgList[currIdx]};
-                const locPsgRef = PassageUtils.getPassageStringNoIndex(
-                    locPsg,
-                    Constants.translationsShortNms.filter(t => t.code === locPsg.translationName).map(t => t.translationName)[0],
-                    true,
-                    locPsg.passageRefAppendLetter);
-                console.log("Practice.handleMenuClick['7'] - setting CurrPsgRef to ", locPsgRef);
-                setCurrPsgRef(locPsgRef);
-                setExplanation(locPsg.explanation);
-                setBusy({state: false, message: ""});
-                setEditExplanationVisible(true);
-            });
+            doShowAddEditExplanation();
         }
     };
 
-    const handleExplanationInput = (evt) => {
-        setExplanation(evt.target.value);
-    };
+    const doShowAddEditExplanation = () => {
+        setExplanationVisible(false);
+        setBusy({state: true, message: "Populating verses..."});
+        populateVerses(false).then(() => {
+            console.log("Practice.doShowAddEditExplanation - verses should be populated for ", memPsgList[currIdx]);
+            const locPsg: Passage = {...memPsgList[currIdx]};
+            const locPsgRef = PassageUtils.getPassageStringNoIndex(
+                locPsg,
+                Constants.translationsShortNms.filter(t => t.code === locPsg.translationName).map(t => t.translationName)[0],
+                true,
+                locPsg.passageRefAppendLetter);
+            console.log("Practice.doShowAddEditExplanation - setting CurrPsgRef to ", locPsgRef);
+            setCurrPsgRef(locPsgRef);
+            setExplanation(locPsg.explanation);
+            setBusy({state: false, message: ""});
+            setEditExplanationVisible(true);
+        });
+    }
+
     const handleAddExplanation = async () => {
         const locPsg: Passage = {...currPassage};
         locPsg.explanation = explanation;
@@ -424,6 +427,12 @@ const Practice = () => {
             setEditExplanationVisible(false);
         });
     };
+
+    const handleExplanationInput = (evt) => {
+        setSubmitExplanationEnabled(true);
+        setExplanation(evt.target.value);
+    };
+
     const handleMoveUp = () => {
         const targetBox = currPassage.frequencyDays - 1;
         if (currPassage.frequencyDays === 2) {
@@ -473,7 +482,6 @@ const Practice = () => {
             }
             setBusy({state: false, message: ""});
         });
-
     };
 
     const handleGoToPassage = () => {
@@ -549,19 +557,25 @@ const Practice = () => {
                                     {currPassage?.explanation}
                                 </Col>
                             </Row>
+                            {user !== Constants.GUEST_USER &&
+                            <Row style={{marginTop: "5px"}}>
+                                <Col>
+                                    <Button type="primary" onClick={doShowAddEditExplanation}>Edit Explanation</Button>
+                                </Col>
+                            </Row>
+                            }
                         </Modal>
                     </>
                 }
                 {!busy.state && currPassage && editExplanationVisible && currPassage?.passageId > 0 && currPassage?.verses.length > 0 &&
                 <Modal footer={null} title={(currPassage?.explanation !== null && currPassage?.explanation?.trim() !== "" ? "Edit " : "Add ") + "Explanation"} open={editExplanationVisible} onCancel={() => setEditExplanationVisible(false)}>
                     <>
-                        {currPsgRef && currPsgTxt && <h1 style={{textAlign: "center"}}>{currPsgRef}</h1>}
+                        {currPsgRef && currPsgTxt && <h5 style={{textAlign: "center"}}>{currPsgRef}</h5>}
                         {currPassage && currPsgTxt &&
                             <Row style={{marginBottom: "5px"}}>
                                 <Col span={24}>
                                     <p
                                         style={{marginTop: "10px"}}
-                                        className="nugget-view"
                                         dangerouslySetInnerHTML={{__html: currPsgTxt}}/>
                                 </Col>
                             </Row>
@@ -578,7 +592,14 @@ const Practice = () => {
                             </Col>
                         </Row>
                         <Row>
-                            <Col><Button disabled={user === Constants.GUEST_USER || !explanation || explanation.trim().length === 0} type="primary" onClick={handleAddExplanation}>Add Explanation</Button></Col>
+                            <Col>
+                                <Button
+                                    disabled={!submitExplanationEnabled || user === Constants.GUEST_USER || !explanation || explanation.trim().length === 0}
+                                    type="primary"
+                                    onClick={handleAddExplanation}>
+                                        {(currPassage?.explanation !== null && currPassage?.explanation?.trim() !== "" ? "Update " : "Add ") + "Explanation"}
+                                </Button>
+                            </Col>
                         </Row>
                     </>
                 </Modal>
