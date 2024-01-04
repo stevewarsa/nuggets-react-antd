@@ -235,6 +235,11 @@ const MainMenu = () => {
                                 key: "5.6",
                                 label: "Practice By Book",
                                 action: "/practiceByBook"
+                            },
+                            {
+                                key: "5.7",
+                                label: "Memory Stats",
+                                action: "/memoryStats"
                             }
                         ]}
                         renderItem={item => (

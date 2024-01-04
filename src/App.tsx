@@ -31,6 +31,7 @@ import GoToPassageByRef from "./pages/GoToPassageByRef";
 import MyMemPsgListInOrder from "./pages/MyMemPsgListInOrder";
 import MemoryPassagesByBox from "./pages/MemoryPassagesByBox";
 import PracticeByBook from "./pages/PracticeByBook";
+import MemoryStats from "./pages/MemoryStats";
 
 const App = () => {
     const dispatcher = useDispatch();
@@ -102,6 +103,7 @@ const App = () => {
                             <Route path="/topicList" element={<TopicList/>}/>
                             <Route path="/goToPassage" element={<GoToPassageByRef/>}/>
                             <Route path="/practiceByBook" element={<PracticeByBook/>}/>
+                            <Route path="/memoryStats" element={<MemoryStats/>}/>
                         </Route>
                     </Routes>
                 </Content>

@@ -85,5 +85,9 @@ export class StringUtils {
       let decodedUri: string = decodeURIComponent(results[2].replace(/\+/g, " "));
       return decodedUri;
     }
+
+    static roundFloat(floatValue: number) {
+        return (Math.round(floatValue * 100) / 100) + "";
+    }
   }
   
