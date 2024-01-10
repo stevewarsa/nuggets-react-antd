@@ -1,5 +1,5 @@
 import {Button, Col, Divider, Input, Modal, Radio, Row, Select} from "antd";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Constants} from "../model/constants";
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
@@ -10,6 +10,8 @@ import SpinnerTimer from "../components/SpinnerTimer";
 import {Passage} from "../model/passage";
 import {stateActions} from "../store";
 import {useNavigate} from "react-router-dom";
+import type { DraggableData, DraggableEvent } from 'react-draggable';
+import Draggable from 'react-draggable';
 
 const BibleSearch = () => {
     const dispatcher = useDispatch();
@@ -24,7 +26,12 @@ const BibleSearch = () => {
     const [searchResults, setSearchResults] = useState<{visible: boolean, results: Passage[]}>({visible: false, results: []});
     const prefs = useSelector((state: AppState) => state.userPreferences);
     const user = useSelector((state: AppState) => state.user);
-
+	const [disabled, setDisabled] = useState<boolean>(true);
+	const [emailInputModalOpen, setEmailInputModalOpen] = useState<boolean>(false);
+    const [emailToSendTo, setEmailToSendTo] = useState<string>(undefined);
+	const [bounds, setBounds] = useState({ left: 0, top: 0, bottom: 0, right: 0 });
+	const draggleRef = useRef<HTMLDivElement>(null);
+	
     useEffect(() => {
         if (prefs && prefs.length > 0) {
             setTranslation(PassageUtils.getPreferredTranslationFromPrefs(prefs, "niv"));
@@ -38,6 +45,19 @@ const BibleSearch = () => {
     const handleTranslationChange = (value) => {
         setTranslation(value);
     };
+	const onStart = (_event: DraggableEvent, uiData: DraggableData) => {
+		const { clientWidth, clientHeight } = window.document.documentElement;
+		const targetRect = draggleRef.current?.getBoundingClientRect();
+		if (!targetRect) {
+		  return;
+		}
+		setBounds({
+		  left: -targetRect.left + uiData.x,
+		  right: clientWidth - (targetRect.right - uiData.x),
+		  top: -targetRect.top + uiData.y,
+		  bottom: clientHeight - (targetRect.bottom - uiData.y),
+		});
+	};
 
     const handleSearch = async () => {
         setSearching({state: true, message: "Searching for '" + searchPhrase + "'..."});
@@ -77,8 +97,9 @@ const BibleSearch = () => {
             const formattedPsgText = PassageUtils.getFormattedPassageTextHighlight(psg, searchPhrase, false);
             formattedSearchResults.push([psgString, formattedPsgText]);
         }
+		setEmailInputModalOpen(false);
         const param: {emailTo: string, searchResults: string[][], searchParam:{book: string, translation: string, testament: string, searchPhrase: string, user: string}} = {
-            emailTo: "steve_warsa@yahoo.com",
+            emailTo: emailToSendTo,
             searchResults: formattedSearchResults,
             searchParam: {
                 book: book,
@@ -113,6 +134,54 @@ const BibleSearch = () => {
                 <Row justify="center">
                     <h1>Bible Search</h1>
                 </Row>
+				<Modal
+					title={
+					  <div
+						style={{
+						  width: '100%',
+						  cursor: 'move',
+						}}
+						onMouseOver={() => {
+						  if (disabled) {
+							setDisabled(false);
+						  }
+						}}
+						onMouseOut={() => {
+						  setDisabled(true);
+						}}
+						// fix eslintjsx-a11y/mouse-events-have-key-events
+						// https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/master/docs/rules/mouse-events-have-key-events.md
+						onFocus={() => {}}
+						onBlur={() => {}}
+						// end
+					  >
+						Enter Email
+					  </div>
+					}
+					open={emailInputModalOpen}
+					onCancel={() => setEmailInputModalOpen(false)}
+					onOk={() => {
+						// Handle the entered text as needed
+						console.log('Entered text:', emailToSendTo);
+						// Additional logic or API calls can be added here
+                        handleMailResults();
+					}}
+					modalRender={(modal) => (
+						<Draggable
+							disabled={disabled}
+							bounds={bounds}
+							nodeRef={draggleRef}
+							onStart={(event, uiData) => onStart(event, uiData)}
+						>
+							<div ref={draggleRef}>{modal}</div>
+						</Draggable>
+					)}
+				>
+					<Input
+                        placeholder="Enter email address to send to"
+                        value={emailToSendTo}
+                        onChange={(evt) => setEmailToSendTo(evt.target.value)} />
+				</Modal>
                 <Row>
                     <h3>Section of Bible to Search:</h3>
                 </Row>
@@ -181,7 +250,7 @@ const BibleSearch = () => {
                             <Row><p style={{fontWeight: "bold"}}>({searchResults.results.length} matches)</p></Row>
                             <Row>
                                 <Col>
-                                    <Button icon={<MailOutlined/>} onClick={handleMailResults}>E-Mail Results</Button>
+                                    <Button icon={<MailOutlined/>} onClick={() => setEmailInputModalOpen(true)}>E-Mail Results</Button>
                                 </Col>
                             </Row>
                             </>}
