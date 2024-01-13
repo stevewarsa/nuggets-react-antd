@@ -14,7 +14,7 @@ import {
     CopyOutlined, DeleteOutlined,
     EyeInvisibleOutlined, MailOutlined,
     MoreOutlined, EditOutlined,
-    SearchOutlined, UnorderedListOutlined, FontSizeOutlined
+    SearchOutlined, UnorderedListOutlined
 } from "@ant-design/icons";
 import {PassageUtils} from "../helpers/passage-utils";
 import {CSSTransition, SwitchTransition} from "react-transition-group";
@@ -26,7 +26,6 @@ import FilterByTagDrawer from "../components/FilterByTagDrawer";
 import React, {useState} from "react";
 import useRemoveTopic from "../hooks/use-remove-topic";
 import {Topic} from "../model/topic";
-import UpdateFontSize from "../components/UpdateFontSize";
 
 const { Panel } = Collapse;
 
@@ -35,8 +34,7 @@ const items: MenuProps["items"] = [
     {label: "Send Quote...", key: "send", icon: <MailOutlined />},
     {label: "Edit Quote...", key: "edit", icon: <EditOutlined />},
     {label: "Topics...", key: "topics", icon: <UnorderedListOutlined />},
-    {label: "Delete...", key: "delete", icon: <DeleteOutlined />},
-    {label: "Override Font...", key: "font", icon: <FontSizeOutlined />}
+    {label: "Delete...", key: "delete", icon: <DeleteOutlined />}
 ];
 
 const BrowseQuotes = () => {
@@ -57,9 +55,7 @@ const BrowseQuotes = () => {
         handleClearFilter,
         handleMenuClick,
         handlePrev,
-        handleNext,
-        overrideFontSizeVisible,
-        setOverrideFontSizeVisible
+        handleNext
     } = useBrowseQuotes();
     const {handleRemoveTopic} = useRemoveTopic();
     const [associatedTopicsOpen, setAssociatedTopicsOpen] = useState(false);
@@ -81,7 +77,6 @@ const BrowseQuotes = () => {
                     <h1>Browse Quotes</h1>
                 </Row>
                 <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
-                    <UpdateFontSize props={{visible: overrideFontSizeVisible, setVisibleFunction: () => setOverrideFontSizeVisible(false)}}/>
                     <Row key="index-row" style={{marginBottom: "10px"}} justify="center" align="middle">
                         <Col>{currentIndex + 1} of {filteredQuotes.length}</Col>
                         <Col style={{marginLeft: "5px"}}><Button icon={<SearchOutlined/>} onClick={handleSearch}/></Col>
@@ -116,7 +111,7 @@ const BrowseQuotes = () => {
                                     <Panel
                                         header={"Associated Topics (" + filteredQuotes[currentIndex].tags.length + ")"}
                                         key="1" style={{fontWeight: "bolder", fontSize: "1.28rem"}}>
-                                        {filteredQuotes[currentIndex] && filteredQuotes[currentIndex].tags.map(topic => (
+                                        {filteredQuotes[currentIndex]?.tags.map(topic => (
                                             <Tag closable
                                                  onClose={e => {
                                                      e.preventDefault();

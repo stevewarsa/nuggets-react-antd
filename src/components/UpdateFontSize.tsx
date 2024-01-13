@@ -49,8 +49,13 @@ const UpdateFontSize = ({props}: {props: UpdateFontSizeProps}) => {
         await updatePreference(user, "font_size_override", newFontSize + "");
     };
 
+    const handleCancel = () => {
+        setOverrideFontSizeVisible(false);
+        props.setVisibleFunction(false);
+    };
+
     return (
-        <Modal footer={null} title="Enter Font Size" open={overrideFontSizeVisible} onCancel={() => setOverrideFontSizeVisible(false)}>
+        <Modal footer={null} title="Enter Font Size" open={overrideFontSizeVisible} onCancel={handleCancel}>
             <Row>
                 <Col span={8}>
                     Size:

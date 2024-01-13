@@ -29,7 +29,6 @@ const useBrowseQuotes = () => {
     const [editingQuote, setEditingQuote] = useState(false);
     const [sendQuoteVisible, setSendQuoteVisible] = useState(false);
     const [isFiltered, setIsFiltered] = useState(false);
-    const [overrideFontSizeVisible, setOverrideFontSizeVisible] = useState<boolean>(false);
 
     useEffect(() => {
         setBusy({state: true, message: "Retrieving quotes from server..."});
@@ -45,8 +44,6 @@ const useBrowseQuotes = () => {
     }, [currentIndex]);
 
     useEffect(() => {
-        // console.log("useBrowseQuotes.useEffect[filteredQuotes, allQuotes] - here are the filtered quotes:", filteredQuotes);
-        // console.log("useBrowseQuotes.useEffect[filteredQuotes, allQuotes] - here are all quotes:", allQuotes);
         if (filteredQuotes && allQuotes) {
             setIsFiltered(filteredQuotes.length < allQuotes.length);
         }
@@ -86,48 +83,58 @@ const useBrowseQuotes = () => {
         });
     };
 
+    const handleCopyQuote = () => {
+        // copy
+        let clipboardContent = getQuoteText();
+        if (!StringUtils.isEmpty(clipboardContent)) {
+            copy(clipboardContent);
+            notification.info({message: "Quote copied!", placement: "bottomRight"});
+        } else {
+            notification.warning({message: "Quote is empty - not copied!", placement: "bottomRight"});
+        }
+    };
+
+    const handDeleteQuote = async () => {
+        Modal.confirm({
+            title: 'Do you want to delete this quote?',
+            content: 'Please confirm that you would like to permanently delete this quote from the database',
+            okText: "Delete Quote",
+            cancelText: "Keep Quote",
+            closable: true,
+            async onOk() {
+                let quoteId = filteredQuotes && filteredQuotes.length > currentIndex ? filteredQuotes[currentIndex].quoteId : -1;
+                if (quoteId !== -1) {
+                    const removeQuoteResponse = await memoryService.removeQuote(quoteId, user);
+                    const response = removeQuoteResponse.data;
+                    if (response.message === "success") {
+                        dispatcher(stateActions.removeQuote(quoteId));
+                        notification.info({message: "Quote removed!", placement: "bottomRight"});
+                    } else {
+                        notification.warning({message: "Unable to remove quote", placement: "bottomRight"});
+                    }
+                } else {
+                    notification.warning({
+                        message: "Unable to remove quote - no current quote loaded",
+                        placement: "bottomRight"
+                    });
+                }
+            },
+            onCancel() {
+            },
+        });
+    };
+
     const handleMenuClick = ({key}) => {
         if (key === "copy") {
-            // copy
-            let clipboardContent = getQuoteText();
-            if (!StringUtils.isEmpty(clipboardContent)) {
-                copy(clipboardContent);
-                notification.info({message: "Quote copied!", placement: "bottomRight"});
-            } else {
-                notification.warning({message: "Quote is empty - not copied!", placement: "bottomRight"});
-            }
+            handleCopyQuote();
         } else if (key === "send") {
             setSendQuoteVisible(true);
         } else if (key === "edit") {
             setEditingQuote(true);
         } else if (key === "topics") {
             setSelectTagsVisible(true);
-        } else if (key === "font") {
-            setOverrideFontSizeVisible(true);
         } else if (key === "delete") {
-            Modal.confirm({
-                title: 'Do you want to delete this quote?',
-                content: 'Please confirm that you would like to permanently delete this quote from the database',
-                okText: "Delete Quote",
-                cancelText: "Keep Quote",
-                closable: true,
-                async onOk() {
-                    let quoteId = filteredQuotes && filteredQuotes.length > currentIndex ? filteredQuotes[currentIndex].quoteId : -1;
-                    if (quoteId !== -1) {
-                        const removeQuoteResponse = await memoryService.removeQuote(quoteId, user);
-                        const response = removeQuoteResponse.data;
-                        if (response.message === "success") {
-                            dispatcher(stateActions.removeQuote(quoteId));
-                            notification.info({message: "Quote removed!", placement: "bottomRight"});
-                        } else {
-                            notification.warning({message: "Unable to remove quote", placement: "bottomRight"});
-                        }
-                    } else {
-                        notification.warning({message: "Unable to remove quote - no current quote loaded", placement: "bottomRight"});
-                    }
-                },
-                onCancel() {},
-            });
+            handDeleteQuote().then(r => console.log("Quote is deleted...  Here is the response: ", r));
         }
     };
 
@@ -154,8 +161,6 @@ const useBrowseQuotes = () => {
         setEditingQuote: setEditingQuote,
         selectTagsVisible: selectTagsVisible,
         setSelectTagsVisible: setSelectTagsVisible,
-        overrideFontSizeVisible: overrideFontSizeVisible,
-        setOverrideFontSizeVisible: setOverrideFontSizeVisible,
         searchString: searchString,
         currentIndex: currentIndex,
         user: user,

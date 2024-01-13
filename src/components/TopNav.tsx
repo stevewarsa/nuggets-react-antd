@@ -1,11 +1,12 @@
 import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
-import {useState} from "react";
+import React, {useState} from "react";
 import {Button, Drawer, Image, Layout, Menu, MenuProps} from "antd";
 import {CookieUtils} from "../helpers/cookie-utils";
 import {stateActions} from "../store";
 import {MenuOutlined} from "@ant-design/icons";
 import styles from "./TopNav.module.css";
+import UpdateFontSize from "./UpdateFontSize";
 
 const menuItems: MenuProps['items'] = [
     {
@@ -49,6 +50,10 @@ const menuItems: MenuProps['items'] = [
         label: "View Chapter"
     },
     {
+        key: 14,
+        label: "Update Font Size..."
+    },
+    {
         key: 8,
         label: "About"
     }
@@ -65,7 +70,8 @@ const menuPaths: {[key: number]: string} = {
     10: "/bibleReadingPlan",
     11: "/browseQuotes",
     12: "/goToPassage",
-    13: "/practiceByBook"
+    13: "/practiceByBook",
+    14: "font"
 };
 
 const TopNav = () => {
@@ -73,6 +79,7 @@ const TopNav = () => {
     const dispatcher = useDispatch();
     const [current, setCurrent] = useState("1");
     const [state, setState] = useState({visible:false});
+    const [overrideFontSizeVisible, setOverrideFontSizeVisible] = useState<boolean>(false);
     const {Header} = Layout;
 
     const handleMenuItem = item => {
@@ -82,7 +89,10 @@ const TopNav = () => {
             // logout
             CookieUtils.deleteCookie('user.name');
             dispatcher(stateActions.setUser(null));
-            navigate("/")
+            navigate("/");
+        } else if (item.key === 14) {
+            // This is the font popup (path will be "font")
+            setOverrideFontSizeVisible(true);
         } else {
             const path = menuPaths[item.key];
             dispatcher(stateActions.setSelectedMenuItem(item.key));
@@ -119,6 +129,7 @@ const TopNav = () => {
             </>
             <Menu className={styles.bigmenu} onClick={handleMenuItem} items={menuItems} theme="light" mode="horizontal" selectedKeys={[current]}
                   overflowedIndicator={<MenuOutlined/>}/>
+            <UpdateFontSize props={{visible: overrideFontSizeVisible, setVisibleFunction: () => setOverrideFontSizeVisible(false)}}/>
         </Header>
     );
 };

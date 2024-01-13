@@ -1,6 +1,6 @@
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
-import {Button, Col, Dropdown, Menu, notification, Row, Select, Space} from "antd";
+import {Button, Col, Dropdown, Menu, Row, Select, Space} from "antd";
 import React, {useEffect, useState} from "react";
 import memoryService from "../services/memory-service";
 import {Passage} from "../model/passage";
@@ -8,7 +8,7 @@ import Swipe from "react-easy-swipe";
 import {
     ArrowLeftOutlined,
     ArrowRightOutlined,
-    CopyOutlined, FontSizeOutlined,
+    CopyOutlined,
     LinkOutlined,
     MoreOutlined,
     SubnodeOutlined
@@ -21,7 +21,6 @@ import {VerseSelectionRequest} from "../model/verse-selection-request";
 import {StringUtils} from "../helpers/string.utils";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import useMemoryPassages from "../hooks/use-memory-passages";
-import UpdateFontSize from "../components/UpdateFontSize";
 
 const ReadChapter = () => {
     const dispatcher = useDispatch();
@@ -36,7 +35,6 @@ const ReadChapter = () => {
     const [chapterIdString, setChapterIdString] = useState(null);
     const [showButton, setShowButton] = useState(false);
     const [currentScrollPercent, setCurrentScrollPercent] = useState(0.0);
-    const [overrideFontSizeVisible, setOverrideFontSizeVisible] = useState<boolean>(false);
 
     useEffect(() => {
         (async () => {
@@ -139,8 +137,6 @@ const ReadChapter = () => {
         } else if (key === "3") {
             dispatcher(stateActions.setVerseSelectionRequest({passage: currPassage, actionToPerform: "add-to-memory", backToPath: "/practiceSetup", selectVerses: false} as VerseSelectionRequest));
             navigate("/selectVerses");
-        } else if (key === "4") {
-            setOverrideFontSizeVisible(true);
         }
     };
 
@@ -154,7 +150,6 @@ const ReadChapter = () => {
                 <h1>Read Chapter</h1>
             </Row>
             <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
-                <UpdateFontSize props={{visible: overrideFontSizeVisible, setVisibleFunction: () => setOverrideFontSizeVisible(false)}}/>
                 <Row justify="center">
                     <Space>
                         <Col span={6}><Button icon={<ArrowLeftOutlined/>} onClick={handlePrev}/></Col>
@@ -177,9 +172,6 @@ const ReadChapter = () => {
                                     </Menu.Item>
                                     <Menu.Item key="2" icon={<LinkOutlined />}>
                                         Interlinear View...
-                                    </Menu.Item>
-                                    <Menu.Item key="4" icon={<FontSizeOutlined />}>
-                                        Override Font...
                                     </Menu.Item>
                                 </Menu>
                             }>
