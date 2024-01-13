@@ -83,19 +83,20 @@ const TopNav = () => {
     const {Header} = Layout;
 
     const handleMenuItem = item => {
-        setCurrent(item.key);
+        const key: string = item.key + "";
+        setCurrent(key);
         setState({visible: false});
-        if (item.key === 9) {
+        if (key === "9") {
             // logout
             CookieUtils.deleteCookie('user.name');
             dispatcher(stateActions.setUser(null));
             navigate("/");
-        } else if (item.key === 14) {
+        } else if (key === "14") {
             // This is the font popup (path will be "font")
             setOverrideFontSizeVisible(true);
         } else {
-            const path = menuPaths[item.key];
-            dispatcher(stateActions.setSelectedMenuItem(item.key));
+            const path = menuPaths[key];
+            dispatcher(stateActions.setSelectedMenuItem(key));
             navigate(path);
         }
     };
