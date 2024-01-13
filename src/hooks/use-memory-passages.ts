@@ -1,14 +1,17 @@
 import memoryService from "../services/memory-service";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
 import {Passage} from "../model/passage";
 import {PassageUtils} from "../helpers/passage-utils";
 import {Quote} from "../model/quote";
 import {Topic} from "../model/topic";
+import {stateActions} from "../store";
+import {notification} from "antd";
 
 const useMemoryPassages = () => {
     const practiceConfig = useSelector((state: AppState) => state.practiceConfig);
     const allTags: Topic[] = useSelector((appState: AppState) => appState.topicList);
+    const dispatcher = useDispatch();
 
     const getMemPassages = async (user: string, sort: boolean): Promise<{ passages: Passage[], overrides: Passage[] }> => {
         const locMemoryPassagesResponse: any = await memoryService.getMemoryPsgList(user);
@@ -89,6 +92,19 @@ const useMemoryPassages = () => {
         return passagesForTopic;
     };
 
+    const updatePreference = async (user: string, prefNm: string, prefVal: string) => {
+        // update the preferred translation in prefs
+        memoryService.updatePreference(user, prefNm, prefVal).then(resp => {
+            if (resp.data === "success") {
+                // the preference was successfully updated, so update it in the preferences in the store
+                dispatcher(stateActions.updatePreference({key: prefNm, value: prefVal}));
+            } else {
+                // the response was error
+                notification.warning({message: "Unable to update '" + prefVal + "' to '" + prefVal + "'!", placement: "topLeft"});
+            }
+        });
+    };
+
     return {
         getMemPassages: getMemPassages,
         addMemoryPassage: addMemoryPassage,
@@ -96,7 +112,8 @@ const useMemoryPassages = () => {
         getPassagesForTopic: getPassagesForTopic,
         addQuoteTopics: addQuoteTopics,
         getQuoteList: getQuoteList,
-        removeQuoteTopic: removeQuoteTopic
+        removeQuoteTopic: removeQuoteTopic,
+        updatePreference: updatePreference
     };
 };
 

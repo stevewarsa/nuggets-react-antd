@@ -12,14 +12,18 @@ export class PassageUtils {
   public static readonly BY_PSG_TXT: string = "by_psgtxt";
 
   public static getPreferredTranslationFromPrefs(prefs: any[], defaultTranslation: string): string {
+    return this.getPreferenceValueByKeyWithDefault(prefs, "preferred_translation", defaultTranslation);
+  }
+
+  public static getPreferenceValueByKeyWithDefault(prefs: any[], prefKey: string, defaultIfNotFound: string): string {
     if (prefs && prefs.length > 0) {
       for (let pref of prefs) {
-        if (pref.key === "preferred_translation" && pref.value && pref.value.length > 0) {
-          return pref.value;
+        if (pref.key === prefKey && pref.value && pref.value.length > 0) {
+          return pref.value as string;
         }
       }
     }
-    return defaultTranslation;
+    return defaultIfNotFound;
   }
 
   public static getSurroundingVerses(passage: Passage, maxVerseByBookChapter: any[]): Passage {

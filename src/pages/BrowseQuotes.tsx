@@ -14,7 +14,7 @@ import {
     CopyOutlined, DeleteOutlined,
     EyeInvisibleOutlined, MailOutlined,
     MoreOutlined, EditOutlined,
-    SearchOutlined, UnorderedListOutlined
+    SearchOutlined, UnorderedListOutlined, FontSizeOutlined
 } from "@ant-design/icons";
 import {PassageUtils} from "../helpers/passage-utils";
 import {CSSTransition, SwitchTransition} from "react-transition-group";
@@ -26,6 +26,7 @@ import FilterByTagDrawer from "../components/FilterByTagDrawer";
 import React, {useState} from "react";
 import useRemoveTopic from "../hooks/use-remove-topic";
 import {Topic} from "../model/topic";
+import UpdateFontSize from "../components/UpdateFontSize";
 
 const { Panel } = Collapse;
 
@@ -34,7 +35,8 @@ const items: MenuProps["items"] = [
     {label: "Send Quote...", key: "send", icon: <MailOutlined />},
     {label: "Edit Quote...", key: "edit", icon: <EditOutlined />},
     {label: "Topics...", key: "topics", icon: <UnorderedListOutlined />},
-    {label: "Delete...", key: "delete", icon: <DeleteOutlined />}
+    {label: "Delete...", key: "delete", icon: <DeleteOutlined />},
+    {label: "Override Font...", key: "font", icon: <FontSizeOutlined />}
 ];
 
 const BrowseQuotes = () => {
@@ -56,6 +58,8 @@ const BrowseQuotes = () => {
         handleMenuClick,
         handlePrev,
         handleNext,
+        overrideFontSizeVisible,
+        setOverrideFontSizeVisible
     } = useBrowseQuotes();
     const {handleRemoveTopic} = useRemoveTopic();
     const [associatedTopicsOpen, setAssociatedTopicsOpen] = useState(false);
@@ -77,6 +81,7 @@ const BrowseQuotes = () => {
                     <h1>Browse Quotes</h1>
                 </Row>
                 <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
+                    <UpdateFontSize props={{visible: overrideFontSizeVisible, setVisibleFunction: () => setOverrideFontSizeVisible(false)}}/>
                     <Row key="index-row" style={{marginBottom: "10px"}} justify="center" align="middle">
                         <Col>{currentIndex + 1} of {filteredQuotes.length}</Col>
                         <Col style={{marginLeft: "5px"}}><Button icon={<SearchOutlined/>} onClick={handleSearch}/></Col>

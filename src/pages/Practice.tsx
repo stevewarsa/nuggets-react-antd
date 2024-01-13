@@ -14,7 +14,7 @@ import {
     CheckSquareOutlined, CommentOutlined,
     CopyOutlined,
     EditOutlined,
-    FileSearchOutlined,
+    FileSearchOutlined, FontSizeOutlined,
     InfoCircleOutlined,
     LinkOutlined,
     MoreOutlined,
@@ -31,6 +31,7 @@ import EditPassage from "../components/EditPassage";
 import {Verse} from "../model/verse";
 import {useLocation, useNavigate} from "react-router-dom";
 import {UpdatePassageParam} from "../model/update-passage-param";
+import UpdateFontSize from "../components/UpdateFontSize";
 
 const handleClipboard = (psg: Passage) => {
     const clipboardContent = PassageUtils.getPassageForClipboard(psg, true);
@@ -51,6 +52,7 @@ const getBox = (psg: Passage) => {
         return psg.frequencyDays.toString();
     }
 };
+
 let MORE_MENU_ITEMS: MenuProps["items"] = [
     {
         label: "Copy",
@@ -76,6 +78,11 @@ let MORE_MENU_ITEMS: MenuProps["items"] = [
         label: "Explanation...",
         key: "7",
         icon: <CommentOutlined />,
+    },
+    {
+        label: "Override Font...",
+        key: "8",
+        icon: <FontSizeOutlined />
     }
 ];
 const moveUp = {
@@ -116,6 +123,7 @@ const Practice = () => {
     const [editExplanationVisible, setEditExplanationVisible] = useState<boolean>(false);
     const [explanation, setExplanation] = useState<string>("");
     const [submitExplanationEnabled, setSubmitExplanationEnabled] = useState<boolean>(false);
+    const [overrideFontSizeVisible, setOverrideFontSizeVisible] = useState<boolean>(false);
     const { TextArea } = Input;
 
     // grab the memory verses from the server based on the practice config...
@@ -378,6 +386,9 @@ const Practice = () => {
         } else if (key === "7") {
             // Enter Explanation
             doShowAddEditExplanation();
+        } else if (key === "8") {
+            // Show the override font size modal
+            setOverrideFontSizeVisible(true);
         }
     };
 
@@ -497,6 +508,7 @@ const Practice = () => {
     return (
         <>
             <Swipe tolerance={60} onSwipeLeft={() => doNavigate(true, -1)} onSwipeRight={() => doNavigate(false, -1)}>
+                <UpdateFontSize props={{visible: overrideFontSizeVisible, setVisibleFunction: () => setOverrideFontSizeVisible(false)}}/>
                 <Row style={{marginBottom: "10px"}} justify="center" align="middle">
                     <Col>{currIdx + 1} of {memPsgList.length}</Col>
                     <Col style={{marginLeft: "5px"}}>

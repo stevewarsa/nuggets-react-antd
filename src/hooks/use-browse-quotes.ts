@@ -29,6 +29,7 @@ const useBrowseQuotes = () => {
     const [editingQuote, setEditingQuote] = useState(false);
     const [sendQuoteVisible, setSendQuoteVisible] = useState(false);
     const [isFiltered, setIsFiltered] = useState(false);
+    const [overrideFontSizeVisible, setOverrideFontSizeVisible] = useState<boolean>(false);
 
     useEffect(() => {
         setBusy({state: true, message: "Retrieving quotes from server..."});
@@ -101,6 +102,8 @@ const useBrowseQuotes = () => {
             setEditingQuote(true);
         } else if (key === "topics") {
             setSelectTagsVisible(true);
+        } else if (key === "font") {
+            setOverrideFontSizeVisible(true);
         } else if (key === "delete") {
             Modal.confirm({
                 title: 'Do you want to delete this quote?',
@@ -151,6 +154,8 @@ const useBrowseQuotes = () => {
         setEditingQuote: setEditingQuote,
         selectTagsVisible: selectTagsVisible,
         setSelectTagsVisible: setSelectTagsVisible,
+        overrideFontSizeVisible: overrideFontSizeVisible,
+        setOverrideFontSizeVisible: setOverrideFontSizeVisible,
         searchString: searchString,
         currentIndex: currentIndex,
         user: user,

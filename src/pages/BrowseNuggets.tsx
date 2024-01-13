@@ -9,7 +9,7 @@ import Swipe from "react-easy-swipe";
 import {
     ArrowLeftOutlined,
     ArrowRightOutlined, CloseOutlined,
-    CopyOutlined, FilterOutlined, LinkOutlined,
+    CopyOutlined, FilterOutlined, FontSizeOutlined, LinkOutlined,
     MoreOutlined, UnorderedListOutlined,
 } from "@ant-design/icons";
 import {Constants} from "../model/constants";
@@ -20,6 +20,7 @@ import {CSSTransition, SwitchTransition} from "react-transition-group";
 import {Passage} from "../model/passage";
 import {Topic} from "../model/topic";
 import TopicSelection from "../components/TopicSelection";
+import UpdateFontSize from "../components/UpdateFontSize";
 const {Panel} = Collapse;
 const {Option} = Select;
 
@@ -27,14 +28,16 @@ const menuItemsNoFilter: MenuProps["items"] = [
     {label: "Copy", key: "copy", icon: <CopyOutlined/>},
     {label: "Interlinear View...", key: "interlinear", icon: <LinkOutlined />},
     {label: "Clear Filter...", key: "clear", icon: <CloseOutlined />},
-    {label: "Topics...", key: "topics", icon: <UnorderedListOutlined />}
+    {label: "Topics...", key: "topics", icon: <UnorderedListOutlined />},
+    {label: "Override Font...", key: "font", icon: <FontSizeOutlined />}
 ];
 
 const menuItemsNoClear: MenuProps["items"] = [
     {label: "Copy", key: "copy", icon: <CopyOutlined/>},
     {label: "Interlinear View...", key: "interlinear", icon: <LinkOutlined />},
     {label: "Filter...", key: "filter", icon: <FilterOutlined />},
-    {label: "Topics...", key: "topics", icon: <UnorderedListOutlined />}
+    {label: "Topics...", key: "topics", icon: <UnorderedListOutlined />},
+    {label: "Override Font...", key: "font", icon: <FontSizeOutlined />}
 ];
 
 const BrowseNuggets = () => {
@@ -56,6 +59,7 @@ const BrowseNuggets = () => {
     const [topicFiltered, setTopicFiltered] = useState<boolean>(false);
     const [associatedTopicsOpen, setAssociatedTopicsOpen] = useState(false);
     const [topicSelectionOpen, setTopicSelectionOpen] = useState(false);
+    const [overrideFontSizeVisible, setOverrideFontSizeVisible] = useState<boolean>(false);
     const topicSelectionComp = useRef();
 
     useEffect(() => {
@@ -155,6 +159,8 @@ const BrowseNuggets = () => {
             dispatcher(stateActions.setIncomingTopic(null));
         } else if (key === "topics") {
             setTopicSelectionOpen(true);
+        } else if (key === "font") {
+            setOverrideFontSizeVisible(true);
         }
     };
 
@@ -231,6 +237,7 @@ const BrowseNuggets = () => {
                 </Row>
             }
             <Swipe tolerance={60} onSwipeLeft={handleNext} onSwipeRight={handlePrev}>
+                <UpdateFontSize props={{visible: overrideFontSizeVisible, setVisibleFunction: () => setOverrideFontSizeVisible(false)}}/>
                 {nuggetIdList && nuggetIdList.length > 0 &&
                     <Row style={{marginBottom: "10px"}} justify="center" align="middle">
                         <Col>{currentIndex + 1} of {nuggetIdList.length}</Col>
