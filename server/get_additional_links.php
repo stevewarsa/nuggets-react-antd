@@ -5,12 +5,7 @@ header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token, X-Requested-With, Accept');
 header('Content-Type: application/json; charset=utf8; Accept: application/json');
 
-$request = file_get_contents('php://input');
-$input = json_decode($request);
-error_log("get_additional_links.php - Here is the JSON received: ");
-error_log($request);
-
-$user = $input->user;
+$user = $_GET["user"];
 error_log("get_additional_links.php - Received data: user=" . $user);
 
 $db = new SQLite3('db/memory_' . $user . '.db');

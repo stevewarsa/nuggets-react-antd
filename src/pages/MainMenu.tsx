@@ -316,11 +316,12 @@ const MainMenu = () => {
     const handleAddLink = async () => {
         const lastLinkKey = parseInt(linkList[linkList.length - 1].key.split(".")[1]);
         const linkToAdd = {
+            user: user,
             key: "4." + (lastLinkKey + 1),
             label: linkLabel,
             action: linkAddress
         };
-        const addLinkResponse = await memoryService.addAdditionalLink(user, linkToAdd);
+        const addLinkResponse = await memoryService.addAdditionalLink(linkToAdd);
         if (addLinkResponse.data === "success") {
             dispatcher(stateActions.addLinks(linkToAdd));
         } else {
