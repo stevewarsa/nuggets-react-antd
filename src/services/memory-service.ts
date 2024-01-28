@@ -168,7 +168,7 @@ class MemoryService {
     }
 
     public getAdditionalLinks(currentUser: string) {
-        return MemoryService.buildAxios().get<{key: string, label: string, action: string}[]>("/bible-app/server/get_additional_links.php?user=" + currentUser);
+        return MemoryService.buildAxios().get<{key: string, label: string, action: string, additional: boolean}[]>("/bible-app/server/get_additional_links.php?user=" + currentUser);
     }
 
     public addAdditionalLink(link: {user: string, key: string, label: string, action: string}) {

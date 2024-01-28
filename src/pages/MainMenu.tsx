@@ -2,9 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {
     AimOutlined,
     CheckCircleOutlined,
-    LinkOutlined,
+    LinkOutlined, SafetyOutlined,
     SearchOutlined,
-    SketchOutlined
+    SketchOutlined, SubnodeOutlined
 } from "@ant-design/icons";
 import {Button, Col, Collapse, CollapseProps, Input, List, Modal, notification, Row} from "antd";
 import {useNavigate} from "react-router-dom";
@@ -19,37 +19,44 @@ const links = [
     {
         key: "4.1",
         label: "Valley of Vision",
-        action: "https://banneroftruth.org/us/valley/"
+        action: "https://banneroftruth.org/us/valley/",
+        additional: false
     },
     {
         key: "4.2",
         label: "Spurgeon Morning & Evening",
-        action: "http://biblegateway.com/devotionals/morning-and-evening/today"
+        action: "http://biblegateway.com/devotionals/morning-and-evening/today",
+        additional: false
     },
     {
         key: "4.3",
         label: "Grace Gems",
-        action: "http://gracegems.org/"
+        action: "http://gracegems.org/",
+        additional: false
     },
     {
         key: "4.4",
         label: "Got Questions",
-        action: "http://www.gotquestions.net/getrandompage.asp?websiteid=1"
+        action: "http://www.gotquestions.net/getrandompage.asp?websiteid=1",
+        additional: false
     },
     {
         key: "4.5",
         label: "J.C. Ryle",
-        action: "http://gracegems.org/Ryle"
+        action: "http://gracegems.org/Ryle",
+        additional: false
     },
     {
         key: "4.6",
         label: "Our Daily Bread",
-        action: "http://odb.org"
+        action: "http://odb.org",
+        additional: false
     },
     {
         key: "4.7",
         label: "Plugged In Movie Reviews",
-        action: "http://www.pluggedin.com"
+        action: "http://www.pluggedin.com",
+        additional: false
     }
 ];
 const MainMenu = () => {
@@ -57,7 +64,8 @@ const MainMenu = () => {
     const dispatcher = useDispatch();
     const user = useSelector((state: AppState) => state.user);
     const additionalLinks = useSelector((state: AppState) => state.additionalLinks);
-    const [linkList, setLinkList] = useState(links);
+    const [linkList, setLinkList] =
+        useState<{key: string, label: string, action: string, additional: boolean}[]>(links);
     const [showAddLink, setShowAddLink] = useState<boolean>(false);
     const [linkLabel, setLinkLabel] = useState<string>(undefined);
     const [linkAddress, setLinkAddress] = useState<string>(undefined);
@@ -71,7 +79,10 @@ const MainMenu = () => {
         (async () => {
             setBusy({state: true, message: "Calling server to get initialization data..."});
             const locAdditionalLinks = await memoryService.getAdditionalLinks(user);
-            dispatcher(stateActions.setAdditionalLinks(locAdditionalLinks.data));
+            const modAdditionalLinks: {key: string, label: string, action: string, additional: boolean}[] = locAdditionalLinks.data.map(l => {
+                return {...l, additional: true};
+            });
+            dispatcher(stateActions.setAdditionalLinks(modAdditionalLinks));
             setBusy({state: false, message: ""});
         })();
 
@@ -83,11 +94,12 @@ const MainMenu = () => {
             for (const additionalLink of additionalLinks) {
                 locLinkList.push(additionalLink);
             }
+            console.log("MainMenu.useEffect[additionalLinks] - here is the links that are being set:", locLinkList);
             setLinkList(locLinkList);
         }
     }, [additionalLinks]);
 
-    const handleSelect = async (item: {key: string, label: string, action: string}) => {
+    const handleSelect = async (item) => {
         if (item.key === "9.1") {
             // this is copy db to guest
             const copyResponse = await memoryService.copyDbToGuestDb();
@@ -225,7 +237,7 @@ const MainMenu = () => {
                         dataSource={linkList}
                         renderItem={item => (
                             <List.Item key={item.key} style={{cursor: "pointer"}} onClick={() => handleSelect(item)}>
-                                {item.label}
+                                {item.label} {item.additional ? <SubnodeOutlined style={{color: "red"}} /> : <SafetyOutlined />}
                             </List.Item>
                         )}
                     />

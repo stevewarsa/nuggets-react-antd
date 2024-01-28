@@ -27,5 +27,5 @@ export interface AppState {
     currentQuoteTagsFiltered: string[];
     recentTopicsUsed: Topic[];
     queryParams: {[key: string]: string};
-    additionalLinks: {key: string, label: string, action: string}[];
+    additionalLinks: {key: string, label: string, action: string, additional: boolean}[];
 }
