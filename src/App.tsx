@@ -41,7 +41,7 @@ const App = () => {
     const {getTopicList} = useMemoryPassages();
     const user = useSelector((state: AppState) => state.user);
     const currentQuotesIndex = useSelector((state: AppState) => state.currentQuotesIndex);
-    const { Content, Footer } = Layout;
+    const {Content, Footer} = Layout;
 
     useEffect(() => {
         (async () => {

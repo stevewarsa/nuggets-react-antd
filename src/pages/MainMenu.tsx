@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     AimOutlined,
     CheckCircleOutlined,
@@ -6,15 +6,86 @@ import {
     SearchOutlined,
     SketchOutlined
 } from "@ant-design/icons";
-import {Collapse, CollapseProps, List, notification} from "antd";
+import {Button, Col, Collapse, CollapseProps, Input, List, Modal, notification, Row} from "antd";
 import {useNavigate} from "react-router-dom";
 import memoryService from "../services/memory-service";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../model/AppState";
+import {StringUtils} from "../helpers/string.utils";
+import {stateActions} from "../store";
+import SpinnerTimer from "../components/SpinnerTimer";
 
+const links = [
+    {
+        key: "4.1",
+        label: "Valley of Vision",
+        action: "https://banneroftruth.org/us/valley/"
+    },
+    {
+        key: "4.2",
+        label: "Spurgeon Morning & Evening",
+        action: "http://biblegateway.com/devotionals/morning-and-evening/today"
+    },
+    {
+        key: "4.3",
+        label: "Grace Gems",
+        action: "http://gracegems.org/"
+    },
+    {
+        key: "4.4",
+        label: "Got Questions",
+        action: "http://www.gotquestions.net/getrandompage.asp?websiteid=1"
+    },
+    {
+        key: "4.5",
+        label: "J.C. Ryle",
+        action: "http://gracegems.org/Ryle"
+    },
+    {
+        key: "4.6",
+        label: "Our Daily Bread",
+        action: "http://odb.org"
+    },
+    {
+        key: "4.7",
+        label: "Plugged In Movie Reviews",
+        action: "http://www.pluggedin.com"
+    }
+];
 const MainMenu = () => {
     const navigate = useNavigate();
+    const dispatcher = useDispatch();
     const user = useSelector((state: AppState) => state.user);
+    const additionalLinks = useSelector((state: AppState) => state.additionalLinks);
+    const [linkList, setLinkList] = useState(links);
+    const [showAddLink, setShowAddLink] = useState<boolean>(false);
+    const [linkLabel, setLinkLabel] = useState<string>(undefined);
+    const [linkAddress, setLinkAddress] = useState<string>(undefined);
+    const [busy, setBusy] = useState({state: false, message: ""});
+
+    useEffect(() => {
+        if (!user) {
+            console.log("MainMenu.useEffect[] - user not loaded yet, returning...");
+            return;
+        }
+        (async () => {
+            setBusy({state: true, message: "Calling server to get initialization data..."});
+            const locAdditionalLinks = await memoryService.getAdditionalLinks(user);
+            dispatcher(stateActions.setAdditionalLinks(locAdditionalLinks.data));
+            setBusy({state: false, message: ""});
+        })();
+
+    }, [user]);
+
+    useEffect(() => {
+        if (additionalLinks?.length > 0) {
+            const locLinkList = [...links];
+            for (const additionalLink of additionalLinks) {
+                locLinkList.push(additionalLink);
+            }
+            setLinkList(locLinkList);
+        }
+    }, [additionalLinks]);
 
     const handleSelect = async (item: {key: string, label: string, action: string}) => {
         if (item.key === "9.1") {
@@ -147,46 +218,11 @@ const MainMenu = () => {
                     </>),
             children:
                 <>
-                    <p style={{fontWeight: "bold"}}>Here are some links that are good spiritual resources for the Christian</p>
+                    <p style={{fontWeight: "bold"}}>Spiritual and other links and resources that have been found useful</p>
+                    <Button style={{marginBottom: "5px"}} type="primary" onClick={() => setShowAddLink(true)}>Add Link</Button>
                     <List
                         bordered
-                        dataSource={[
-                            {
-                                key: "4.1",
-                                label: "Valley of Vision",
-                                action: "https://banneroftruth.org/us/valley/"
-                            },
-                            {
-                                key: "4.2",
-                                label: "Spurgeon Morning & Evening",
-                                action: "http://biblegateway.com/devotionals/morning-and-evening/today"
-                            },
-                            {
-                                key: "4.3",
-                                label: "Grace Gems",
-                                action: "http://gracegems.org/"
-                            },
-                            {
-                                key: "4.4",
-                                label: "Got Questions",
-                                action: "http://www.gotquestions.net/getrandompage.asp?websiteid=1"
-                            },
-                            {
-                                key: "4.5",
-                                label: "J.C. Ryle",
-                                action: "http://gracegems.org/Ryle"
-                            },
-                            {
-                                key: "4.6",
-                                label: "Our Daily Bread",
-                                action: "http://odb.org"
-                            },
-                            {
-                                key: "4.7",
-                                label: "Plugged In Movie Reviews",
-                                action: "http://www.pluggedin.com"
-                            }
-                        ]}
+                        dataSource={linkList}
                         renderItem={item => (
                             <List.Item key={item.key} style={{cursor: "pointer"}} onClick={() => handleSelect(item)}>
                                 {item.label}
@@ -277,9 +313,60 @@ const MainMenu = () => {
         }
     ];
 
-    return (
-        <Collapse accordion items={items.filter(item => item.key !== "9" || (item.key === "9" && user === "SteveWarsa"))}></Collapse>
-    );
+    const handleAddLink = async () => {
+        const lastLinkKey = parseInt(linkList[linkList.length - 1].key.split(".")[1]);
+        const linkToAdd = {
+            key: "4." + (lastLinkKey + 1),
+            label: linkLabel,
+            action: linkAddress
+        };
+        const addLinkResponse = await memoryService.addAdditionalLink(user, linkToAdd);
+        if (addLinkResponse.data === "success") {
+            dispatcher(stateActions.addLinks(linkToAdd));
+        } else {
+            Modal.error({
+                title: "Error",
+                content: "Error adding link: " + addLinkResponse.data,
+            });
+        }
+        setLinkLabel(undefined);
+        setLinkAddress(undefined);
+        setShowAddLink(false);
+    };
+    if (busy.state) {
+        return <SpinnerTimer message={busy.message} />;
+    } else {
+        return (
+            <>
+                <Modal footer={null} title="Add Link" open={showAddLink}
+                       onCancel={() => setShowAddLink(false)}>
+                    <>
+                        <Row style={{marginBottom: "5px"}}>
+                            <Col>
+                                <Input autoFocus value={linkLabel} placeholder="Link Label"
+                                       onChange={evt => setLinkLabel(evt.target.value)}/>
+                            </Col>
+                        </Row>
+                        <Row style={{marginBottom: "10px"}}>
+                            <Col>
+                                <Input value={linkAddress} placeholder="Link Address"
+                                       onChange={evt => setLinkAddress(evt.target.value)}/>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <Button
+                                    disabled={StringUtils.isEmpty(linkLabel) || StringUtils.isEmpty(linkAddress)}
+                                    type="primary" onClick={handleAddLink}>Add Link</Button>
+                            </Col>
+                        </Row>
+                    </>
+                </Modal>
+                <Collapse accordion
+                          items={items.filter(item => item.key !== "9" || (item.key === "9" && user === "SteveWarsa"))}></Collapse>
+            </>
+        );
+    }
 }
 
 export default MainMenu;

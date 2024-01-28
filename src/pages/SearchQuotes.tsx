@@ -69,7 +69,7 @@ const SearchQuotes = () => {
     };
 
     const onPaginationChanged = (evt) => {
-        if (evt && evt.api) {
+        if (evt?.api) {
             const pgInfo = {
                 currentPage: evt.api.paginationGetCurrentPage() + 1,
                 totalPages: evt.api.paginationGetTotalPages(),

@@ -167,6 +167,14 @@ class MemoryService {
         return MemoryService.buildAxios().post<string>("/bible-app/server/update_passage.php", updatePassageParam);
     }
 
+    public getAdditionalLinks(currentUser: string) {
+        return MemoryService.buildAxios().get<{key: string, label: string, action: string}[]>("/bible-app/server/get_additional_links.php?user=" + currentUser);
+    }
+
+    public addAdditionalLink(currentUser: string, link: {key: string, label: string, action: string}) {
+        return MemoryService.buildAxios().post<string>("/bible-app/server/add_additional_link.php", link);
+    }
+
     private static buildAxios(): AxiosInstance {
         // implement 15 second timeout
         const config: AxiosRequestConfig = {
