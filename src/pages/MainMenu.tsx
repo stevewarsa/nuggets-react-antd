@@ -288,6 +288,11 @@ const MainMenu = () => {
                                 key: "5.7",
                                 label: "Memory Stats",
                                 action: "/memoryStats"
+                            },
+                            {
+                                key: "5.8",
+                                label: "Edit Memory Explanations",
+                                action: "/editExplanations"
                             }
                         ]}
                         renderItem={item => (

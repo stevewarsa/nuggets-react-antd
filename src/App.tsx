@@ -32,6 +32,7 @@ import MyMemPsgListInOrder from "./pages/MyMemPsgListInOrder";
 import MemoryPassagesByBox from "./pages/MemoryPassagesByBox";
 import PracticeByBook from "./pages/PracticeByBook";
 import MemoryStats from "./pages/MemoryStats";
+import EditMemPsgExplanations from "./pages/EditMemPsgExplanations";
 
 
 const App = () => {
@@ -105,6 +106,7 @@ const App = () => {
                             <Route path="/goToPassage" element={<GoToPassageByRef/>}/>
                             <Route path="/practiceByBook" element={<PracticeByBook/>}/>
                             <Route path="/memoryStats" element={<MemoryStats/>}/>
+                            <Route path="/editExplanations" element={<EditMemPsgExplanations/>}/>
                         </Route>
                     </Routes>
                 </Content>
