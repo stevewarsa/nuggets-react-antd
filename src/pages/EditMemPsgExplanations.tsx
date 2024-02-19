@@ -47,12 +47,7 @@ const EditMemPsgExplanations = () => {
         });
     }, [user]);
 
-    useEffect(() => {
-        console.log("EditMemPsgExplanations.useEffect[selectedPassage]: ", selectedPassage);
-    }, [selectedPassage]);
-
     const handleExplanationInput = (evt) => {
-        console.log("EditMemPsgExplanation.handleExplanationInput - value: " + evt.target.value);
         setNewExplanation(evt.target.value);
     };
 
@@ -143,7 +138,7 @@ const EditMemPsgExplanations = () => {
                     </Row>
                     <Row>
                         <Col>
-                            <Button disabled={!selectedPassage || selectedPassage.explanation === newExplanation.trim()}
+                            <Button disabled={!selectedPassage || StringUtils.isEmpty(newExplanation) || selectedPassage.explanation === newExplanation.trim()}
                                     type={"primary"}
                                     onClick={updateExplanation}>Update</Button>
                         </Col>
