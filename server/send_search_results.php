@@ -50,6 +50,12 @@ $msg = "
 	<html>
 	<head>
 	<title>Search Results from " . $fromUser . "</title>
+	<style>
+    .search_result {
+      color: forestgreen;
+      font-weight: bold;
+    }
+  </style>
 	</head>
 	<body>
 	{{bodyHeader}}
