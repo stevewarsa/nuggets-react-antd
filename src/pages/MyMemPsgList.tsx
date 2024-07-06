@@ -69,7 +69,7 @@ const MyMemPsgList = () => {
         }
         {filteredMemPassageList && filteredMemPassageList.length > 0 && filteredMemPassageList.map(psg => (
             <Row key={psg.passageId} justify="center" align="middle">
-                <Col><a style={{cursor: "pointer"}} onClick={() => handlePsgClick(psg)}>{PassageUtils.getPassageStringNoIndex(psg, null, true)}</a></Col>
+                <Col><a style={{cursor: "pointer", fontSize: "1.3rem"}} onClick={() => handlePsgClick(psg)}>{PassageUtils.getPassageStringNoIndex(psg, null, true)}</a></Col>
             </Row>
         ))
         }

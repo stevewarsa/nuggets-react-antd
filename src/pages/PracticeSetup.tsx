@@ -59,6 +59,7 @@ const PracticeSetup = () => {
                     <Radio.Group onChange={handlePassageDisplayOrderChange} value={passageDisplayOrder}>
                         <Space direction="vertical">
                             <Radio value={PassageUtils.BY_FREQ}>By Frequency</Radio>
+                            <Radio value={PassageUtils.INTERLEAVE}>Interleave</Radio>
                             <Radio value={PassageUtils.RAND}>By Random</Radio>
                             <Radio value={PassageUtils.BY_LAST_PRACTICED}>By Last Practiced Date/Time</Radio>
                         </Space>

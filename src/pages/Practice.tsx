@@ -77,6 +77,11 @@ let MORE_MENU_ITEMS: MenuProps["items"] = [
         label: "Explanation...",
         key: "7",
         icon: <CommentOutlined />,
+    },
+    {
+        label: "Bible Hub...",
+        key: "8",
+        icon: <LinkOutlined />,
     }
 ];
 const moveUp = {
@@ -361,6 +366,9 @@ const Practice = () => {
         } else if (key === "2") {
             // interlinear link
             PassageUtils.openInterlinearLink(currPassage);
+        } else if (key === "8") {
+            // BibleHub link
+            PassageUtils.openBibleHubLink(currPassage);
         } else if (key === "3") {
             // Edit
             populateVerses(false).then(() => {

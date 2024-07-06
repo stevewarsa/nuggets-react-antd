@@ -7,6 +7,7 @@ import {StringUtils} from "./string.utils";
 export class PassageUtils {
   public static readonly RAND: string = "rand";
   public static readonly BY_FREQ: string = "by_freq";
+  public static readonly INTERLEAVE: string = "interleave";
   public static readonly BY_LAST_PRACTICED: string = "by_last_practiced_time";
   public static readonly BY_REF: string = "by_ref";
   public static readonly BY_PSG_TXT: string = "by_psgtxt";
@@ -51,6 +52,33 @@ export class PassageUtils {
       urlQuery = passage.bookName + "+" + passage.chapter + ":" + passage.startVerse + "-" + passage.endVerse + "&t=nas"
     }
     window.open("https://www.biblestudytools.com/interlinear-bible/passage/?q=" + urlQuery, '_blank');
+  }
+
+  public static openBibleHubLink(passage: Passage) {
+    // https://biblehub.com/genesis/1-1.htm
+    const replacements: {} = {
+      "1-kings": "1_kings",
+      "2-kings": "2_kings",
+      "1-samuel": "1_samuel",
+      "2-samuel": "2_samuel",
+      "1-chronicles": "1_chronicles",
+      "2-chronicles": "2_chronicles",
+      "1-peter": "1_peter",
+      "2-peter": "2_peter",
+      "1-john": "1_john",
+      "2-john": "2_john",
+      "3-john": "3_john",
+      "song-of-solomon": "songs",
+      "1-timothy": "1_timothy",
+      "2-timothy": "2_timothy",
+      "1-thessalonians": "1_thessalonians",
+      "2-thessalonians": "2_thessalonians",
+      "1-corinthians": "1_corinthians",
+      "2-corinthians": "2_corinthians",
+    };
+    const bibleHubBookName: string = replacements.hasOwnProperty(passage.bookName) ? replacements[passage.bookName] : passage.bookName;
+    let urlQuery: string = bibleHubBookName + "/" + passage.chapter + "-" + passage.startVerse + ".htm";
+    window.open("https://biblehub.com/" + urlQuery, '_blank');
   }
 
   // public static deepClonePassage(passage: Passage): Passage {
@@ -534,27 +562,15 @@ export class PassageUtils {
   // }
 
   public static sortWithinFrequencyGroups(passages: Passage[], order: string): Passage[] {
-    let frequencyGroups = {};
-    for (let passage of passages) {
-      let frequencyGroup: Passage[] = frequencyGroups[passage.frequencyDays];
-      if (!frequencyGroup) {
-        frequencyGroups[passage.frequencyDays] = [passage];
-      } else {
-        frequencyGroup.push(passage);
-        frequencyGroups[passage.frequencyDays] = frequencyGroup;
-      }
-    }
+    let frequencyGroups: {[freq: number]: Passage[]} = this.getFrequencyGroups(passages);
     // now, iterate through the frequency groups and randomize each group
     // and append that group to the return array
     let returnPassageArray: Passage[] = [];
-    let frequencies: any[] = Object.keys(frequencyGroups);
-    let numFrequencies: number[] = [];
-    for (let frequency of frequencies) {
-      numFrequencies.push(parseInt(frequency));
-    }
-    numFrequencies.sort((a: number, b: number) => {
-      return a - b;
-    });
+    let numFrequencies: number[] = Object.keys(frequencyGroups)
+        .map(f => parseInt(f))
+        .sort((a: number, b: number) => {
+          return a - b;
+        });
     for (let numFreq of numFrequencies) {
       let passagesForFrequency: Passage[] = frequencyGroups[numFreq + ""];
       if (order === PassageUtils.RAND) {
@@ -569,7 +585,41 @@ export class PassageUtils {
     return returnPassageArray;
   }
 
-  // public static sortPassagesByBibleBookOrder(passages: Passage[]): Passage[] {
+  public static getFrequencyGroups(passages: Passage[]): {[freq: number]: Passage[]} {
+    let frequencyGroups: {[freq: number]: Passage[]} = {};
+    for (let passage of passages) {
+      let frequencyGroup: Passage[] = frequencyGroups[passage.frequencyDays];
+      if (!frequencyGroup) {
+        frequencyGroups[passage.frequencyDays] = [passage];
+      } else {
+        frequencyGroup.push(passage);
+        frequencyGroups[passage.frequencyDays] = frequencyGroup;
+      }
+    }
+    for (let i = 1; i <= 5; i++) {
+      if (frequencyGroups["" + i] === undefined) {
+        frequencyGroups["" + i] = [];
+      }
+    }
+    return frequencyGroups;
+  }
+
+  public static interleaveArrays(arr1: Passage[], arr2: Passage[]): Passage[] {
+    if (arr1.length === 0) return arr2;
+
+    let result = [...arr2]; // Create a copy of arr2
+    let interval = 5; // Fixed interval of 5
+
+    for (let i = 0; i < arr1.length; i++) {
+      let insertIndex = i * interval; // Calculate the insert position
+      if (insertIndex >= result.length) insertIndex = result.length; // Adjust if out of bounds
+      result.splice(insertIndex, 0, arr1[i]); // Insert element
+    }
+
+    return result;
+  }
+
+// public static sortPassagesByBibleBookOrder(passages: Passage[]): Passage[] {
   //   passages = passages.sort((a: Passage, b: Passage) => {
   //     return (a.bookId - b.bookId);
   //   });
