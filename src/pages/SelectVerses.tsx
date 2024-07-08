@@ -79,6 +79,17 @@ const SelectVerses = () => {
                     notification.info({message: psgRef + " added to memory list!", placement: "bottomRight"});
                 }
             }
+        } else if (verseSelectionRequest.actionToPerform === "biblehub") {
+            const selectedVerses = locVerses.filter(v => v.selected);
+            if (selectedVerses.length === 1) {
+                const passage = {...verseSelectionRequest.passage};
+                passage.startVerse = selectedVerses[0].verseNum;
+                passage.endVerse = selectedVerses[0].verseNum;
+                PassageUtils.openBibleHubLink(passage);
+            } else {
+                notification.warning({message: "Please select exactly one verse", placement: "bottomRight"});
+                return;
+            }
         }
         if (verseSelectionRequest.passage.passageId && verseSelectionRequest.passage.passageId > 0) {
             dispatcher(stateActions.setStartingPassageId(verseSelectionRequest.passage.passageId));

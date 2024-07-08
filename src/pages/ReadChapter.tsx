@@ -137,6 +137,10 @@ const ReadChapter = () => {
         } else if (key === "3") {
             dispatcher(stateActions.setVerseSelectionRequest({passage: currPassage, actionToPerform: "add-to-memory", backToPath: "/practiceSetup", selectVerses: false} as VerseSelectionRequest));
             navigate("/selectVerses");
+        } else if (key === "4") {
+            scrollToTop();
+            dispatcher(stateActions.setVerseSelectionRequest({passage: currPassage, actionToPerform: "biblehub", backToPath: "/readChapter", selectVerses: false} as VerseSelectionRequest));
+            navigate("/selectVerses");
         }
     };
 
@@ -172,6 +176,9 @@ const ReadChapter = () => {
                                     </Menu.Item>
                                     <Menu.Item key="2" icon={<LinkOutlined />}>
                                         Interlinear View...
+                                    </Menu.Item>
+                                    <Menu.Item key="4" icon={<LinkOutlined />}>
+                                        Biblehub...
                                     </Menu.Item>
                                 </Menu>
                             }>

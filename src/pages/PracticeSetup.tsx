@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {PassageUtils} from "../helpers/passage-utils";
 import useMemoryPassages from "../hooks/use-memory-passages";
 import {AppState} from "../model/AppState";
+import {Passage} from "../model/passage";
 
 const PracticeSetup = () => {
     const navigate = useNavigate();
@@ -17,11 +18,17 @@ const PracticeSetup = () => {
     const [practiceMode, setPracticeMode] = useState(PassageUtils.BY_REF);
     const [passageDisplayOrder, setPassageDisplayOrder] = useState(PassageUtils.BY_FREQ);
     const [memPassagesExist, setMemPassagesExist] = useState(false);
+    const [showInterleave, setShowInterleave] = useState(false);
 
     useEffect(() => {
         (async () => {
             const memPsgResp = await getMemPassages(user, false);
-            setMemPassagesExist(memPsgResp?.passages && memPsgResp.passages.length > 0);
+            const memPsgsExist = memPsgResp?.passages && memPsgResp.passages.length > 0;
+            setMemPassagesExist(memPsgsExist);
+            if (memPsgsExist) {
+                const frequencyGroups: { [freq: number]: Passage[] } = PassageUtils.getFrequencyGroups(memPsgResp.passages);
+                setShowInterleave(frequencyGroups["5"].length >= 20);
+            }
         })();
     }, []);
 
@@ -59,7 +66,7 @@ const PracticeSetup = () => {
                     <Radio.Group onChange={handlePassageDisplayOrderChange} value={passageDisplayOrder}>
                         <Space direction="vertical">
                             <Radio value={PassageUtils.BY_FREQ}>By Frequency</Radio>
-                            <Radio value={PassageUtils.INTERLEAVE}>Interleave</Radio>
+                            {showInterleave && <Radio value={PassageUtils.INTERLEAVE}>Interleave</Radio>}
                             <Radio value={PassageUtils.RAND}>By Random</Radio>
                             <Radio value={PassageUtils.BY_LAST_PRACTICED}>By Last Practiced Date/Time</Radio>
                         </Space>

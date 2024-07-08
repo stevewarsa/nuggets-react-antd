@@ -69,7 +69,7 @@ const useMemoryPassages = () => {
                         // changes were made because box 5 length is greater than it was originally
                         console.log("Since box 5 has " + box5.length + " passages, which is greater than its original size (" + frequencyGroups["5"].length + "), tempPassages, which has " + tempPassages.length + ", is being replaced with box 5");
                         tempPassages = box5;
-                        console.log("Here are the new frequencies: ", tempPassages.map(el => el.frequencyDays < 5 ? `**${el.frequencyDays}**` : el.frequencyDays).join('\n'));
+                        //console.log("Here are the new frequencies: ", tempPassages.map(el => el.frequencyDays < 5 ? `**${el.frequencyDays}**` : el.frequencyDays).join('\n'));
                     } else {
                         console.log("No changes were made to box 5 - it still has " + box5.length + " passages.");
                     }
