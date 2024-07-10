@@ -45,8 +45,8 @@ const useMemoryPassages = () => {
                     // interleave the boxes 1-4 into this box
                     for (let i = 0; i < box5.length; i++) {
                         // first interleave box 1 passages in until exhausted, then box 2 until exhausted, then 3, etc
-                        // we want to add the lower box elements either as the first element or  every 2 elements thereafter
-                        if (i === 0 || i % 3 === 0) {
+                        // we want to add the lower box elements either as the first element or every other elements thereafter
+                        if (i === 0 || i % 2 === 0) {
                             // go through boxes 1-4 and try to get (and remove) the first element of that box and add
                             // it to box 5 at the current index.  If successful, then break out of the inner loop
                             for (let box of boxes1Thru4) {
