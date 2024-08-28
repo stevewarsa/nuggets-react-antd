@@ -13,12 +13,13 @@ const useLoadQuotes = () => {
     const dispatcher = useDispatch();
     const user = useSelector((state: AppState) => state.user);
     const allQuotes = useSelector((appState: AppState) => appState.allQuotes);
+    const allTags: Topic[] = useSelector((appState: AppState) => appState.topicList);
     const queryParamMap = useSelector((appState: AppState) => appState.queryParams);
-    const {getQuoteList} = useMemoryPassages();
+    const {getQuoteList, getQuoteText} = useMemoryPassages();
 
     useEffect( () => {
         console.log("useLoadQuotes.useEffect[queryParamMap, allQuotes] - entering... here's allQuotes:", allQuotes);
-        if (allQuotes && allQuotes.length > 0) {
+        if (allQuotes && allQuotes.length > 0 && !allTags || allTags.length === 0) {
             (async () => {
                 const topicListResponse = await memoryService.getTopicList(user);
                 const topics: Topic[] = topicListResponse.data;
@@ -28,10 +29,10 @@ const useLoadQuotes = () => {
         }
     }, [queryParamMap, allQuotes]);
 
-    const doQuotesLoad = () => {
+    const doQuotesLoad = (includeQuoteText: boolean) => {
         if (!allQuotes || allQuotes.length === 0) {
             (async () => {
-                const quoteListResponse = await getQuoteList(user);
+                const quoteListResponse = await getQuoteList(user, includeQuoteText);
                 const quotes: Quote[] = quoteListResponse.filter(({quoteId, quoteTx}, index, a) =>
                     a.findIndex(e => quoteId === e.quoteId && quoteTx === e.quoteTx) === index)
                     .filter(q => StringUtils.isEmpty(q.approved) || q.approved === "Y");
@@ -40,6 +41,10 @@ const useLoadQuotes = () => {
                 dispatcher(stateActions.setAllQuotes(dedupedQuotes));
             })();
         }
+    };
+
+    const doGetQuoteText = async (quoteId: number) => {
+        return await getQuoteText(user, quoteId);
     };
 
     const handleFilterCategory = (topics: Topic[], dedupedQuotes: Quote[]) => {
@@ -61,7 +66,8 @@ const useLoadQuotes = () => {
     }
 
     return {
-        doQuotesLoad: doQuotesLoad
+        doQuotesLoad: doQuotesLoad,
+        doGetQuoteText: doGetQuoteText
     };
 };
 

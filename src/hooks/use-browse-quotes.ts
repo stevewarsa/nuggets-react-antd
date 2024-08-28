@@ -8,11 +8,12 @@ import copy from "copy-to-clipboard";
 import {Modal, notification} from "antd";
 import useLoadQuotes from "./use-load-quotes";
 import memoryService from "../services/memory-service";
+import {Quote} from "../model/quote";
 
 const useBrowseQuotes = () => {
     const dispatcher = useDispatch();
     const navigate = useNavigate();
-    const {doQuotesLoad} = useLoadQuotes();
+    const {doQuotesLoad, doGetQuoteText} = useLoadQuotes();
 
     const user = useSelector((state: AppState) => state.user);
     const allUsers = useSelector((appState: AppState) => appState.allUsers);
@@ -32,7 +33,7 @@ const useBrowseQuotes = () => {
 
     useEffect(() => {
         setBusy({state: true, message: "Retrieving quotes from server..."});
-        doQuotesLoad();
+        doQuotesLoad(false);
         setBusy({state: false, message: ""});
     }, [user]);
 
@@ -41,11 +42,19 @@ const useBrowseQuotes = () => {
         if (currentIndex !== currentQuotesIndex) {
             dispatcher(stateActions.setCurrentQuotesIndex(currentIndex));
         }
+        console.log("useBrowseQuotes.useEffect[currentIndex] - calling handleGetQuoteText(" + currentIndex + ")");
+        handleGetQuoteText(currentIndex);
     }, [currentIndex]);
 
     useEffect(() => {
+        console.log("useBrowseQuotes.useEffect[filteredQuotes, allQuotes] - entering...");
         if (filteredQuotes && allQuotes) {
+            console.log("useBrowseQuotes.useEffect[filteredQuotes, allQuotes] - quotes exist, filteredQuotes.length=" + filteredQuotes.length);
             setIsFiltered(filteredQuotes.length < allQuotes.length);
+            if (filteredQuotes.length > 0) {
+                console.log("useBrowseQuotes.useEffect[filteredQuotes, allQuotes] - calling handleGetQuoteText(0)");
+                handleGetQuoteText(0);
+            }
         }
         if (filteredQuotes && currentIndex >= filteredQuotes.length) {
             setCurrentIndex(0);
@@ -62,6 +71,23 @@ const useBrowseQuotes = () => {
             }
         }
     }, [filteredQuotes, startingQuote]);
+
+    const handleGetQuoteText = (index: number) => {
+        console.log("handleGetQuoteText - index=" + index);
+        if (filteredQuotes && filteredQuotes.length > 0 && StringUtils.isEmpty(filteredQuotes[index].quoteTx)) {
+            console.log("handleGetQuoteText - index=" + index + ", getting quote text...");
+            setBusy({state: true, message: "Retrieving quote text from server..."});
+            // since the index changed and the current quote's text is null, grab the quote text from the server
+            doGetQuoteText(filteredQuotes[index].quoteId)
+                .then(quoteText => {
+                    console.log("handleGetQuoteText - index=" + index + ", got quote text - updating quote...");
+                    const locQuote = {...filteredQuotes[index], quoteTx: quoteText} as Quote;
+                    console.log("handleGetQuoteText - index=" + index + ", Here is the updated quote:", locQuote);
+                    dispatcher(stateActions.updateQuoteInList(locQuote));
+                    setBusy({state: false, message: ""});
+                });
+        }
+    };
 
     const handleNext = () => {
         setCurrentIndex(prev => {

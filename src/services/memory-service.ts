@@ -59,8 +59,12 @@ class MemoryService {
         return MemoryService.buildAxios().post("/bible-app/server/update_preference.php", {user: user, prefNm: prefNm, prefVal: prefVal});
     }
 
-    public getQuoteList(userName: string) {
-        return MemoryService.buildAxios().get<Quote[]>("/bible-app/server/get_quote_list.php?user=" + userName);
+    public getQuoteList(userName: string, includeQuoteText: boolean) {
+        return MemoryService.buildAxios().get<Quote[]>("/bible-app/server/get_quote_list.php?user=" + userName + "&includeQuoteText=" + includeQuoteText);
+    }
+
+    public getQuoteText(userName: string, quoteId: number) {
+        return MemoryService.buildAxios().get<string>("/bible-app/server/get_quote_text.php?user=" + userName + "&quoteId=" + quoteId);
     }
 
     public addNonBibleQuote(quote: any, user: string) {

@@ -7,7 +7,6 @@ import {Quote} from "../model/quote";
 import {Topic} from "../model/topic";
 import {stateActions} from "../store";
 import {notification} from "antd";
-import assert from "node:assert";
 
 const useMemoryPassages = () => {
     const practiceConfig = useSelector((state: AppState) => state.practiceConfig);
@@ -69,7 +68,6 @@ const useMemoryPassages = () => {
                         // changes were made because box 5 length is greater than it was originally
                         console.log("Since box 5 has " + box5.length + " passages, which is greater than its original size (" + frequencyGroups["5"].length + "), tempPassages, which has " + tempPassages.length + ", is being replaced with box 5");
                         tempPassages = box5;
-                        //console.log("Here are the new frequencies: ", tempPassages.map(el => el.frequencyDays < 5 ? `**${el.frequencyDays}**` : el.frequencyDays).join('\n'));
                     } else {
                         console.log("No changes were made to box 5 - it still has " + box5.length + " passages.");
                     }
@@ -105,8 +103,8 @@ const useMemoryPassages = () => {
         return removeQuoteTopicResponse.data;
     };
 
-    const getQuoteList = async (user: string) => {
-        const quoteListResponse = await memoryService.getQuoteList(user);
+    const getQuoteList = async (user: string, includeQuoteText: boolean) => {
+        const quoteListResponse = await memoryService.getQuoteList(user, includeQuoteText);
         const quoteList: Quote[] = quoteListResponse.data;
         for (let quote of quoteList) {
             if (!quote.tags) {
@@ -124,6 +122,12 @@ const useMemoryPassages = () => {
             }
         }
         return quoteList;
+    };
+
+    const getQuoteText = async (user: string, quoteId: number) => {
+        const quoteListResponse = await memoryService.getQuoteText(user, quoteId);
+        const quoteText: string = quoteListResponse.data;
+        return quoteText;
     };
 
     const getTopicList = async (user: string) => {
@@ -159,7 +163,8 @@ const useMemoryPassages = () => {
         addQuoteTopics: addQuoteTopics,
         getQuoteList: getQuoteList,
         removeQuoteTopic: removeQuoteTopic,
-        updatePreference: updatePreference
+        updatePreference: updatePreference,
+        getQuoteText: getQuoteText
     };
 };
 

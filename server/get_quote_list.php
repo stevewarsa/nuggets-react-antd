@@ -1,9 +1,13 @@
-<?php /** @noinspection SqlNoDataSourceInspection */
+<?php /** @noinspection PhpParamsInspection */
+/** @noinspection PhpParamsInspection */
+/** @noinspection ALL */
+/** @noinspection SqlNoDataSourceInspection */
 /** @noinspection SqlDialectInspection */
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json; charset=utf8');
 
 $user = $_GET['user'];
+$includeQuoteText = $_GET['includeQuoteText'] == 'true' ? true : false;
 
 $db = new SQLite3('db/memory_' . $user . '.db');
 $quotesByQuoteId = array();
@@ -13,7 +17,7 @@ while ($row = $results->fetchArray()) {
     if (!array_key_exists($row['quote_id'], $quotesByQuoteId)) {
         $quote = new stdClass;
         $quote->quoteId = $row['quote_id'];
-        $quote->quoteTx = $row['quote_tx'];
+        $quote->quoteTx = $includeQuoteText ? $row['quote_tx'] : null;
         $quote->approved = $row['approved'];
         $quote->fromUser = $row['sent_from_user'];
         $quote->sourceId = $row['source_id'];

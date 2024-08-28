@@ -65,6 +65,7 @@ const BrowseQuotes = () => {
         console.log("Remove topic: ", topic);
         handleRemoveTopic(topic, filteredQuotes[currentIndex]).then(() => setAssociatedTopicsOpen(false));
     };
+
     if (!filteredQuotes) {
         return <Row key="spinner-row" justify="center"><SpinnerTimer message="Loading quotes from server..." /></Row>;
     } else if (filteredQuotes.length === 0) {
