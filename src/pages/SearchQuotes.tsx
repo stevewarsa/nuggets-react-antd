@@ -29,7 +29,7 @@ const SearchQuotes = () => {
 
     useEffect(() => {
         setBusy({state: true, message: "Retrieving quotes from server..."});
-        doQuotesLoad();
+        doQuotesLoad(true);
         setBusy({state: false, message: ""});
     }, [user]);
 

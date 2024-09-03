@@ -40,7 +40,7 @@ const EditPassage = ({props}: {props: EditPassageProps}) => {
         // populate the frequency dropdown values (only one time - no dependencies)
         const freqDep: {freqLabel: string, freqValue: number}[] = [];
         freqDep.push({freqValue: -1, freqLabel: "Every Time"});
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 3; i++) {
             freqDep.push({freqLabel: i + "", freqValue: i});
         }
         setFrequencies(freqDep);

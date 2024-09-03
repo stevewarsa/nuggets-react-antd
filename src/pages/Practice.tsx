@@ -188,7 +188,7 @@ const Practice = () => {
             locMoreMenuItems.push(moveUp);
             updatedArray = true;
         }
-        if (currPassage?.frequencyDays < 5 && hasMoveDown === undefined) {
+        if (currPassage?.frequencyDays < 3 && hasMoveDown === undefined) {
             locMoreMenuItems.push(moveDown);
             updatedArray = true;
         }
@@ -196,7 +196,7 @@ const Practice = () => {
             locMoreMenuItems = locMoreMenuItems.filter(menu => menu.key !== "5");
             updatedArray = true;
         }
-        if (hasMoveDown !== undefined && currPassage?.frequencyDays === 5) {
+        if (hasMoveDown !== undefined && currPassage?.frequencyDays === 3) {
             locMoreMenuItems = locMoreMenuItems.filter(menu => menu.key !== "6");
             updatedArray = true;
         }
@@ -538,7 +538,7 @@ const Practice = () => {
                                 <span style={{color: "red", fontWeight: "bolder", fontSize: "1.25rem"}}>{memPsgList[currIdx]?.frequencyDays}</span>
                             </div>
                         </Col>
-                        <Col>{memPsgList[currIdx]?.frequencyDays === 5 ? <Button style={{color: "red"}} disabled={true} className="button" icon={<StopOutlined className="icon" />}/> : <Button onClick={handleMoveDown} className="button" icon={<ArrowDownOutlined className="icon" />}/>}</Col>
+                        <Col>{memPsgList[currIdx]?.frequencyDays === 3 ? <Button style={{color: "red"}} disabled={true} className="button" icon={<StopOutlined className="icon" />}/> : <Button onClick={handleMoveDown} className="button" icon={<ArrowDownOutlined className="icon" />}/>}</Col>
                         <Col span={6}><Button className="button" icon={<ArrowRightOutlined className="icon"/>} onClick={() => doNavigate(true, -1)}/></Col>
                         <Col span={6}>
                             <Dropdown className="button" placement="bottomRight" trigger={["click"]} menu={{items: moreMenuItems, onClick: handleMenuClick}}>

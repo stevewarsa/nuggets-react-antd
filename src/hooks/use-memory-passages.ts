@@ -31,45 +31,43 @@ const useMemoryPassages = () => {
                 // the passages within each frequency group
                 tempPassages = PassageUtils.sortWithinFrequencyGroups(tempPassages, PassageUtils.BY_LAST_PRACTICED);
             } else if (practiceConfig.passageDisplayOrder === PassageUtils.INTERLEAVE) {
-                // in this case, we want to take passages from boxes 1-4 and mix them into box 5 passages
+                // in this case, we want to take passages from boxes 1-2 and mix them into box 3 passages
                 const frequencyGroups: {[freq: number]: Passage[]} = PassageUtils.getFrequencyGroups(tempPassages);
-                if (frequencyGroups["5"].length >= 20) {
+                if (frequencyGroups["3"].length >= 20) {
                     console.log("frequencyGroups: ", frequencyGroups);
-                    const box5 = PassageUtils.sortWithinFrequencyGroups([...frequencyGroups["5"]], PassageUtils.BY_LAST_PRACTICED);
-                    const box4 = PassageUtils.sortWithinFrequencyGroups([...frequencyGroups["4"]], PassageUtils.BY_LAST_PRACTICED);
                     const box3 = PassageUtils.sortWithinFrequencyGroups([...frequencyGroups["3"]], PassageUtils.BY_LAST_PRACTICED);
                     const box2 = PassageUtils.sortWithinFrequencyGroups([...frequencyGroups["2"]], PassageUtils.BY_LAST_PRACTICED);
                     const box1 = PassageUtils.sortWithinFrequencyGroups([...frequencyGroups["1"]], PassageUtils.BY_LAST_PRACTICED);
-                    const boxes1Thru4 = [box1, box2, box3, box4];
-                    // interleave the boxes 1-4 into this box
-                    for (let i = 0; i < box5.length; i++) {
+                    const boxes1Thru2 = [box1, box2];
+                    // interleave the boxes 1-2 into this box
+                    for (let i = 0; i < box3.length; i++) {
                         // first interleave box 1 passages in until exhausted, then box 2 until exhausted, then 3, etc
                         // we want to add the lower box elements either as the first element or every other elements thereafter
                         if (i === 0 || i % 2 === 0) {
-                            // go through boxes 1-4 and try to get (and remove) the first element of that box and add
-                            // it to box 5 at the current index.  If successful, then break out of the inner loop
-                            for (let box of boxes1Thru4) {
+                            // go through boxes 1-2 and try to get (and remove) the first element of that box and add
+                            // it to box 3 at the current index.  If successful, then break out of the inner loop
+                            for (let box of boxes1Thru2) {
                                 // shift() returns and removes the first element of an array if the contained anything.
                                 // otherwise, it returns undefined
                                 let lowerBoxElement = box.shift();
-                                // if we returned the first element, add it into box 5 at the current index, then
+                                // if we returned the first element, add it into box 3 at the current index, then
                                 // increment the index counter so we advance past the newly added element
                                 if (lowerBoxElement) {
-                                    box5.splice(i, 0, lowerBoxElement);
+                                    box3.splice(i, 0, lowerBoxElement);
                                     i++;
                                     break;
                                 }
                             }
                         }
                     }
-                    // at this point, all the lower box elements should've been interleaved into box 5 and box5's length
+                    // at this point, all the lower box elements should've been interleaved into box 3 and box3's length
                     // should be equal to the size of the whole list of passages
-                    if (box5.length > frequencyGroups["5"].length) {
-                        // changes were made because box 5 length is greater than it was originally
-                        console.log("Since box 5 has " + box5.length + " passages, which is greater than its original size (" + frequencyGroups["5"].length + "), tempPassages, which has " + tempPassages.length + ", is being replaced with box 5");
-                        tempPassages = box5;
+                    if (box3.length > frequencyGroups["3"].length) {
+                        // changes were made because box 3 length is greater than it was originally
+                        console.log("Since box 3 has " + box3.length + " passages, which is greater than its original size (" + frequencyGroups["3"].length + "), tempPassages, which has " + tempPassages.length + ", is being replaced with box 3");
+                        tempPassages = box3;
                     } else {
-                        console.log("No changes were made to box 5 - it still has " + box5.length + " passages.");
+                        console.log("No changes were made to box 3 - it still has " + box3.length + " passages.");
                     }
                 } else {
                     tempPassages = PassageUtils.sortWithinFrequencyGroups(tempPassages, PassageUtils.BY_LAST_PRACTICED);

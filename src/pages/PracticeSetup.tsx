@@ -27,7 +27,7 @@ const PracticeSetup = () => {
             setMemPassagesExist(memPsgsExist);
             if (memPsgsExist) {
                 const frequencyGroups: { [freq: number]: Passage[] } = PassageUtils.getFrequencyGroups(memPsgResp.passages);
-                setShowInterleave(frequencyGroups["5"].length >= 20);
+                setShowInterleave(frequencyGroups["3"].length >= 20);
             }
         })();
     }, []);

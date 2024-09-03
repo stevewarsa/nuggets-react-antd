@@ -596,33 +596,11 @@ export class PassageUtils {
         frequencyGroups[passage.frequencyDays] = frequencyGroup;
       }
     }
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 3; i++) {
       if (frequencyGroups["" + i] === undefined) {
         frequencyGroups["" + i] = [];
       }
     }
     return frequencyGroups;
   }
-
-  public static interleaveArrays(arr1: Passage[], arr2: Passage[]): Passage[] {
-    if (arr1.length === 0) return arr2;
-
-    let result = [...arr2]; // Create a copy of arr2
-    let interval = 5; // Fixed interval of 5
-
-    for (let i = 0; i < arr1.length; i++) {
-      let insertIndex = i * interval; // Calculate the insert position
-      if (insertIndex >= result.length) insertIndex = result.length; // Adjust if out of bounds
-      result.splice(insertIndex, 0, arr1[i]); // Insert element
-    }
-
-    return result;
-  }
-
-// public static sortPassagesByBibleBookOrder(passages: Passage[]): Passage[] {
-  //   passages = passages.sort((a: Passage, b: Passage) => {
-  //     return (a.bookId - b.bookId);
-  //   });
-  //   return passages;
-  // }
 }
