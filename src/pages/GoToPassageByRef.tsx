@@ -7,6 +7,7 @@ import {stateActions} from "../store";
 import {AppState} from "../model/AppState";
 import {PassageUtils} from "../helpers/passage-utils";
 import {Passage} from "../model/passage";
+import {BibleReferenceInput} from "../components/BibleReferenceInput";
 
 const GoToPassageByRef = () => {
     const navigate = useNavigate();
@@ -15,7 +16,9 @@ const GoToPassageByRef = () => {
     const [passageRef, setPassageRef] = useState("");
     const [selectedTranslation, setSelectedTranslation] = useState("niv");
     const [parsedPassage, setParsedPassage] = useState<Passage>(undefined);
-    const { TextArea } = Input;
+
+    const handleLogReference = () => {
+    };
 
     useEffect(() => {
         if (prefs) {
@@ -23,25 +26,21 @@ const GoToPassageByRef = () => {
         }
     }, [prefs]);
 
-    const handleInput = (evt) => {
-        const enteredPassageRef = evt.target.value;
-        setPassageRef(enteredPassageRef);
-        const passagesFromPassageRef: Passage[] = PassageUtils.getPassageFromPassageRef(enteredPassageRef.trim());
+    const handleGoToPassage = () => {
+        console.log('Bible Reference:', passageRef);
+        const passagesFromPassageRef: Passage[] = PassageUtils.getPassageFromPassageRef(passageRef.trim());
         console.log("Here are the passages parsed:", passagesFromPassageRef);
         if (passagesFromPassageRef.length > 0) {
             console.log("Setting the first one:", passagesFromPassageRef[0]);
             setParsedPassage(passagesFromPassageRef[0]);
+            dispatcher(stateActions.setChapterSelection({
+                book: passagesFromPassageRef[0].bookName,
+                chapter: passagesFromPassageRef[0].chapter,
+                verse: passagesFromPassageRef[0].startVerse,
+                translation: selectedTranslation
+            }));
+            navigate("/readChapter");
         }
-    };
-
-    const handleGoToPassage = () => {
-        dispatcher(stateActions.setChapterSelection({
-            book: parsedPassage.bookName,
-            chapter: parsedPassage.chapter,
-            verse: parsedPassage.startVerse,
-            translation: selectedTranslation
-        }));
-        navigate("/readChapter");
     };
 
     return (
@@ -49,7 +48,7 @@ const GoToPassageByRef = () => {
             <h2><PlayCircleOutlined/> Go To Passage By Passage Ref</h2>
             <Row style={{marginBottom: "5px"}}>
                 <Col span={24}>
-                    <TextArea autoSize={{ minRows: 3, maxRows: 3 }} style={{width: "100%"}} autoFocus value={passageRef} onChange={handleInput}/>
+                    <BibleReferenceInput value={passageRef} onChange={setPassageRef} />
                 </Col>
             </Row>
             <Row>
